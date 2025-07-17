@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
 interface Employee {
@@ -52,8 +52,8 @@ export class AddEmployee implements OnInit {
 
   initForm(): void {
     this.employeeForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
-      address: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(200)]],
+      name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
+      address: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(25)]],
       phoneNumber: ['', [Validators.required, Validators.pattern(/^[\+]?[1][\d]{0,15}$/)]],
       gender: ['', Validators.required],
       nationality: ['', Validators.required],
@@ -68,18 +68,26 @@ export class AddEmployee implements OnInit {
 
   onSubmit(): void {
     if (this.employeeForm.valid) {
+      // Get form values BEFORE resetting
+      const employeeData: Employee = this.employeeForm.value;
+      
+      console.log('Form is valid:', this.employeeForm.valid);
+      console.log('Form values:', employeeData);
+      console.log('Raw form object:', this.employeeForm);
+      
       this.isSubmitting = true;
       
       // Simulate API call
       setTimeout(() => {
-        const employeeData: Employee = this.employeeForm.value;
-        console.log('Employee data to submit:', employeeData);
+        console.log('Submitting employee data:', employeeData);
         
         // Here you would typically make an API call to save the employee
         // this.employeeService.addEmployee(employeeData).subscribe(...)
         
         this.isSubmitting = false;
         this.submitSuccess = true;
+        
+        // Reset form AFTER getting the values
         this.employeeForm.reset();
         
         // Reset success message after 3 seconds
@@ -88,6 +96,8 @@ export class AddEmployee implements OnInit {
         }, 3000);
       }, 1000);
     } else {
+      console.log('Form is invalid:', this.employeeForm.errors);
+      console.log('Form values when invalid:', this.employeeForm.value);
       this.markFormGroupTouched();
     }
   }
