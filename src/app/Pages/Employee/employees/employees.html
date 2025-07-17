@@ -1,0 +1,135 @@
+<div class="employees-container">
+  <aside class="sidebar">
+    <div class="sidebar-logo">O</div>
+    <nav class="sidebar-nav">
+      <ul>
+        <li><span class="icon">🏠</span></li>
+        <li><span class="icon">👤</span></li>
+        <li><span class="icon">📁</span></li>
+        <li><span class="icon">📊</span></li>
+        <li><span class="icon">⚙️</span></li>
+      </ul>
+    </nav>
+  </aside>
+  <main class="main-content">
+    <header class="header">
+      <div class="breadcrumbs">Home / Candidates</div>
+      <h1>Employees</h1>
+      <div class="header-actions">
+        <input type="text" placeholder="Search name, headline or tag" [(ngModel)]="searchTerm">
+        <select [(ngModel)]="selectedGroup">
+          <option *ngFor="let group of groups" [value]="group">{{ group }}</option>
+        </select>
+        <select [(ngModel)]="jobType">
+          <option *ngFor="let jt of jobTypes" [value]="jt">{{ jt }}</option>
+        </select>
+        <select [(ngModel)]="level">
+          <option *ngFor="let lvl of levels" [value]="lvl">{{ lvl }}</option>
+        </select>
+        <button class="more-filter">More Filter</button>
+        <button class="new-candidate">New Candidate</button>
+      </div>
+    </header>
+    <section class="board-of-directors">
+      <h2>Board of Directors</h2>
+      <div class="board-list">
+        <div class="board-member" *ngFor="let member of boardMembers">
+          <div class="avatar"></div>
+          <div class="info">
+            <div class="name">{{ member.name }}</div>
+            <div class="email">{{ member.email }}</div>
+            <div class="role">{{ member.role }}</div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="employee-groups">
+      <!-- All Employees Collapse -->
+      <div class="group">
+        <div class="group-header" (click)="toggleGroup('All')" [ngClass]="{expanded: isGroupExpanded('All'), collapsed: !isGroupExpanded('All')}">
+          <span class="group-arrow">
+            <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8 10l4 4 4-4" stroke="#0284c7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span class="group-title">All Employees</span>
+        </div>
+        <div [ngClass]="{'collapse-content': true, 'collapsed': !isGroupExpanded('All')}">
+          <table class="employee-table">
+            <thead>
+              <tr>
+                <th>Employee ID</th>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Phone</th>
+                <th>Join Date</th>
+                <th>Job Type</th>
+                <th>Level</th>
+                <th>Group</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let emp of getEmployeesByGroup()">
+                <td>{{ emp.id }}</td>
+                <td>{{ emp.name }}</td>
+                <td><span class="role-badge">{{ emp.role }}</span></td>
+                <td>{{ emp.phone }}</td>
+                <td>{{ emp.joinDate }}</td>
+                <td>{{ emp.jobType }}</td>
+                <td>{{ emp.level }}</td>
+                <td>{{ emp.group }}</td>
+                <td>
+                  <button (click)="editEmployee(emp)" class="action-btn edit"><span>✏️</span></button>
+                  <button (click)="deleteEmployee(emp)" class="action-btn delete"><span>🗑️</span></button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- Grouped Collapses -->
+      <div class="group" *ngFor="let group of groups.slice(1)">
+        <div class="group-header" (click)="toggleGroup(group)" [ngClass]="{expanded: isGroupExpanded(group), collapsed: !isGroupExpanded(group)}">
+          <span class="group-arrow">
+            <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8 10l4 4 4-4" stroke="#0284c7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span class="group-title">{{ group }}</span>
+        </div>
+        <div [ngClass]="{'collapse-content': true, 'collapsed': !isGroupExpanded(group)}">
+          <table class="employee-table">
+            <thead>
+              <tr>
+                <th>Employee ID</th>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Phone</th>
+                <th>Join Date</th>
+                <th>Job Type</th>
+                <th>Level</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let emp of groupedEmployees[group]">
+                <td>{{ emp.id }}</td>
+                <td>{{ emp.name }}</td>
+                <td><span class="role-badge">{{ emp.role }}</span></td>
+                <td>{{ emp.phone }}</td>
+                <td>{{ emp.joinDate }}</td>
+                <td>{{ emp.jobType }}</td>
+                <td>{{ emp.level }}</td>
+                <td>
+                  <button (click)="editEmployee(emp)" class="action-btn edit"><span>✏️</span></button>
+                  <button (click)="deleteEmployee(emp)" class="action-btn delete"><span>🗑️</span></button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+</div> 
