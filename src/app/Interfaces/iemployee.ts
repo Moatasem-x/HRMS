@@ -1,5 +1,5 @@
 export interface IEmployee {
-    id: number;
+    employeeId: number;
     fullName: string;
     email: string;
     password: string;
@@ -10,4 +10,5 @@ export interface IEmployee {
     hireDate: string;
     salary: number;
     departmentId: number;
+    departmentName: string;
 }

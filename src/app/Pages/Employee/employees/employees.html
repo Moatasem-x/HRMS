@@ -18,21 +18,11 @@
       <div class="header-actions">
         <input type="text" placeholder="Search name, headline or tag" [(ngModel)]="searchTerm">
         <select [(ngModel)]="selectedGroup">
-          @for (group of groups; track group) {
+          @for (group of departments; track group) {
             <option [value]="group">{{ group }}</option>
           }
         </select>
-        <select [(ngModel)]="jobType">
-          @for (jt of jobTypes; track jt) {
-            <option [value]="jt">{{ jt }}</option>
-          }
-        </select>
-        <select [(ngModel)]="level">
-          @for (lvl of levels; track lvl) {
-            <option [value]="lvl">{{ lvl }}</option>
-          }
-        </select>
-        <button class="more-filter">More Filter</button>
+
         <button class="new-candidate">New Candidate</button>
       </div>
     </header>
@@ -52,7 +42,6 @@
       </div>
     </section>
     <section class="employee-groups">
-      <!-- All Employees Collapse -->
       <div class="group">
         <div class="group-header" (click)="toggleGroup('All')" [ngClass]="{expanded: isGroupExpanded('All'), collapsed: !isGroupExpanded('All')}">
           <span class="group-arrow">
@@ -70,29 +59,34 @@
                   <tr>
                     <th>Employee ID</th>
                     <th>Name</th>
-                    <th>Role</th>
+                    <th>Email</th>
                     <th>Phone</th>
-                    <th>Join Date</th>
-                    <th>Job Type</th>
-                    <th>Level</th>
-                    <th>Group</th>
+                    <th>Hire Date</th>
+                    <th>Salary</th>
+                    <th>Address</th>
+                    <th>Department</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  @for (emp of getEmployeesByGroup(); track emp.id) {
+                  @for (emp of getEmployeesByGroup(); track emp.employeeId) {
                     <tr>
-                      <td>{{ emp.id }}</td>
-                      <td>{{ emp.name }}</td>
-                      <td><span class="app-table-badge">{{ emp.role }}</span></td>
-                      <td>{{ emp.phone }}</td>
-                      <td>{{ emp.joinDate }}</td>
-                      <td>{{ emp.jobType }}</td>
-                      <td>{{ emp.level }}</td>
-                      <td>{{ emp.group }}</td>
+                      <td>{{ emp.nationalId }}</td>
+                      <td>{{ emp.fullName }}</td>
+                      <td><span class="app-table-badge">{{ emp.email }}</span></td>
+                      <td>{{ emp.phoneNumber }}</td>
+                      <td>{{ emp.hireDate | date:'dd-MM-yyyy' }}</td>
+                      <td>{{ emp.salary }}</td>
+                      <td>{{ emp.address }}</td>
+                      <td>{{ emp.departmentName }}</td>
                       <td>
                         <button (click)="editEmployee(emp)" class="app-table-action-btn edit"><span>✏️</span></button>
-                        <button (click)="deleteEmployee(emp)" class="app-table-action-btn delete"><span>🗑️</span></button>
+                        <button 
+                        [swal]="{title: 'Confirmation', text: 'Are you sure you want to delete this employee?', showCancelButton: true}"
+                        (confirm)="deleteEmployee(emp.employeeId)" 
+                        class="app-table-action-btn delete">
+                          <span>🗑️</span>
+                        </button>
                       </td>
                     </tr>
                   }
@@ -103,7 +97,7 @@
         }
       </div>
       <!-- Grouped Collapses -->
-      @for (group of groups.slice(1); track group) {
+      @for (group of departments.slice(1); track group) {
         <div class="group">
           <div class="group-header" (click)="toggleGroup(group)" [ngClass]="{expanded: isGroupExpanded(group), collapsed: !isGroupExpanded(group)}">
             <span class="group-arrow">
@@ -121,27 +115,32 @@
                     <tr>
                       <th>Employee ID</th>
                       <th>Name</th>
-                      <th>Role</th>
+                      <th>Email</th>
                       <th>Phone</th>
-                      <th>Join Date</th>
-                      <th>Job Type</th>
-                      <th>Level</th>
+                      <th>Hire Date</th>
+                      <th>Salary</th>
+                      <th>Address</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    @for (emp of groupedEmployees[group]; track emp.id) {
+                    @for (emp of groupedEmployees[group]; track emp.employeeId) {
                       <tr>
-                        <td>{{ emp.id }}</td>
-                        <td>{{ emp.name }}</td>
-                        <td><span class="app-table-badge">{{ emp.role }}</span></td>
-                        <td>{{ emp.phone }}</td>
-                        <td>{{ emp.joinDate }}</td>
-                        <td>{{ emp.jobType }}</td>
-                        <td>{{ emp.level }}</td>
+                        <td>{{ emp.nationalId }}</td>
+                        <td>{{ emp.fullName }}</td>
+                        <td><span class="app-table-badge">{{ emp.email }}</span></td>
+                        <td>{{ emp.phoneNumber }}</td>
+                        <td>{{ emp.hireDate | date:'dd-MM-yyyy' }}</td>
+                        <td>{{ emp.salary }}</td>
+                        <td>{{ emp.address }}</td>
                         <td>
                           <button (click)="editEmployee(emp)" class="app-table-action-btn edit"><span>✏️</span></button>
-                          <button (click)="deleteEmployee(emp)" class="app-table-action-btn delete"><span>🗑️</span></button>
+                          <button 
+                          [swal]="{title: 'Confirmation', text: 'Are you sure you want to delete this employee?', showCancelButton: true}" 
+                          (confirm)="deleteEmployee(emp.employeeId)" 
+                          class="app-table-action-btn delete">
+                            <span>🗑️</span>
+                          </button>
                         </td>
                       </tr>
                     }

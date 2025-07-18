@@ -1,8 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { trigger, style, animate, transition, query, group } from '@angular/animations';
-
+import { IEmployee } from '../../../Interfaces/iemployee';
+import { Subscription } from 'rxjs';
+import { EmployeeService } from '../../../Services/employee-service';
+import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
+import Swal from 'sweetalert2';
 
 interface BoardMember {
   name: string;
@@ -11,22 +15,10 @@ interface BoardMember {
   avatarUrl?: string;
 }
 
-interface Employee {
-  id: string;
-  name: string;
-  role: string;
-  phone: string;
-  joinDate: string;
-  group: string;
-  level: string;
-  jobType: string;
-  experience: string;
-}
-
 @Component({
   selector: 'app-employees',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, SweetAlert2Module],
   templateUrl: './employees.html',
   styleUrls: ['./employees.css'],
   animations: [
@@ -58,7 +50,16 @@ interface Employee {
     ])
   ]
 })
-export class EmployeesComponent {
+export class EmployeesComponent implements OnInit, OnDestroy {
+
+  constructor(private employeeService: EmployeeService, private cdr: ChangeDetectorRef) {}
+
+  ngOnInit(): void {
+    this.loadEmployees();
+  }
+
+
+
   boardMembers: BoardMember[] = [
     { name: 'Grace Hall', email: 'name@talenthub.com', role: 'General Director', avatarUrl: '' },
     { name: 'Bob Brown', email: 'name@talenthub.com', role: 'The CEO', avatarUrl: '' },
@@ -66,18 +67,8 @@ export class EmployeesComponent {
     { name: 'Alice Johnson', email: 'name@talenthub.com', role: 'The CMO', avatarUrl: '' },
   ];
 
-  employees: Employee[] = [
-    { id: 'E00173', name: 'Bob Brown', role: 'Lead Designer', phone: '555-456-7890', joinDate: '20-05-2024', group: 'UI/UX designer', level: 'Manager', jobType: 'Full Time', experience: 'Senior' },
-    { id: 'E00172', name: 'Charlie Davis', role: 'Sub-Lead Designer', phone: '555-567-4891', joinDate: '20-05-2024', group: 'UI/UX designer', level: 'Manager', jobType: 'Part Time', experience: 'Junior' },
-    { id: 'E00174', name: 'Emily Evans', role: 'Junior Designer', phone: '555-567-4891', joinDate: '20-05-2024', group: 'UI/UX designer', level: 'Manager', jobType: 'Full Time', experience: 'Junior' },
-    { id: 'E00201', name: 'Ahmed Ali', role: 'Frontend Engineer', phone: '555-123-4567', joinDate: '21-05-2024', group: 'Engineering', level: 'Senior', jobType: 'Full Time', experience: 'Senior' },
-    { id: 'E00202', name: 'Sara Smith', role: 'Backend Engineer', phone: '555-234-5678', joinDate: '22-05-2024', group: 'Engineering', level: 'Junior', jobType: 'Part Time', experience: 'Junior' },
-    { id: 'E00301', name: 'Lina Lee', role: 'Graphic Designer', phone: '555-345-6789', joinDate: '23-05-2024', group: 'Design', level: 'Mid', jobType: 'Full Time', experience: 'Mid' },
-    { id: 'E00302', name: 'Tom Green', role: 'Illustrator', phone: '555-456-7891', joinDate: '24-05-2024', group: 'Design', level: 'Senior', jobType: 'Part Time', experience: 'Senior' },
-    { id: 'E00401', name: 'Mona Hassan', role: 'HR Manager', phone: '555-789-1234', joinDate: '25-05-2024', group: 'HR', level: 'Senior', jobType: 'Full Time', experience: 'Senior' },
-    { id: 'E00402', name: 'Omar Youssef', role: 'Recruiter', phone: '555-890-2345', joinDate: '26-05-2024', group: 'HR', level: 'Junior', jobType: 'Part Time', experience: 'Junior' },
-    // Add more mock data for other groups as needed
-  ];
+  employees: IEmployee[] = [];
+  subs: Subscription[] = [];
 
   // Placeholder for search/filter
   searchTerm = '';
@@ -85,29 +76,45 @@ export class EmployeesComponent {
   level = 'All';
 
   selectedGroup = 'All';
-  get groups(): string[] {
-    const allGroups = this.employees.map(e => e.group);
-    return ['All', ...Array.from(new Set(allGroups))];
+  get departments(): string[] {
+    const allDepartments = this.employees.map(e => e.departmentName);
+    return ['All', ...Array.from(new Set(allDepartments))];
   }
 
-  get jobTypes(): string[] {
-    const all = this.employees.map(e => e.jobType);
-    return ['All', ...Array.from(new Set(all))];
-  }
-  get levels(): string[] {
-    const all = this.employees.map(e => e.level);
-    return ['All', ...Array.from(new Set(all))];
-  }
+  // get jobTypes(): string[] {
+  //   const all = this.employees.map(e => e.jobType);
+  //   return ['All', ...Array.from(new Set(all))];
+  // }
+  // get levels(): string[] {
+  //   const all = this.employees.map(e => e.level);
+  //   return ['All', ...Array.from(new Set(all))];
+  // }
 
-  expandedGroups = new Set<string>(['All']); // By default, 'All' is expanded
+  expandedGroups = new Set<string>([]); // By default, 'All' is expanded
 
-  get groupedEmployees(): { [group: string]: Employee[] } {
-    const groups: { [group: string]: Employee[] } = {};
+  get groupedEmployees(): { [group: string]: IEmployee[] } {
+    const groups: { [group: string]: IEmployee[] } = {};
     for (const emp of this.getEmployeesByGroup()) {
-      if (!groups[emp.group]) groups[emp.group] = [];
-      groups[emp.group].push(emp);
+      if (!groups[emp.departmentName]) groups[emp.departmentName] = [];
+      groups[emp.departmentName].push(emp);
     }
     return groups;
+  }
+
+  loadEmployees() {
+    this.subs.push(this.employeeService.getEmployees().subscribe({
+      next: (resp) => {
+        this.employees = resp;
+        this.cdr.detectChanges();
+        console.log(this.employees);
+      },
+      error: (err) => {
+        console.log(err);
+      },
+      complete: () => {
+        
+      }
+    }));
   }
 
   isGroupExpanded(group: string): boolean {
@@ -122,29 +129,47 @@ export class EmployeesComponent {
     }
   }
 
-  editEmployee(employee: Employee) {
+  editEmployee(employee: IEmployee) {
     // Placeholder for edit action
-    alert('Edit ' + employee.name);
+    alert('Edit ' + employee.fullName);
   }
 
-  deleteEmployee(employee: Employee) {
-    // Placeholder for delete action
-    alert('Delete ' + employee.name);
+  deleteEmployee(empId: number) {
+    console.log(empId);
+    this.subs.push(this.employeeService.deleteEmployee(empId).subscribe({
+      next: (resp) => {
+        Swal.fire("Success", "Deleted Successfully", "success");
+        this.employees = this.employees.filter(e => e.employeeId !== empId);
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Something went wrong!",
+        });
+        console.log(err);
+      },
+      complete: () => {
+      }
+    }));
   }
 
-  getEmployeesByGroup(): Employee[] {
+  getEmployeesByGroup(): IEmployee[] {
     const selected = this.selectedGroup.trim().toLowerCase();
     return this.employees.filter(e => {
-      const group = e.group.trim().toLowerCase();
+      const group = e.departmentName.trim().toLowerCase();
       const matchesGroup = selected === 'all' || group === selected;
       const term = this.searchTerm.trim().toLowerCase();
       const matchesSearch = !term ||
-        e.name.toLowerCase().includes(term) ||
-        e.role.toLowerCase().includes(term);
-      const matchesJobType = this.jobType === 'All' || e.jobType === this.jobType;
-      const matchesLevel = this.level === 'All' || e.level === this.level;
-      return matchesGroup && matchesSearch && matchesJobType && matchesLevel;
+        e.fullName.toLowerCase().includes(term) ||
+        e.email.toLowerCase().includes(term);
+      return matchesGroup && matchesSearch;
     });
+  }
+
+  ngOnDestroy(): void {
+    this.subs.forEach(sub => sub.unsubscribe());
   }
 }
 

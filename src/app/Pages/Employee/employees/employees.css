@@ -63,6 +63,11 @@
   background: #fff;
   cursor: pointer;
 }
+
+.header-actions select {
+  appearance: none;
+  width: 10rem;
+}
 .header-actions .new-candidate {
   background: #3b82f6;
   color: #fff;
