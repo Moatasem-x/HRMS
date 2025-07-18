@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { trigger, style, animate, transition, query, group } from '@angular/animations';
+
 
 interface BoardMember {
   name: string;
@@ -26,7 +28,35 @@ interface Employee {
   standalone: true,
   imports: [FormsModule, CommonModule],
   templateUrl: './employees.html',
-  styleUrls: ['./employees.css']
+  styleUrls: ['./employees.css'],
+  animations: [
+    trigger("expand",[
+      transition(":enter", [
+        style({height: 0,opacity: 0}),
+        query(".details",[
+          style({translate: "0 -100%"})
+        ]),
+        group([
+          animate("0.8s cubic-bezier(0.4, 0, 0.2, 1)", style({height: "*", opacity: 1})),
+          query(".details",[
+            animate("0.8s cubic-bezier(0.4, 0, 0.2, 1)", style({translate: "0 0"}))
+          ])
+        ])
+      ]),
+      transition(":leave",[
+        style({height: "*", opacity: 1}),
+        query(".details",[
+          style({translate: "0 0"})
+        ]),
+        group([
+          animate("0.8s cubic-bezier(0.4, 0, 0.2, 1)", style({height: 0,opacity: 0})),
+          query(".details",[
+            animate("0.8s cubic-bezier(0.4, 0, 0.2, 1)", style({translate: "0 -100%"}))
+          ])
+        ])
+      ])
+    ])
+  ]
 })
 export class EmployeesComponent {
   boardMembers: BoardMember[] = [

@@ -18,13 +18,19 @@
       <div class="header-actions">
         <input type="text" placeholder="Search name, headline or tag" [(ngModel)]="searchTerm">
         <select [(ngModel)]="selectedGroup">
-          <option *ngFor="let group of groups" [value]="group">{{ group }}</option>
+          @for (group of groups; track group) {
+            <option [value]="group">{{ group }}</option>
+          }
         </select>
         <select [(ngModel)]="jobType">
-          <option *ngFor="let jt of jobTypes" [value]="jt">{{ jt }}</option>
+          @for (jt of jobTypes; track jt) {
+            <option [value]="jt">{{ jt }}</option>
+          }
         </select>
         <select [(ngModel)]="level">
-          <option *ngFor="let lvl of levels" [value]="lvl">{{ lvl }}</option>
+          @for (lvl of levels; track lvl) {
+            <option [value]="lvl">{{ lvl }}</option>
+          }
         </select>
         <button class="more-filter">More Filter</button>
         <button class="new-candidate">New Candidate</button>
@@ -33,7 +39,8 @@
     <section class="board-of-directors">
       <h2>Board of Directors</h2>
       <div class="board-list">
-        <div class="board-member" *ngFor="let member of boardMembers">
+        @for (member of boardMembers; track member) {
+        <div class="board-member">
           <div class="avatar"></div>
           <div class="info">
             <div class="name">{{ member.name }}</div>
@@ -41,6 +48,7 @@
             <div class="role">{{ member.role }}</div>
           </div>
         </div>
+        }
       </div>
     </section>
     <section class="employee-groups">
@@ -54,82 +62,96 @@
           </span>
           <span class="group-title">All Employees</span>
         </div>
-        <div [ngClass]="{'collapse-content': true, 'collapsed': !isGroupExpanded('All')}">
-          <table class="employee-table">
-            <thead>
-              <tr>
-                <th>Employee ID</th>
-                <th>Name</th>
-                <th>Role</th>
-                <th>Phone</th>
-                <th>Join Date</th>
-                <th>Job Type</th>
-                <th>Level</th>
-                <th>Group</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let emp of getEmployeesByGroup()">
-                <td>{{ emp.id }}</td>
-                <td>{{ emp.name }}</td>
-                <td><span class="role-badge">{{ emp.role }}</span></td>
-                <td>{{ emp.phone }}</td>
-                <td>{{ emp.joinDate }}</td>
-                <td>{{ emp.jobType }}</td>
-                <td>{{ emp.level }}</td>
-                <td>{{ emp.group }}</td>
-                <td>
-                  <button (click)="editEmployee(emp)" class="action-btn edit"><span>✏️</span></button>
-                  <button (click)="deleteEmployee(emp)" class="action-btn delete"><span>🗑️</span></button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        @if (isGroupExpanded("All")) {
+          <div @expand class="overflow-hidden">
+            <div class="details">
+              <table class="app-table">
+                <thead>
+                  <tr>
+                    <th>Employee ID</th>
+                    <th>Name</th>
+                    <th>Role</th>
+                    <th>Phone</th>
+                    <th>Join Date</th>
+                    <th>Job Type</th>
+                    <th>Level</th>
+                    <th>Group</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (emp of getEmployeesByGroup(); track emp.id) {
+                    <tr>
+                      <td>{{ emp.id }}</td>
+                      <td>{{ emp.name }}</td>
+                      <td><span class="app-table-badge">{{ emp.role }}</span></td>
+                      <td>{{ emp.phone }}</td>
+                      <td>{{ emp.joinDate }}</td>
+                      <td>{{ emp.jobType }}</td>
+                      <td>{{ emp.level }}</td>
+                      <td>{{ emp.group }}</td>
+                      <td>
+                        <button (click)="editEmployee(emp)" class="app-table-action-btn edit"><span>✏️</span></button>
+                        <button (click)="deleteEmployee(emp)" class="app-table-action-btn delete"><span>🗑️</span></button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        }
       </div>
       <!-- Grouped Collapses -->
-      <div class="group" *ngFor="let group of groups.slice(1)">
-        <div class="group-header" (click)="toggleGroup(group)" [ngClass]="{expanded: isGroupExpanded(group), collapsed: !isGroupExpanded(group)}">
-          <span class="group-arrow">
-            <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M8 10l4 4 4-4" stroke="#0284c7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </span>
-          <span class="group-title">{{ group }}</span>
+      @for (group of groups.slice(1); track group) {
+        <div class="group">
+          <div class="group-header" (click)="toggleGroup(group)" [ngClass]="{expanded: isGroupExpanded(group), collapsed: !isGroupExpanded(group)}">
+            <span class="group-arrow">
+              <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8 10l4 4 4-4" stroke="#0284c7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <span class="group-title">{{ group }}</span>
+          </div>
+          @if (isGroupExpanded(group)) {
+            <div @expand class="overflow-hidden">
+              <div class="details">
+                <table class="app-table">
+                  <thead>
+                    <tr>
+                      <th>Employee ID</th>
+                      <th>Name</th>
+                      <th>Role</th>
+                      <th>Phone</th>
+                      <th>Join Date</th>
+                      <th>Job Type</th>
+                      <th>Level</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (emp of groupedEmployees[group]; track emp.id) {
+                      <tr>
+                        <td>{{ emp.id }}</td>
+                        <td>{{ emp.name }}</td>
+                        <td><span class="app-table-badge">{{ emp.role }}</span></td>
+                        <td>{{ emp.phone }}</td>
+                        <td>{{ emp.joinDate }}</td>
+                        <td>{{ emp.jobType }}</td>
+                        <td>{{ emp.level }}</td>
+                        <td>
+                          <button (click)="editEmployee(emp)" class="app-table-action-btn edit"><span>✏️</span></button>
+                          <button (click)="deleteEmployee(emp)" class="app-table-action-btn delete"><span>🗑️</span></button>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          }
         </div>
-        <div [ngClass]="{'collapse-content': true, 'collapsed': !isGroupExpanded(group)}">
-          <table class="employee-table">
-            <thead>
-              <tr>
-                <th>Employee ID</th>
-                <th>Name</th>
-                <th>Role</th>
-                <th>Phone</th>
-                <th>Join Date</th>
-                <th>Job Type</th>
-                <th>Level</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let emp of groupedEmployees[group]">
-                <td>{{ emp.id }}</td>
-                <td>{{ emp.name }}</td>
-                <td><span class="role-badge">{{ emp.role }}</span></td>
-                <td>{{ emp.phone }}</td>
-                <td>{{ emp.joinDate }}</td>
-                <td>{{ emp.jobType }}</td>
-                <td>{{ emp.level }}</td>
-                <td>
-                  <button (click)="editEmployee(emp)" class="action-btn edit"><span>✏️</span></button>
-                  <button (click)="deleteEmployee(emp)" class="action-btn delete"><span>🗑️</span></button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+      }
     </section>
   </main>
 </div> 

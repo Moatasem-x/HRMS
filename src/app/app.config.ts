@@ -17,7 +17,7 @@ export const appConfig: ApplicationConfig = {
     provideZonelessChangeDetection(),
     provideRouter(routes), 
     provideClientHydration(withEventReplay()),
-    provideHttpClient(withInterceptorsFromDi(),withFetch()),
+    provideHttpClient(),
     provideAnimationsAsync(),
     provideAnimations(),
     importProvidersFrom([SweetAlert2Module.forRoot()]),
