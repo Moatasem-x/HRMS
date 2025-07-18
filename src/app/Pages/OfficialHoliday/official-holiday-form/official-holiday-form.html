@@ -1,0 +1,16 @@
+<div class="official-holiday-form-container" dir="ltr">
+  <form (ngSubmit)="submit()">
+    <div class="form-row">
+      <label for="name">Name</label>
+      <input id="name" type="text" [(ngModel)]="name" name="name" required />
+    </div>
+    <div class="form-row">
+      <label for="date">Date</label>
+      <input id="date" type="date" [(ngModel)]="date" name="date" required />
+    </div>
+    
+    <div class="form-row">
+      <button type="submit">Add</button>
+    </div>
+  </form>
+</div>

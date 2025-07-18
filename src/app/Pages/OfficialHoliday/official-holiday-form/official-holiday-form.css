@@ -1,0 +1,110 @@
+/* Container and Card */
+.add-employee-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 40px 0;
+  }
+  
+  .salary-input-group {
+    display: flex;
+    align-items: center;
+  }
+  
+  .currency-symbol {
+    background: #f8f9fa;
+    border: 1.5px solid #e9ecef;
+    border-right: none;
+    border-radius: 8px 0 0 8px;
+    padding: 10px 12px;
+    color: #6c757d;
+    font-size: 1rem;
+  }
+  
+  .salary-input {
+    border-radius: 0 8px 8px 0;
+    border-left: none;
+  }
+
+.official-holiday-form-container {
+  background: #fff;
+  border-radius: 10px;
+  padding: 24px;
+  margin: 0 auto 32px auto;
+  max-width: 600px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 18px;
+}
+
+label {
+  font-weight: bold;
+  margin-bottom: 6px;
+  color: #0284c7;
+}
+
+input[type="text"], textarea {
+  padding: 8px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  font-size: 1rem;
+  background: #f7f8fa;
+}
+
+textarea {
+  min-height: 60px;
+  resize: vertical;
+}
+
+button[type="submit"] {
+  background: #0284c7;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 28px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+button[type="submit"]:hover {
+  background: #0369a1;
+}
+
+input[type="date"] {
+  padding: 8px 12px;
+  border: 1px solid #0284c7;
+  border-radius: 4px;
+  font-size: 1rem;
+  background: #f7f8fa;
+  color: #222;
+  transition: border 0.2s;
+}
+
+input[type="date"]:focus {
+  border: 1.5px solid #0369a1;
+  outline: none;
+  background: #e0f2fe;
+}
+
+/* Remove default calendar icon and use a custom one for Chrome */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(38%) sepia(99%) saturate(747%) hue-rotate(170deg) brightness(95%) contrast(92%);
+  cursor: pointer;
+  height: 1.5em;
+  width: 1.5em;
+}
+
+/* For Firefox */
+input[type="date"]::-moz-focus-inner {
+  border: 0;
+}
+
+
+

@@ -1,0 +1,27 @@
+<div class="official-holiday-table-container" dir="ltr">
+  <table class="app-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Date</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let holiday of holidays; let i = index">
+        <td *ngIf="editIndex !== i">{{ holiday.name }}</td>
+        <td *ngIf="editIndex === i && editedHoliday"><input type="text" [(ngModel)]="editedHoliday.name" /></td>
+
+        <td *ngIf="editIndex !== i">{{ holiday.date }}</td>
+        <td *ngIf="editIndex === i && editedHoliday"><input type="date" [(ngModel)]="editedHoliday.date" /></td>
+
+        
+        <td>
+          <button *ngIf="editIndex !== i" (click)="editHoliday(i)" title="Edit">✏️</button>
+          <button *ngIf="editIndex === i && editedHoliday" (click)="saveHoliday(i)" title="Save">💾</button>
+          <button (click)="deleteHoliday(i)" title="Delete">🗑️</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div> 
