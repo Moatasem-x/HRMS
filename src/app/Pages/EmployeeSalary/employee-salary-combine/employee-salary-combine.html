@@ -1,0 +1,9 @@
+<div class="employee-salary-combine-container">
+  <app-employee-salary-filter 
+    (filterChanged)="onFilterChanged($event)"
+  ></app-employee-salary-filter>
+  
+  <app-employee-salary-table 
+    [filter]="currentFilter"
+  ></app-employee-salary-table>
+</div> 

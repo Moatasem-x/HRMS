@@ -4,10 +4,11 @@ import { EmployeesComponent as EmployeesComponent } from "./Pages/Employee/emplo
 import { EmployeeForm } from './Pages/Employee/employee-form/employee-form';
 import { OfficialHolidayCombineComponent } from "./Pages/OfficialHoliday/official-holiday-combine/official-holiday-combine";
 import { AttendanceReportCombineComponent } from "./Pages/AttendanceReport/attendance-report-combine/attendance-report-combine";
+import { EmployeeSalaryCombineComponent } from "./Pages/EmployeeSalary/employee-salary-combine/employee-salary-combine";
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, EmployeesComponent, EmployeeForm, OfficialHolidayCombineComponent, AttendanceReportCombineComponent],
+  imports: [RouterOutlet, EmployeesComponent, EmployeeForm, OfficialHolidayCombineComponent, AttendanceReportCombineComponent, EmployeeSalaryCombineComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

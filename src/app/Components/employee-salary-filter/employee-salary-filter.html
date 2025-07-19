@@ -1,0 +1,37 @@
+<div class="employee-salary-filter-container">
+  <div class="filter-header">
+    <h3>Employee Salaries</h3>
+    <p>At the end of each month.</p>
+  </div>
+  
+  <div class="filter-section">
+    <div class="search-input-group">
+      <input 
+        type="text" 
+        [(ngModel)]="filter.employeeName" 
+        placeholder="Search by Employee Name"
+        class="search-input"
+      >
+      <i class="search-icon">🔍</i>
+    </div>
+    
+    <div class="filter-controls">
+      <div class="select-group">
+        <label>Month</label>
+        <select [(ngModel)]="filter.month" class="filter-select">
+          <option *ngFor="let month of months" [value]="month">{{ month }}</option>
+        </select>
+      </div>
+      
+      <div class="select-group">
+        <label>Year</label>
+        <select [(ngModel)]="filter.year" class="filter-select">
+          <option *ngFor="let year of years" [value]="year">{{ year }}</option>
+        </select>
+      </div>
+      
+      <button (click)="onSearch()" class="search-btn">Search</button>
+      <button (click)="onClear()" class="clear-btn">Clear</button>
+    </div>
+  </div>
+</div> 
