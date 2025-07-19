@@ -1,0 +1,44 @@
+<div class="attendance-report-table-container" dir="ltr">
+  <table class="app-table">
+    <thead>
+      <tr>
+        <th>Actions</th>
+        <th>Date</th>
+        <th>Day</th>
+        <th>Attendance Time</th>
+        <th>Leave Time</th>
+        <th>Employee Name</th>
+        <th>Department</th>
+        <th>No.</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let record of records; let i = index">
+        <td>
+          <button *ngIf="editIndex !== i" (click)="editRecord(i)" title="Edit">✏️</button>
+          <button *ngIf="editIndex === i && editedRecord" (click)="saveRecord(i)" title="Save">💾</button>
+          <button (click)="deleteRecord(i)" title="Delete">🗑️</button>
+        </td>
+        <td *ngIf="editIndex !== i">{{ record.date }}</td>
+        <td *ngIf="editIndex === i && editedRecord"><input [(ngModel)]="editedRecord.date" type="date" [class.editing]="editIndex === i" /></td>
+
+        <td *ngIf="editIndex !== i">{{ record.day }}</td>
+        <td *ngIf="editIndex === i && editedRecord"><input [(ngModel)]="editedRecord.day" type="text" [class.editing]="editIndex === i" /></td>
+
+        <td *ngIf="editIndex !== i">{{ record.attendanceTime }}</td>
+        <td *ngIf="editIndex === i && editedRecord"><input [(ngModel)]="editedRecord.attendanceTime" type="time" [class.editing]="editIndex === i" /></td>
+
+        <td *ngIf="editIndex !== i">{{ record.leaveTime }}</td>
+        <td *ngIf="editIndex === i && editedRecord"><input [(ngModel)]="editedRecord.leaveTime" type="time" [class.editing]="editIndex === i" /></td>
+
+        <td *ngIf="editIndex !== i">{{ record.employeeName }}</td>
+        <td *ngIf="editIndex === i && editedRecord"><input [(ngModel)]="editedRecord.employeeName" type="text" [class.editing]="editIndex === i" /></td>
+
+        <td *ngIf="editIndex !== i">{{ record.department }}</td>
+        <td *ngIf="editIndex === i && editedRecord"><input [(ngModel)]="editedRecord.department" type="text" [class.editing]="editIndex === i" /></td>
+
+        <td>{{ record.serial }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div> 
