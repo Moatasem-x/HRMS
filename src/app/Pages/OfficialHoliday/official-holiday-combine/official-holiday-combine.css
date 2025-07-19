@@ -1,6 +1,14 @@
 .official-holiday-combine-container {
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 16px;
   padding: 32px;
+} 
+
+.official-holiday-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #2a4d69;
+  text-align: center;
+  letter-spacing: 1px;
 } 

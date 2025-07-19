@@ -1,4 +1,5 @@
 <div class="official-holiday-combine-container">
-  <app-official-holiday-form (addHoliday)="onAddHoliday($event)"></app-official-holiday-form>
-  <app-official-holiday-table></app-official-holiday-table>
+  <h1 class="official-holiday-title">Official Holidays Management</h1>
+  <app-official-holiday-form (holidayEmitter)="onHolidayAdded($event)"></app-official-holiday-form>
+  <app-official-holiday-table [addedHoliday]="addedHoliday"></app-official-holiday-table>
 </div> 

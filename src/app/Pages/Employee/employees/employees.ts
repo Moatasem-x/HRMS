@@ -70,10 +70,7 @@ export class EmployeesComponent implements OnInit, OnDestroy {
   employees: IEmployee[] = [];
   subs: Subscription[] = [];
 
-  // Placeholder for search/filter
   searchTerm = '';
-  jobType = 'All';
-  level = 'All';
 
   selectedGroup = 'All';
   get departments(): string[] {
@@ -81,16 +78,7 @@ export class EmployeesComponent implements OnInit, OnDestroy {
     return ['All', ...Array.from(new Set(allDepartments))];
   }
 
-  // get jobTypes(): string[] {
-  //   const all = this.employees.map(e => e.jobType);
-  //   return ['All', ...Array.from(new Set(all))];
-  // }
-  // get levels(): string[] {
-  //   const all = this.employees.map(e => e.level);
-  //   return ['All', ...Array.from(new Set(all))];
-  // }
-
-  expandedGroups = new Set<string>([]); // By default, 'All' is expanded
+  expandedGroups = new Set<string>([]); 
 
   get groupedEmployees(): { [group: string]: IEmployee[] } {
     const groups: { [group: string]: IEmployee[] } = {};
@@ -106,13 +94,13 @@ export class EmployeesComponent implements OnInit, OnDestroy {
       next: (resp) => {
         this.employees = resp;
         this.cdr.detectChanges();
-        console.log(this.employees);
       },
       error: (err) => {
         console.log(err);
       },
       complete: () => {
-        
+        this.expandedGroups.add('All');
+        this.cdr.detectChanges();
       }
     }));
   }
@@ -135,24 +123,40 @@ export class EmployeesComponent implements OnInit, OnDestroy {
   }
 
   deleteEmployee(empId: number) {
-    console.log(empId);
-    this.subs.push(this.employeeService.deleteEmployee(empId).subscribe({
-      next: (resp) => {
-        Swal.fire("Success", "Deleted Successfully", "success");
-        this.employees = this.employees.filter(e => e.employeeId !== empId);
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        Swal.fire({
-          icon: "error",
-          title: "Oops...",
-          text: "Something went wrong!",
-        });
-        console.log(err);
-      },
-      complete: () => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.subs.push(this.employeeService.deleteEmployee(empId).subscribe({
+          next: (resp) => {
+            Swal.fire({
+              title: "Deleted!",
+              text: "Employee has been deleted.",
+              icon: "success"
+            });
+            this.employees = this.employees.filter(e => e.employeeId !== empId);
+            this.cdr.detectChanges();
+          },
+          error: (err) => {
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Something went wrong!",
+            });
+            console.log(err);
+          },
+          complete: () => {
+          }
+        }));
       }
-    }));
+    });
+    
   }
 
   getEmployeesByGroup(): IEmployee[] {
@@ -173,4 +177,3 @@ export class EmployeesComponent implements OnInit, OnDestroy {
   }
 }
 
-export { EmployeesComponent as Employees }; 

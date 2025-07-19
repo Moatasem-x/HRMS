@@ -1,0 +1,36 @@
+<div class="official-holiday-form-container" dir="ltr">
+  <form [formGroup]="holidayForm" (ngSubmit)="onSubmit()" class="holiday-form">
+    <div class="form-group">
+      <label for="holidayName">Holiday Name</label>
+      <input id="holidayName" type="text" formControlName="holidayName" class="form-input" placeholder="Enter holiday name">
+      @if (holidayForm.get('holidayName')?.touched && holidayForm.get('holidayName')?.invalid) {
+        <div class="error-message">
+          Holiday name is required.
+        </div>
+      }
+    </div>
+    <div class="form-group">
+      <label for="holidayDate">Holiday Date</label>
+      <input id="holidayDate" type="date" formControlName="holidayDate" class="form-input">
+      @if (holidayForm.get('holidayDate')?.touched && holidayForm.get('holidayDate')?.invalid) {
+        <div class="error-message">
+          Holiday date is required.
+        </div>
+      }
+    </div>
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea id="description" formControlName="description" class="form-input" placeholder="Enter description"></textarea>
+      @if (holidayForm.get('description')?.touched && holidayForm.get('description')?.invalid) {
+        <div class="error-message">
+          Holiday description is required.
+        </div>
+      }
+    </div>
+    <div class="form-actions justify-content-center">
+      <button type="submit" class="btn holiday-form-btn" [disabled]="holidayForm.invalid || isSubmitting">
+        {{ isSubmitting ? 'Adding...' : 'Add Holiday' }}
+      </button>
+    </div>
+  </form>
+</div>

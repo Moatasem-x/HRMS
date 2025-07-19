@@ -1,0 +1,58 @@
+<div class="official-holiday-table-container">
+  <table class="app-table">
+    <thead>
+      <tr>
+        <th>Holiday Name</th>
+        <th>Date</th>
+        <th>Description</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (holiday of holidays; track holiday?.holidayId; let i = $index) {
+        @if (editIndex === i && editedHoliday && editForm) {
+          <tr [formGroup]="editForm">
+            <td>
+              <input class="form-input" formControlName="holidayName" required />
+              @if (editForm.get('holidayName')?.touched && editForm.get('holidayName')?.invalid) {
+                <div class="error-message">
+                  Name is required.
+                </div>
+              }
+            </td>
+            <td>
+              <input class="form-input" type="date" formControlName="holidayDate" required />
+              @if (editForm.get('holidayDate')?.touched && editForm.get('holidayDate')?.invalid) {
+                <div class="error-message">
+                  Date is required.
+                </div>
+              }
+            </td>
+            <td>
+              <input class="form-input" formControlName="description" required />
+              @if (editForm.get('description')?.touched && editForm.get('description')?.invalid) {
+                <div class="error-message">
+                  Description is required.
+                </div>
+              }
+            </td>
+            <td>
+              <button class="app-table-action-btn edit" (click)="saveHoliday(holiday, i)" [disabled]="editForm.invalid"><span>💾</span></button>
+              <button class="app-table-action-btn delete" (click)="cancelEdit()"><span>✖️</span></button>
+            </td>
+          </tr>
+        } @else {
+          <tr>
+            <td>{{ holiday?.holidayName }}</td>
+            <td>{{ holiday?.holidayDate | date:'dd-MM-yyyy' }}</td>
+            <td>{{ holiday?.description || '-' }}</td>
+            <td>
+              <button class="app-table-action-btn edit" (click)="editHoliday(holiday, i)"><span>✏️</span></button>
+              <button class="app-table-action-btn delete" (click)="deleteHoliday(holiday.holidayId)"><span>🗑️</span></button>
+            </td>
+          </tr>
+        }
+      }
+    </tbody>
+  </table>
+</div> 
