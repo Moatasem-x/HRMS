@@ -1,0 +1,238 @@
+<div class="employee-salary-table-container">
+  <table class="app-table">
+    <thead>
+      <tr>
+        <th>Employee Name</th>
+        <th>Department</th>
+        <th>Basic Salary</th>
+        <th>Attendance Days</th>
+        <th>Absence Days</th>
+        <th>Overtime Hours</th>
+        <th>Deduction Hours</th>
+        <th>Total Overtime</th>
+        <th>Total Deduction</th>
+        <th>Net Salary</th>
+        <th>Operations</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let salary of paginatedSalaries">
+        <!-- Employee Name -->
+        <td>
+          <ng-container *ngIf="editingRow !== salary.employeeId; else editEmployeeName">
+            {{ salary.employeeName }}
+          </ng-container>
+          <ng-template #editEmployeeName>
+            <input 
+              type="text" 
+              [(ngModel)]="editedSalary!.employeeName" 
+              class="editing"
+            >
+          </ng-template>
+        </td>
+
+        <!-- Department -->
+        <td>
+          <ng-container *ngIf="editingRow !== salary.employeeId; else editDepartment">
+            {{ salary.department }}
+          </ng-container>
+          <ng-template #editDepartment>
+            <input 
+              type="text" 
+              [(ngModel)]="editedSalary!.department" 
+              class="editing"
+            >
+          </ng-template>
+        </td>
+
+        <!-- Basic Salary -->
+        <td>
+          <ng-container *ngIf="editingRow !== salary.employeeId; else editBasicSalary">
+            {{ salary.basicSalary | number }}
+          </ng-container>
+          <ng-template #editBasicSalary>
+            <input 
+              type="number" 
+              [(ngModel)]="editedSalary!.basicSalary" 
+              class="editing"
+            >
+          </ng-template>
+        </td>
+
+        <!-- Attendance Days -->
+        <td>
+          <ng-container *ngIf="editingRow !== salary.employeeId; else editAttendanceDays">
+            {{ salary.attendanceDays }}
+          </ng-container>
+          <ng-template #editAttendanceDays>
+            <input 
+              type="number" 
+              [(ngModel)]="editedSalary!.attendanceDays" 
+              class="editing"
+            >
+          </ng-template>
+        </td>
+
+        <!-- Absence Days -->
+        <td>
+          <ng-container *ngIf="editingRow !== salary.employeeId; else editAbsenceDays">
+            {{ salary.absenceDays }}
+          </ng-container>
+          <ng-template #editAbsenceDays>
+            <input 
+              type="number" 
+              [(ngModel)]="editedSalary!.absenceDays" 
+              class="editing"
+            >
+          </ng-template>
+        </td>
+
+        <!-- Overtime Hours -->
+        <td>
+          <ng-container *ngIf="editingRow !== salary.employeeId; else editOvertimeHours">
+            {{ salary.overtimeHours }}
+          </ng-container>
+          <ng-template #editOvertimeHours>
+            <input 
+              type="number" 
+              [(ngModel)]="editedSalary!.overtimeHours" 
+              class="editing"
+            >
+          </ng-template>
+        </td>
+
+        <!-- Deduction Hours -->
+        <td>
+          <ng-container *ngIf="editingRow !== salary.employeeId; else editDeductionHours">
+            {{ salary.deductionHours }}
+          </ng-container>
+          <ng-template #editDeductionHours>
+            <input 
+              type="number" 
+              [(ngModel)]="editedSalary!.deductionHours" 
+              class="editing"
+            >
+          </ng-template>
+        </td>
+
+        <!-- Total Overtime -->
+        <td>
+          <ng-container *ngIf="editingRow !== salary.employeeId; else editTotalOvertime">
+            {{ salary.totalOvertime | number }}
+          </ng-container>
+          <ng-template #editTotalOvertime>
+            <input 
+              type="number" 
+              [(ngModel)]="editedSalary!.totalOvertime" 
+              class="editing"
+            >
+          </ng-template>
+        </td>
+
+        <!-- Total Deduction -->
+        <td>
+          <ng-container *ngIf="editingRow !== salary.employeeId; else editTotalDeduction">
+            {{ salary.totalDeduction | number }}
+          </ng-container>
+          <ng-template #editTotalDeduction>
+            <input 
+              type="number" 
+              [(ngModel)]="editedSalary!.totalDeduction" 
+              class="editing"
+            >
+          </ng-template>
+        </td>
+
+        <!-- Net Salary -->
+        <td>
+          <ng-container *ngIf="editingRow !== salary.employeeId; else editNetSalary">
+            {{ salary.netSalary | number }}
+          </ng-container>
+          <ng-template #editNetSalary>
+            <input 
+              type="number" 
+              [(ngModel)]="editedSalary!.netSalary" 
+              class="editing"
+            >
+          </ng-template>
+        </td>
+
+        <!-- Operations -->
+        <td>
+          <ng-container *ngIf="editingRow !== salary.employeeId; else editOperations">
+            <button 
+              title="Edit" 
+              (click)="startEdit(salary)"
+              class="edit-btn"
+            >
+              ✏️
+            </button>
+            <button 
+              title="Print" 
+              (click)="printSalary(salary)"
+              class="print-btn"
+            >
+              🖨️
+            </button>
+            <button 
+              title="Delete" 
+              (click)="deleteSalary(salary.employeeId)"
+              class="delete-btn"
+            >
+              🗑️
+            </button>
+          </ng-container>
+          <ng-template #editOperations>
+            <button 
+              title="Save" 
+              (click)="saveEdit()"
+              class="save-btn"
+            >
+              ✅
+            </button>
+            <button 
+              title="Cancel" 
+              (click)="cancelEdit()"
+              class="cancel-btn"
+            >
+              ❌
+            </button>
+          </ng-template>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Pagination -->
+  <div class="pagination" *ngIf="totalPages > 1">
+    <div class="pagination-info">
+      Page {{ currentPage }} of {{ totalPages }}
+    </div>
+    <div class="pagination-controls">
+      <button 
+        (click)="previousPage()" 
+        [disabled]="currentPage === 1"
+        class="pagination-btn"
+      >
+        ‹
+      </button>
+      
+      <button 
+        *ngFor="let page of getPageNumbers()" 
+        (click)="goToPage(page)"
+        [class.active]="page === currentPage"
+        class="pagination-btn"
+      >
+        {{ page }}
+      </button>
+      
+      <button 
+        (click)="nextPage()" 
+        [disabled]="currentPage === totalPages"
+        class="pagination-btn"
+      >
+        ›
+      </button>
+    </div>
+  </div>
+</div> 
