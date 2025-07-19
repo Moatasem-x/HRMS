@@ -1,0 +1,16 @@
+<div class="attendance-report-filter-container" dir="ltr">
+  <div class="attendance-filter-form">
+    <div>
+      <div class="filter-row">
+        <input type="text" [(ngModel)]="search" placeholder="Search employee or department" (input)="onSearchInput()" />
+      </div>      
+      <div class="filter-row">
+        <label>From:</label>
+        <input type="date" [(ngModel)]="fromDate" />
+        <label>To:</label>
+        <input type="date" [(ngModel)]="toDate" />
+      </div>
+      <button class="show-btn att-filter-btn" (click)="showFilters()">Show</button>
+    </div>
+  </div>
+</div> 

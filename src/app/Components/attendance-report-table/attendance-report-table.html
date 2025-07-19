@@ -1,0 +1,61 @@
+<div class="attendance-report-table-container" dir="ltr">
+  <table class="app-table">
+    <thead>
+      <tr>
+        <th>No.</th>
+        <th>Employee Name</th>
+        <th>Attendance Time</th>
+        <th>Leave Time</th>
+        <th>Over Time</th>
+        <th>Delay Time</th>
+        <th>Date</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (record of records; track record.attendanceId; let i = $index) {
+        <tr>
+          <td>{{ record.attendanceId }}</td>
+          <td>{{ record.employeeName }}</td>
+
+          @if (editIndex !== i) {
+            <td>{{ record.checkInTime }}</td>
+          }
+          @if (editIndex === i && editedRecord) {
+            <td><input [(ngModel)]="editedRecord.checkInTime" type="time" [class.editing]="editIndex === i" /></td>
+          }
+
+          @if (editIndex !== i) {
+            <td>{{ record.checkOutTime }}</td>
+          }
+          @if (editIndex === i && editedRecord) {
+            <td><input [(ngModel)]="editedRecord.checkOutTime" type="time" [class.editing]="editIndex === i" /></td>
+          }
+
+          <td>{{ record.overtimeHours }}</td>
+          
+          <td>{{ record.delayHours }}</td>
+
+          @if (editIndex !== i) {
+            <td>{{ record.createdAt | date:'dd-MM-yyyy' }}</td>
+          }
+          @if (editIndex === i && editedRecord) {
+            <td><input [(ngModel)]="editedRecord.createdAt" type="date" [class.editing]="editIndex === i" /></td>
+          }
+
+          <td>
+            @if (editIndex !== i) {
+              <button (click)="editRecord(i)" title="Edit">✏️</button>
+            }
+            @if (editIndex === i && editedRecord) {
+              <button (click)="saveRecord(i)" title="Save">💾</button>
+              <button (click)="cancelEdit()" title="Cancel">❌</button>
+            }
+            <button (click)="deleteRecord(i)" title="Delete">🗑️</button>
+          </td>
+          
+        </tr>
+      }
+    </tbody>
+  </table>
+</div> 

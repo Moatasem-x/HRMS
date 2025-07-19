@@ -18,4 +18,8 @@ export class AttendanceReportFilterComponent {
   showFilters() {
     this.filterChange.emit({ fromDate: this.fromDate, toDate: this.toDate, search: this.search });
   }
+
+  onSearchInput() {
+    this.filterChange.emit({ fromDate: '', toDate: '', search: this.search });
+  }
 } 

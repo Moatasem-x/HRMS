@@ -1,0 +1,161 @@
+.attendance-report-table-container {
+  background: linear-gradient(135deg, #667eea 0%, #5a67d8 100%);
+  padding: 2px;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  margin: 20px auto;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.app-table {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 8px;
+  overflow: hidden;
+  width: 100%;
+  border-collapse: collapse;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.app-table th {
+  background: linear-gradient(135deg, #667eea 0%, #5a67d8 100%);
+  color: white;
+  font-weight: 600;
+  padding: 16px 12px;
+  text-align: center;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.app-table td {
+  padding: 14px 12px;
+  text-align: center;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 0.9rem;
+}
+
+.app-table tbody tr:nth-child(odd) {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.app-table tbody tr:nth-child(even) {
+  background: rgba(248, 250, 252, 0.8);
+}
+
+.app-table tbody tr:hover {
+  background: rgba(102, 126, 234, 0.1) !important;
+  transform: scale(1.01);
+  transition: all 0.2s ease;
+}
+
+@media (max-width: 768px) {
+  .attendance-report-table-container {
+    margin: 10px;
+    padding: 1px;
+  }
+  .app-table th,
+  .app-table td {
+    padding: 10px 8px;
+    font-size: 0.85rem;
+  }
+}
+
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  margin: 0 4px;
+  transition: transform 0.2s ease;
+}
+
+button:hover {
+  transform: scale(1.1);
+}
+
+/* Save button styling */
+button[title="Save"] {
+  color: #059669;
+}
+
+button[title="Save"]:hover {
+  color: #047857;
+}
+
+/* Cancel button styling */
+button[title="Cancel"] {
+  color: #dc2626;
+}
+
+button[title="Cancel"]:hover {
+  color: #b91c1c;
+}
+
+/* Edit button styling */
+button[title="Edit"] {
+  color: #2563eb;
+}
+
+button[title="Edit"]:hover {
+  color: #1d4ed8;
+}
+
+/* Delete button styling */
+button[title="Delete"] {
+  color: #dc2626;
+}
+
+button[title="Delete"]:hover {
+  color: #b91c1c;
+}
+
+/* .app-table input[type="text"] {
+  max-width: 110px;
+} */
+
+.app-table input[type="date"] {
+  max-width: 130px;
+}
+
+.app-table input[type="time"] {
+  max-width: 80px;
+}
+
+/* Smaller text, bigger time when editing */
+.app-table input[type="text"].editing {
+  max-width: 160px !important;
+}
+.app-table input[type="date"].editing {
+  max-width: 160px !important;
+}
+.app-table input[type="time"].editing {
+  max-width: 160px !important;
+}
+
+.app-table input[type="text"],
+.app-table input[type="date"],
+.app-table input[type="time"] {
+  padding: 8px 14px;
+  border: 1.5px solid #0284c7;
+  border-radius: 6px;
+  background: #f1f5f9;
+  font-size: 1rem;
+  color: #222;
+  box-shadow: 0 1px 3px rgba(2,132,199,0.06);
+  transition: border 0.2s, box-shadow 0.2s, background 0.2s;
+  outline: none;
+  text-align: center;
+}
+
+.app-table input[type="text"]:focus,
+.app-table input[type="date"]:focus,
+.app-table input[type="time"]:focus {
+  border: 2px solid #0369a1;
+  background: #e0f2fe;
+  box-shadow: 0 2px 8px rgba(2,132,199,0.10);
+} 

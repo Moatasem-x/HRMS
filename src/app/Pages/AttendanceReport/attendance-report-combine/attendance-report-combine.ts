@@ -1,6 +1,9 @@
-import { Component, ViewChild } from '@angular/core';
-import { AttendanceReportFilterComponent } from '../attendance-report-filter/attendance-report-filter';
-import { AttendanceReportTableComponent } from '../attendance-report-table/attendance-report-table';
+import { Component, ViewChild, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { AttendanceReportFilterComponent } from '../../../Components/attendance-report-filter/attendance-report-filter';
+import { AttendanceReportTableComponent } from '../../../Components/attendance-report-table/attendance-report-table';
+import { AttendanceService } from '../../../Services/attendance-service';
+import { IAttendance } from '../../../Interfaces/iattendance';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-attendance-report-combine',
@@ -9,37 +12,68 @@ import { AttendanceReportTableComponent } from '../attendance-report-table/atten
   templateUrl: './attendance-report-combine.html',
   styleUrls: ['./attendance-report-combine.css']
 })
-export class AttendanceReportCombineComponent {
+export class AttendanceReportCombineComponent implements OnInit, OnDestroy {
   @ViewChild(AttendanceReportTableComponent) table!: AttendanceReportTableComponent;
-  allRecords = [
-    { serial: 1, department: 'Development', employeeName: 'Employee 1', attendanceTime: '09:00', leaveTime: '17:00', date: '2021-08-11', day: 'Monday' },
-    { serial: 2, department: 'Accounting', employeeName: 'Employee 2', attendanceTime: '09:00', leaveTime: '18:00', date: '2021-08-11', day: 'Monday' },
-    { serial: 3, department: 'Accounting', employeeName: 'Employee 3', attendanceTime: '08:30', leaveTime: '16:30', date: '2021-08-12', day: 'Tuesday' },
-    { serial: 4, department: 'Marketing', employeeName: 'Employee 4', attendanceTime: '10:00', leaveTime: '18:00', date: '2021-08-13', day: 'Wednesday' },
-    { serial: 5, department: 'HR', employeeName: 'Employee 5', attendanceTime: '08:00', leaveTime: '16:00', date: '2021-08-14', day: 'Thursday' },
-    { serial: 6, department: 'Development', employeeName: 'Employee 6', attendanceTime: '09:15', leaveTime: '17:15', date: '2021-08-15', day: 'Friday' },
-    { serial: 7, department: 'Accounting', employeeName: 'Employee 7', attendanceTime: '09:30', leaveTime: '18:30', date: '2021-08-16', day: 'Saturday' },
-    { serial: 8, department: 'Marketing', employeeName: 'Employee 8', attendanceTime: '10:30', leaveTime: '19:00', date: '2021-08-17', day: 'Sunday' },
-    { serial: 9, department: 'HR', employeeName: 'Employee 9', attendanceTime: '08:45', leaveTime: '16:45', date: '2021-08-18', day: 'Monday' },
-    { serial: 10, department: 'Development', employeeName: 'Employee 10', attendanceTime: '09:00', leaveTime: '17:00', date: '2021-08-19', day: 'Tuesday' },
-  ];
-  filteredRecords = this.allRecords;
+  allRecords: IAttendance[] = [];
+  filteredRecords: IAttendance[] = [];
+  subs: Subscription[] = [];
+
+  private lastSearch = '';
+  private lastFromDate = '';
+  private lastToDate = '';
+
+  constructor(private attendanceService: AttendanceService, private cdr: ChangeDetectorRef) {}
+
+  ngOnInit() {
+    this.loadRecords();
+  }
+
+  loadRecords() {
+    this.subs.push(this.attendanceService.getAttendances().subscribe({
+      next: (records) => {
+        this.allRecords = records;
+        this.filteredRecords = records;
+        this.cdr.detectChanges();
+        console.log(this.allRecords);
+      },
+      error: (error) => {
+        console.error('Error loading records:', error);
+      },
+      complete: () => {
+        console.log('Records loaded successfully');
+      }
+    }));
+  }
 
   onFilterChange(filter: { fromDate: string; toDate: string; search: string }) {
-    let filtered = this.allRecords;
-    if (filter.fromDate) {
-      filtered = filtered.filter(r => r.date >= filter.fromDate);
+    
+    if (filter.fromDate === '' && filter.toDate === '') {
+      this.lastSearch = filter.search;
+      this.filteredRecords = this.allRecords.filter(r =>
+        r.employeeName.toLowerCase().includes(this.lastSearch.toLowerCase())
+      );
+    } 
+    else {
+      
+      this.lastFromDate = filter.fromDate;
+      this.lastToDate = filter.toDate;
+      this.lastSearch = filter.search;
+      let filtered = this.allRecords;
+      if (this.lastFromDate) {
+        filtered = filtered.filter(r => r.createdAt >= this.lastFromDate);
+      }
+      if (this.lastToDate) {
+        filtered = filtered.filter(r => r.createdAt <= this.lastToDate);
+      }
+      if (this.lastSearch) {
+        filtered = filtered.filter(r => r.employeeName.toLowerCase().includes(this.lastSearch.toLowerCase()));
+      }
+      this.filteredRecords = filtered;
     }
-    if (filter.toDate) {
-      filtered = filtered.filter(r => r.date <= filter.toDate);
-    }
-    if (filter.search) {
-      const s = filter.search.toLowerCase();
-      filtered = filtered.filter(r => r.employeeName.toLowerCase().includes(s) || r.department.toLowerCase().includes(s));
-    }
-    this.filteredRecords = filtered;
-    if (this.table) {
-      this.table.records = filtered;
-    }
+    this.cdr.detectChanges();
+  }
+
+  ngOnDestroy(): void {
+    this.subs.forEach(sub => sub.unsubscribe());
   }
 } 
