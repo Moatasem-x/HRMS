@@ -60,10 +60,10 @@ export class AttendanceReportCombineComponent implements OnInit, OnDestroy {
       this.lastSearch = filter.search;
       let filtered = this.allRecords;
       if (this.lastFromDate) {
-        filtered = filtered.filter(r => r.createdAt >= this.lastFromDate);
+        filtered = filtered.filter(r => r.attendanceDate >= this.lastFromDate);
       }
       if (this.lastToDate) {
-        filtered = filtered.filter(r => r.createdAt <= this.lastToDate);
+        filtered = filtered.filter(r => r.attendanceDate <= this.lastToDate);
       }
       if (this.lastSearch) {
         filtered = filtered.filter(r => r.employeeName.toLowerCase().includes(this.lastSearch.toLowerCase()));

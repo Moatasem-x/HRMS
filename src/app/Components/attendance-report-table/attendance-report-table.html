@@ -37,21 +37,21 @@
           <td>{{ record.delayHours }}</td>
 
           @if (editIndex !== i) {
-            <td>{{ record.createdAt | date:'dd-MM-yyyy' }}</td>
+            <td>{{ record.attendanceDate| date:'dd-MM-yyyy' }}</td>
           }
           @if (editIndex === i && editedRecord) {
-            <td><input [(ngModel)]="editedRecord.createdAt" type="date" [class.editing]="editIndex === i" /></td>
+            <td><input [(ngModel)]="editedRecord.attendanceDate" type="date" [class.editing]="editIndex === i" /></td>
           }
 
           <td>
             @if (editIndex !== i) {
-              <button (click)="editRecord(i)" title="Edit">✏️</button>
+              <button class="app-table-action-btn edit" (click)="editRecord(i)" title="Edit"><span>✏️</span></button>
+              <button class="app-table-action-btn delete" (click)="deleteRecord(i)" title="Delete"><span>🗑️</span></button>
             }
             @if (editIndex === i && editedRecord) {
-              <button (click)="saveRecord(i)" title="Save">💾</button>
-              <button (click)="cancelEdit()" title="Cancel">❌</button>
+              <button class="app-table-action-btn edit" (click)="saveRecord(i)" title="Save"><span>💾</span></button>
+              <button class="app-table-action-btn delete" (click)="cancelEdit()" title="Cancel"><span>❌</span></button>
             }
-            <button (click)="deleteRecord(i)" title="Delete">🗑️</button>
           </td>
           
         </tr>

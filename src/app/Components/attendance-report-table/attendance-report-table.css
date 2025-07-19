@@ -65,53 +65,51 @@
   }
 }
 
-button {
+/* Remove old button styles and add official-holiday-table button styles */
+
+/* Action buttons */
+.app-table-action-btn {
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 1.2rem;
-  margin: 0 4px;
-  transition: transform 0.2s ease;
+  font-size: 1.1rem;
+  margin-right: 8px;
+  transition: all 0.2s ease;
+  padding: 8px;
+  border-radius: 6px;
 }
 
-button:hover {
+.app-table-action-btn.edit {
+  color: #3b82f6;
+}
+
+.app-table-action-btn.delete {
+  color: #ef4444;
+}
+
+.app-table-action-btn.edit:hover {
+  background: rgba(59, 130, 246, 0.15);
   transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
 }
 
-/* Save button styling */
-button[title="Save"] {
-  color: #059669;
+.app-table-action-btn.delete:hover {
+  background: rgba(239, 68, 68, 0.15);
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2);
 }
 
-button[title="Save"]:hover {
-  color: #047857;
+.app-table-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
-/* Cancel button styling */
-button[title="Cancel"] {
-  color: #dc2626;
-}
 
-button[title="Cancel"]:hover {
-  color: #b91c1c;
-}
-
-/* Edit button styling */
-button[title="Edit"] {
-  color: #2563eb;
-}
-
-button[title="Edit"]:hover {
-  color: #1d4ed8;
-}
-
-/* Delete button styling */
-button[title="Delete"] {
-  color: #dc2626;
-}
-
-button[title="Delete"]:hover {
-  color: #b91c1c;
+button {
+  /* Reset margin for legacy selectors */
+  margin: 0 4px;
 }
 
 /* .app-table input[type="text"] {

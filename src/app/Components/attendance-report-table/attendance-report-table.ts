@@ -32,18 +32,12 @@ export class AttendanceReportTableComponent {
     if (this.editedRecord) {
       this.subs.push(this.attendanceService.editAttendance(this.editedRecord).subscribe({
         next: (resp) => {
-          // Check if response is valid and has the expected structure
-          if (resp && resp.attendanceId) {
-            // Update the record in the local array with the response from server
-            this.records[index] = resp;
-          } else {
-            // If server response is empty or invalid, update with the edited record
-            // This ensures the UI shows the updated data even if server doesn't return the full object
-            this.records[index] = this.editedRecord as IAttendance;
-          }
-          
+          this.records[index] = this.editedRecord as IAttendance;
           this.editIndex = null;
           this.editedRecord = null;
+          console.log(this.records[index]);
+          console.log(resp);
+
           
           Swal.fire({
             title: "Success!",

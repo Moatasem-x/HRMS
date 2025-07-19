@@ -6,6 +6,5 @@ export interface IAttendance {
     checkOutTime: string;
     overtimeHours: number;
     delayHours: number;
-    createdAt: string;
-    updatedAt: string;
+    attendanceDate: string;
 }
