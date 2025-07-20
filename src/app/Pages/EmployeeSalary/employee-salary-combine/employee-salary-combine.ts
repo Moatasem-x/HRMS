@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { EmployeeSalaryFilterComponent } from '../../../Components/employee-salary-filter/employee-salary-filter';
 import { EmployeeSalaryTableComponent } from '../../../Components/employee-salary-table/employee-salary-table';
-import { IEmployeeSalaryFilter } from '../../../Interfaces/iemployee-salary';
 
 @Component({
   selector: 'app-employee-salary-combine',
@@ -12,13 +11,22 @@ import { IEmployeeSalaryFilter } from '../../../Interfaces/iemployee-salary';
   styleUrls: ['./employee-salary-combine.css']
 })
 export class EmployeeSalaryCombineComponent {
-  currentFilter: IEmployeeSalaryFilter = {
+  currentFilter: {
+    employeeName: string;
+    month: string;
+    year: string;
+  } = {
     employeeName: '',
     month: '',
     year: ''
   };
 
-  onFilterChanged(filter: IEmployeeSalaryFilter): void {
-    this.currentFilter = filter;
+  onFilterChanged(filter: {
+    employeeName: string;
+    month: string;
+    year: string;
+  }): void {
+    // Create a new object reference to trigger change detection
+    this.currentFilter = { ...filter };
   }
 } 

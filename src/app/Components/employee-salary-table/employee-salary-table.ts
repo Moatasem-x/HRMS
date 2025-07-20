@@ -1,8 +1,9 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IEmployeeSalary, IEmployeeSalaryFilter } from '../../Interfaces/iemployee-salary';
-import { EmployeeSalaryService } from '../../Services/employee-salary-service';
+import { ISalaryReport } from '../../Interfaces/isalary-report';
+import { SalaryReportService } from '../../Services/salary-report-service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-employee-salary-table',
@@ -11,78 +12,80 @@ import { EmployeeSalaryService } from '../../Services/employee-salary-service';
   templateUrl: './employee-salary-table.html',
   styleUrls: ['./employee-salary-table.css']
 })
-export class EmployeeSalaryTableComponent implements OnInit, OnChanges {
-  @Input() filter: IEmployeeSalaryFilter = {
+export class EmployeeSalaryTableComponent implements OnInit, OnChanges, OnDestroy {
+  @Input() filter: {
+    employeeName: string;
+    month: string;
+    year: string;
+  } = {
     employeeName: '',
     month: '',
     year: ''
   };
 
-  employeeSalaries: IEmployeeSalary[] = [];
-  editingRow: number | null = null;
-  editedSalary: IEmployeeSalary | null = null;
+  salaryReports: ISalaryReport[] = [];
+  filteredReports: ISalaryReport[] = [];
+  subs: Subscription[] = [];
   currentPage = 1;
   itemsPerPage = 10;
 
-  constructor(private employeeSalaryService: EmployeeSalaryService) {}
+  constructor(private salaryReportService: SalaryReportService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
-    this.loadEmployeeSalaries();
+    this.loadSalaryReports();
+
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['filter']) {
-      this.loadEmployeeSalaries();
+      console.log('Filter changed:', this.filter);
+      this.applyFilter();
     }
   }
 
-  loadEmployeeSalaries(): void {
-    this.employeeSalaryService.getEmployeeSalaries(this.filter).subscribe(data => {
-      this.employeeSalaries = data;
+  loadSalaryReports(): void {
+    this.subs.push(this.salaryReportService.getSalaryReports().subscribe({
+      next: (data) => {
+        this.salaryReports = data;
+        console.log('Loaded salary reports:', data.length);
+        this.applyFilter();
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('Error loading salary reports:', error);
+      }
+    }));
+  }
+
+  applyFilter(): void {
+    console.log('Applying filter:', this.filter);
+    console.log('Total reports before filter:', this.salaryReports.length);
+    
+    this.filteredReports = this.salaryReports.filter(report => {
+      const matchesEmployeeName = !this.filter.employeeName || 
+        report.employeeName.toLowerCase().includes(this.filter.employeeName.toLowerCase());
+      
+      const matchesMonth = !this.filter.month || 
+        report.month.toString() === this.filter.month;
+      
+      const matchesYear = !this.filter.year || 
+        report.year.toString() === this.filter.year;
+      
+      return matchesEmployeeName && matchesMonth && matchesYear;
     });
+    console.log(this.salaryReports);
+    
+    this.currentPage = 1; // Reset to first page when filter changes
   }
 
-  startEdit(salary: IEmployeeSalary): void {
-    this.editingRow = salary.employeeId;
-    this.editedSalary = { ...salary };
-  }
-
-  saveEdit(): void {
-    if (this.editedSalary) {
-      this.employeeSalaryService.updateEmployeeSalary(this.editedSalary).subscribe(() => {
-        this.loadEmployeeSalaries();
-        this.cancelEdit();
-      });
-    }
-  }
-
-  cancelEdit(): void {
-    this.editingRow = null;
-    this.editedSalary = null;
-  }
-
-  deleteSalary(employeeId: number): void {
-    if (confirm('Are you sure you want to delete this record?')) {
-      this.employeeSalaryService.deleteEmployeeSalary(employeeId).subscribe(() => {
-        this.loadEmployeeSalaries();
-      });
-    }
-  }
-
-  printSalary(salary: IEmployeeSalary): void {
-    // Implementation for printing salary slip
-    console.log('Printing salary for:', salary.employeeName);
-    // You can implement actual printing logic here
-  }
-
-  get paginatedSalaries(): IEmployeeSalary[] {
+  get paginatedReports(): ISalaryReport[] {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     const endIndex = startIndex + this.itemsPerPage;
-    return this.employeeSalaries.slice(startIndex, endIndex);
+    return this.filteredReports.slice(startIndex, endIndex);
   }
 
   get totalPages(): number {
-    return Math.ceil(this.employeeSalaries.length / this.itemsPerPage);
+    return Math.ceil(this.filteredReports.length / this.itemsPerPage);
   }
 
   nextPage(): void {
@@ -118,5 +121,17 @@ export class EmployeeSalaryTableComponent implements OnInit, OnChanges {
     }
     
     return pages;
+  }
+
+  getMonthName(month: number): string {
+    const months = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    return months[month - 1] || '';
+  }
+
+  ngOnDestroy(): void {
+    this.subs.forEach(sub => sub.unsubscribe());
   }
 } 

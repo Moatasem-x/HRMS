@@ -74,13 +74,14 @@
   top: 50%;
   transform: translateY(-50%);
   color: #64748b;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
+  pointer-events: none;
 }
 
 .filter-controls {
   display: flex;
   gap: 15px;
-  align-items: center;
+  align-items: end;
   flex-wrap: wrap;
 }
 
@@ -88,7 +89,8 @@
   display: flex;
   flex-direction: column;
   gap: 5px;
-  min-width: 120px;
+  min-width: 140px;
+  flex: 0 1 auto;
 }
 
 .select-group label {
@@ -107,6 +109,8 @@
   box-shadow: 0 1px 3px rgba(2,132,199,0.06);
   transition: border 0.2s, box-shadow 0.2s, background 0.2s;
   outline: none;
+  appearance: none;
+  cursor: pointer;
 }
 
 .filter-select:focus {
@@ -124,6 +128,8 @@
   cursor: pointer;
   transition: all 0.2s ease;
   min-width: 80px;
+  height: 42px;
+  align-self: end;
 }
 
 .search-btn {

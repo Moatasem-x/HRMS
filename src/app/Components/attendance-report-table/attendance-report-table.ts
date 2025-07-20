@@ -32,7 +32,7 @@ export class AttendanceReportTableComponent {
     if (this.editedRecord) {
       this.subs.push(this.attendanceService.editAttendance(this.editedRecord).subscribe({
         next: (resp) => {
-          this.records[index] = this.editedRecord as IAttendance;
+          this.records[index] = resp;
           this.editIndex = null;
           this.editedRecord = null;
           console.log(this.records[index]);
