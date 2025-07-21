@@ -7,6 +7,7 @@ import { Subscription } from 'rxjs';
 import { EmployeeService } from '../../../Services/employee-service';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import Swal from 'sweetalert2';
+import { RouterLink } from '@angular/router';
 
 interface BoardMember {
   name: string;
@@ -18,7 +19,7 @@ interface BoardMember {
 @Component({
   selector: 'app-employees',
   standalone: true,
-  imports: [FormsModule, CommonModule, SweetAlert2Module],
+  imports: [FormsModule, CommonModule, SweetAlert2Module, RouterLink],
   templateUrl: './employees.html',
   styleUrls: ['./employees.css'],
   animations: [

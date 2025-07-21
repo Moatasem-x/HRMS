@@ -1,0 +1,24 @@
+<nav class="sidebar" [class.expanded]="isExpanded" (mouseenter)="onSidebarEnter()" (mouseleave)="onSidebarLeave()">
+  <ul>
+    <li routerLink="/employees" routerLinkActive="active">
+      <i class="bi bi-people"></i>
+      <span class="sidebar-label">Employees</span>
+    </li>
+    <li routerLink="/addemployee/0" routerLinkActive="active">
+      <i class="bi bi-person-plus"></i>
+      <span class="sidebar-label">Add Employee</span>
+    </li>
+    <li routerLink="/attendance" routerLinkActive="active">
+      <i class="bi bi-calendar-check"></i>
+      <span class="sidebar-label">Attendance</span>
+    </li>
+    <li routerLink="/salaryreports" routerLinkActive="active">
+      <i class="bi bi-cash-stack"></i>
+      <span class="sidebar-label">Salary Report</span>
+    </li>
+    <li routerLink="/holidays" routerLinkActive="active">
+      <i class="bi bi-calendar-event"></i>
+      <span class="sidebar-label">Official Holidays</span>
+    </li>
+  </ul>
+</nav>

@@ -14,7 +14,7 @@ import { IEmployee } from '../../../Interfaces/iemployee';
   templateUrl: './employee-form.html',
   styleUrl: './employee-form.css'
 })
-export class EmployeeForm implements OnInit, OnDestroy {
+export class EmployeeFormComponent implements OnInit, OnDestroy {
   employeeForm!: FormGroup;
   isSubmitting = false;
   submitSuccess = false;
