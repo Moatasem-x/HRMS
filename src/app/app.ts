@@ -1,18 +1,20 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { EmployeesComponent as EmployeesComponent } from "./Pages/Employee/employees/employees";
-import { EmployeeFormComponent } from './Pages/Employee/employee-form/employee-form';
-import { OfficialHolidayCombineComponent } from "./Pages/OfficialHoliday/official-holiday-combine/official-holiday-combine";
-import { AttendanceReportCombineComponent } from "./Pages/AttendanceReport/attendance-report-combine/attendance-report-combine";
-import { EmployeeSalaryCombineComponent } from "./Pages/EmployeeSalary/employee-salary-combine/employee-salary-combine";
+import { Router } from '@angular/router';
+import { AuthService } from './Services/auth-service';
 import { Sidebar } from './Components/sidebar/sidebar';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, EmployeesComponent, EmployeeFormComponent, OfficialHolidayCombineComponent, AttendanceReportCombineComponent, EmployeeSalaryCombineComponent, Sidebar],
+  imports: [Sidebar, RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
 export class App {
   protected title = 'HRMS';
+  public authReady = false;
+
+  constructor(public router: Router, private authService: AuthService) {
+    
+  }
 }

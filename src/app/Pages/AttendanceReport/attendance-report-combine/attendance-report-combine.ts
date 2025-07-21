@@ -1,6 +1,6 @@
 import { Component, ViewChild, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
-import { AttendanceReportFilterComponent } from '../../../Components/attendance-report-filter/attendance-report-filter';
-import { AttendanceReportTableComponent } from '../../../Components/attendance-report-table/attendance-report-table';
+import { AttendanceReportFilter } from '../../../Components/attendance-report-filter/attendance-report-filter';
+import { AttendanceReportTable } from '../../../Components/attendance-report-table/attendance-report-table';
 import { AttendanceService } from '../../../Services/attendance-service';
 import { IAttendance } from '../../../Interfaces/iattendance';
 import { Subscription } from 'rxjs';
@@ -8,12 +8,12 @@ import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-attendance-report-combine',
   standalone: true,
-  imports: [AttendanceReportFilterComponent, AttendanceReportTableComponent],
+  imports: [AttendanceReportFilter, AttendanceReportTable],
   templateUrl: './attendance-report-combine.html',
   styleUrls: ['./attendance-report-combine.css']
 })
-export class AttendanceReportCombineComponent implements OnInit, OnDestroy {
-  @ViewChild(AttendanceReportTableComponent) table!: AttendanceReportTableComponent;
+export class AttendanceReportCombine implements OnInit, OnDestroy {
+  @ViewChild(AttendanceReportTable) table!: AttendanceReportTable;
   allRecords: IAttendance[] = [];
   filteredRecords: IAttendance[] = [];
   subs: Subscription[] = [];

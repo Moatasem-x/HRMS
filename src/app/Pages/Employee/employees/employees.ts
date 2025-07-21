@@ -8,6 +8,7 @@ import { EmployeeService } from '../../../Services/employee-service';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import Swal from 'sweetalert2';
 import { RouterLink } from '@angular/router';
+import { AuthService } from '../../../Services/auth-service';
 
 interface BoardMember {
   name: string;
@@ -51,12 +52,15 @@ interface BoardMember {
     ])
   ]
 })
-export class EmployeesComponent implements OnInit, OnDestroy {
+export class Employees implements OnInit, OnDestroy {
 
-  constructor(private employeeService: EmployeeService, private cdr: ChangeDetectorRef) {}
+  constructor(private employeeService: EmployeeService, private cdr: ChangeDetectorRef, private authService: AuthService) {}
 
   ngOnInit(): void {
     this.loadEmployees();
+    console.log(this.authService.getEmail());
+    console.log(this.authService.getRole());
+    console.log(this.authService.getUserName());
   }
 
 

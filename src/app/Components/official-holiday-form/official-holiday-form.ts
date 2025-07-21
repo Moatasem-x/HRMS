@@ -14,7 +14,7 @@ import Swal from 'sweetalert2';
   templateUrl: './official-holiday-form.html',
   styleUrl: './official-holiday-form.css'
 })
-export class OfficialHolidayFormComponent implements OnInit, OnDestroy {
+export class OfficialHolidayForm implements OnInit, OnDestroy {
   holidayForm!: FormGroup;
   isSubmitting = false;
   submitSuccess = false;

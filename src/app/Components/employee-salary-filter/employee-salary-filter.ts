@@ -9,7 +9,7 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './employee-salary-filter.html',
   styleUrls: ['./employee-salary-filter.css']
 })
-export class EmployeeSalaryFilterComponent implements OnInit {
+export class EmployeeSalaryFilter implements OnInit {
   @Output() filterChanged = new EventEmitter<{
     employeeName: string;
     month: string;

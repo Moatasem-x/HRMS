@@ -76,7 +76,6 @@ input[type="date"]::-moz-focus-inner {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s;
-  display: inline-flex;
   background: transparent;
   overflow: hidden;
   text-align: center;

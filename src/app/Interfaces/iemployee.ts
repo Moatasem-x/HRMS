@@ -3,12 +3,13 @@ export interface IEmployee {
     fullName: string;
     email: string;
     password: string;
-    address:string;
+    address: string;
     phoneNumber: string;
-    nationalId:string;
-    gender:string;
+    nationalId: string;
+    gender: string;
     hireDate: string;
     salary: number;
     departmentId: number;
     departmentName: string;
+    image?: File; // Optional image property for file upload
 }

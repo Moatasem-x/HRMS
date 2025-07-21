@@ -13,7 +13,7 @@ import Swal from 'sweetalert2';
   standalone: true,
   imports: [DatePipe, CommonModule, FormsModule, ReactiveFormsModule]
 })
-export class OfficialHolidayTableComponent implements OnInit, OnDestroy, OnChanges {
+export class OfficialHolidayTable implements OnInit, OnDestroy, OnChanges {
   holidays: IOfficialHoliday[] = [];
   isLoading = false;
   error: string | null = null;

@@ -6,6 +6,7 @@ import { DepartmentService } from '../../../Services/department-service';
 import { IDepartment } from '../../../Interfaces/idepartment';
 import { Subscription } from 'rxjs';
 import { IEmployee } from '../../../Interfaces/iemployee';
+import { AuthService } from '../../../Services/auth-service';
 
 
 @Component({
@@ -14,7 +15,7 @@ import { IEmployee } from '../../../Interfaces/iemployee';
   templateUrl: './employee-form.html',
   styleUrl: './employee-form.css'
 })
-export class EmployeeFormComponent implements OnInit, OnDestroy {
+export class EmployeeForm implements OnInit, OnDestroy {
   employeeForm!: FormGroup;
   isSubmitting = false;
   submitSuccess = false;
@@ -32,11 +33,15 @@ export class EmployeeFormComponent implements OnInit, OnDestroy {
     private fb: FormBuilder, 
     private employeeService: EmployeeService, 
     private departmentService: DepartmentService, 
-    private cdr: ChangeDetectorRef) {}
+    private cdr: ChangeDetectorRef,
+    private authService: AuthService) {}
 
   ngOnInit(): void {
     this.loadDepartments();
     this.initForm();
+    console.log(this.authService.getEmail());
+    console.log(this.authService.getRole());
+    console.log(this.authService.getUserName());
     
   }
 
@@ -59,6 +64,7 @@ export class EmployeeFormComponent implements OnInit, OnDestroy {
       ],
       hireDate: ['', Validators.required],
       salary: ['', [Validators.required, Validators.min(0)]],
+      image: [null]
     });
   }
 
@@ -76,9 +82,25 @@ export class EmployeeFormComponent implements OnInit, OnDestroy {
 
   onSubmit(): void {
     if (this.employeeForm.valid) {
-      const employeeData: IEmployee = this.employeeForm.value;
+      const formValue = this.employeeForm.value;
+      const employeeData: IEmployee = { ...formValue };
+      const formData = new FormData();
+
+      // Append all fields except image
+      Object.keys(employeeData).forEach(key => {
+        if (key !== 'image' && employeeData[key as keyof IEmployee] !== undefined && employeeData[key as keyof IEmployee] !== null) {
+          formData.append(key, employeeData[key as keyof IEmployee] as any);
+        }
+      });
+
+      // Append the image file if present
+      if (employeeData.image) {
+        formData.append('image', employeeData.image);
+      }
+      console.log(formData);
+
       this.isSubmitting = true;
-      const sub = this.employeeService.addEmployee(employeeData).subscribe({
+      const sub = this.employeeService.addEmployee(formData).subscribe({
         next: (resp) => {
           console.log('Employee added successfully:', resp);
         },

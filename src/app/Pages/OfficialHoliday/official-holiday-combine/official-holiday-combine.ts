@@ -1,18 +1,18 @@
 import { Component, ViewChild } from '@angular/core';
-import { OfficialHolidayFormComponent } from '../../../Components/official-holiday-form/official-holiday-form';
-import { OfficialHolidayTableComponent } from '../../../Components/official-holiday-table/official-holiday-table';
+import { OfficialHolidayForm } from '../../../Components/official-holiday-form/official-holiday-form';
+import { OfficialHolidayTable } from '../../../Components/official-holiday-table/official-holiday-table';
 import { IOfficialHoliday } from '../../../Interfaces/iofficial-holiday';
 
 
 @Component({
   selector: 'app-official-holiday-combine',
   standalone: true,
-  imports: [OfficialHolidayFormComponent, OfficialHolidayTableComponent],
+  imports: [OfficialHolidayForm, OfficialHolidayTable],
   templateUrl: './official-holiday-combine.html',
   styleUrls: ['./official-holiday-combine.css']
 })
-export class OfficialHolidayCombineComponent {
-  @ViewChild(OfficialHolidayTableComponent) table!: OfficialHolidayTableComponent;
+export class OfficialHolidayCombine {
+  @ViewChild(OfficialHolidayTable) table!: OfficialHolidayTable;
   addedHoliday!: IOfficialHoliday;
 
   onAddHoliday(holiday: { name: string; date: string; }) {

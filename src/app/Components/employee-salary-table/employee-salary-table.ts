@@ -12,7 +12,7 @@ import { Subscription } from 'rxjs';
   templateUrl: './employee-salary-table.html',
   styleUrls: ['./employee-salary-table.css']
 })
-export class EmployeeSalaryTableComponent implements OnInit, OnChanges, OnDestroy {
+export class EmployeeSalaryTable implements OnInit, OnChanges, OnDestroy {
   @Input() filter: {
     employeeName: string;
     month: string;

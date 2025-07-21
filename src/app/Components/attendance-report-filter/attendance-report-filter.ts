@@ -8,7 +8,7 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './attendance-report-filter.html',
   styleUrls: ['./attendance-report-filter.css']
 })
-export class AttendanceReportFilterComponent {
+export class AttendanceReportFilter {
   fromDate = '';
   toDate = '';
   search = '';

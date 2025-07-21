@@ -13,7 +13,7 @@ import { Subscription } from 'rxjs';
   templateUrl: './attendance-report-table.html',
   styleUrls: ['./attendance-report-table.css']
 })
-export class AttendanceReportTableComponent {
+export class AttendanceReportTable {
 
   constructor(private attendanceService: AttendanceService, private cdr: ChangeDetectorRef) {}
   @Input() records: IAttendance[] = [];

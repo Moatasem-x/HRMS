@@ -1,0 +1,23 @@
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(120deg, #f8fafc 0%, #e9f0fa 100%);
+}
+
+.login-logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 0.2rem;
+}
+
+.login-logo img {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(60, 80, 120, 0.07);
+  background: #f4f6fa;
+}

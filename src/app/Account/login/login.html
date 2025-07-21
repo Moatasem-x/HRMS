@@ -1,0 +1,42 @@
+<div class="login-container">
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="form-card" style="max-width: 370px;">
+    <div class="form-header">
+      <div class="login-logo">
+        <img src="assets/logo.png" alt="HRMS Logo" />
+      </div>
+      <div class="form-title">Login</div>
+    </div>
+    <div class="form-group">
+      <label for="email" class="form-label">Email</label>
+      <input id="email" type="email" formControlName="email" [class.invalid]="email?.invalid && (email?.touched || email?.dirty)" class="form-input" placeholder="Enter your email" />
+      @if (email?.invalid && (email?.touched || email?.dirty)) {
+        <div class="error-message">
+          @if (email?.errors?.['required']) {
+            <span>Email is required.</span>
+          }
+          @if (email?.errors?.['email']) {
+            <span>Enter a valid email.</span>
+          }
+        </div>
+      }
+    </div>
+    <div class="form-group">
+      <label for="password" class="form-label">Password</label>
+      <input id="password" type="password" formControlName="password" [class.invalid]="password?.invalid && (password?.touched || password?.dirty)" class="form-input" placeholder="Enter your password" />
+      @if (password?.invalid && (password?.touched || password?.dirty)) {
+        <div class="error-message">
+          @if (password?.errors?.['required']) {
+            <span>Password is required.</span>
+          }
+          @if (password?.errors?.['minlength']) {
+            <span>Password must be at least 6 characters.</span>
+          }
+        </div>
+      }
+    </div>
+    <button type="submit" [disabled]="loading || loginForm.invalid" class="btn btn-primary w-100">{{ loading ? 'Logging in...' : 'Login' }}</button>
+    @if (error) {
+      <div class="error-message">{{ error }}</div>
+    }
+  </form>
+</div>
