@@ -7,4 +7,5 @@ export interface IAttendance {
     overtimeHours: number;
     delayHours: number;
     attendanceDate: string;
+    status: string; // e.g., 'present', 'absent', 'leave', 'pending'
 }
