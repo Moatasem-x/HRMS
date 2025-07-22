@@ -1,1 +1,56 @@
-<p>employee-dashboard works!</p>
+<div class="dashboard-layout">
+  <main class="main-content">
+    <!-- Header -->
+    <header class="dashboard-header">
+      <div class="welcome">Welcome, {{employee?.fullName}}!</div>
+    </header>
+
+    <!-- Employee Info Card -->
+    <div class="card" style="max-width:400px;margin:0 auto 2rem auto;">
+      <div style="font-size:1.2rem;font-weight:600;">Personal Info</div>
+      <div style="margin:0.5rem 0;"><b>Email:</b> {{employee?.email}}</div>
+      <div style="margin:0.5rem 0;"><b>Department:</b> {{employee?.departmentName}}</div>
+      <div style="margin:0.5rem 0;"><b>Phone:</b> {{employee?.phoneNumber}}</div>
+    </div>
+
+    <!-- Top Cards -->
+    <div class="dashboard-cards">
+      <div class="card">
+        <div class="card-title">Attendance (7d)</div>
+        <div class="card-value">{{attendanceData.length}}</div>
+        <div class="card-desc">Days Present</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Absences (7d)</div>
+        <div class="card-value">{{7 - attendanceData.length}}</div>
+        <div class="card-desc">Days Absent</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Pending Leaves</div>
+        <div class="card-value">{{pendingLeaves}}</div>
+        <div class="card-desc">Requests</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Net Salary</div>
+        <div class="card-value">{{salaryData?.netSalary || 0}}</div>
+        <div class="card-desc">This Month</div>
+      </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="dashboard-row dashboard-row-3">
+      <div class="chart-card">
+        <div class="chart-title">Attendance (Last 7 Days)</div>
+        <canvas #attendanceChartCanvas></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Salary Breakdown</div>
+        <canvas #salaryChartCanvas></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Tasks Status</div>
+        <canvas #tasksChartCanvas></canvas>
+      </div>
+    </div>
+  </main>
+</div>
