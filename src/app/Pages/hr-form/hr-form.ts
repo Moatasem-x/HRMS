@@ -1,23 +1,24 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormControl } from '@angular/forms';
-import { CommonModule } from '@angular/common';
-import { EmployeeService } from '../../../Services/employee-service';
-import { DepartmentService } from '../../../Services/department-service';
-import { IDepartment } from '../../../Interfaces/idepartment';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { IEmployee } from '../../../Interfaces/iemployee';
-import { AuthService } from '../../../Services/auth-service';
+import { IDepartment } from '../../Interfaces/idepartment';
+import { IEmployee } from '../../Interfaces/iemployee';
+import { DepartmentService } from '../../Services/department-service';
+import { EmployeeService } from '../../Services/employee-service';
+import { AuthService } from '../../Services/auth-service';
+import { ChangeDetectorRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { HRService } from '../../Services/hr-service';
 import Swal from 'sweetalert2';
 
-
 @Component({
-  selector: 'app-employee-form',
+  selector: 'app-hr-form',
   imports: [ReactiveFormsModule, CommonModule],
-  templateUrl: './employee-form.html',
-  styleUrl: './employee-form.css'
+  templateUrl: './hr-form.html',
+  styleUrl: './hr-form.css'
 })
-export class EmployeeForm implements OnInit, OnDestroy {
-  employeeForm!: FormGroup;
+export class HRForm implements OnInit, OnDestroy {
+  hrForm!: FormGroup;
   isSubmitting = false;
   submitSuccess = false;
   textType = false;
@@ -34,7 +35,7 @@ export class EmployeeForm implements OnInit, OnDestroy {
 
   constructor(
     private fb: FormBuilder, 
-    private employeeService: EmployeeService, 
+    private HRService: HRService,
     private departmentService: DepartmentService, 
     private cdr: ChangeDetectorRef,
     private authService: AuthService) {}
@@ -46,7 +47,7 @@ export class EmployeeForm implements OnInit, OnDestroy {
   }
 
   initForm(): void {
-    this.employeeForm = this.fb.group({
+    this.hrForm = this.fb.group({
       fullName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
       address: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(25)]],
       phoneNumber: ['', [Validators.required, Validators.pattern(/^\+20[0125][0-9]{9}$/)]],
@@ -81,37 +82,37 @@ export class EmployeeForm implements OnInit, OnDestroy {
   }
 
   onSubmit(): void {
-    if (this.employeeForm.valid) {
-      const formValue = this.employeeForm.value;
-      const employeeData: IEmployee = { ...formValue };
+    if (this.hrForm.valid) {
+      const formValue = this.hrForm.value;
+      const hrData: IEmployee = { ...formValue };
       const formData = new FormData();
 
       // Append all fields except image
-      Object.keys(employeeData).forEach(key => {
-        if (key !== 'image' && employeeData[key as keyof IEmployee] !== undefined && employeeData[key as keyof IEmployee] !== null) {
-          formData.append(key, employeeData[key as keyof IEmployee] as any);
+      Object.keys(hrData).forEach(key => {
+        if (key !== 'image' && hrData[key as keyof IEmployee] !== undefined && hrData[key as keyof IEmployee] !== null) {
+          formData.append(key, hrData[key as keyof IEmployee] as any);
         }
       });
 
       // Append the image file if present
-      if (employeeData.image) {
-        formData.append('image', employeeData.image);
+      if (hrData.image) {
+        formData.append('image', hrData.image);
       }
       console.log(formData);
 
       this.isSubmitting = true;
-      const sub = this.employeeService.addEmployee(formData).subscribe({
+      const sub = this.HRService.addHR(formData).subscribe({
         next: (resp) => {
           Swal.fire({
             title: "Success!",
-            text: "Employee Has Been Added Successfully.",
+            text: "HR Has Been Added Successfully.",
             icon: "success",
             timer: 1500,
             showConfirmButton: false
           });
         },
         error: (err) => {
-          console.error('Error adding employee:', err);
+          console.error('Error adding HR:', err);
         },
         complete: () => {
           this.isSubmitting = false;
@@ -122,21 +123,21 @@ export class EmployeeForm implements OnInit, OnDestroy {
       this.subs.push(sub);
     } 
     else {
-      console.log('Form is invalid:', this.employeeForm.errors);
-      console.log('Form values when invalid:', this.employeeForm.value);
+      console.log('Form is invalid:', this.hrForm.errors);
+      console.log('Form values when invalid:', this.hrForm.value);
       this.markFormGroupTouched();
     }
   }
 
   markFormGroupTouched(): void {
-    Object.keys(this.employeeForm.controls).forEach(key => {
-      const control = this.employeeForm.get(key);
+    Object.keys(this.hrForm.controls).forEach(key => {
+      const control = this.hrForm.get(key);
       control?.markAsTouched();
     });
   }
 
   getFieldError(fieldName: string): string {
-    const field = this.employeeForm.get(fieldName);
+    const field = this.hrForm.get(fieldName);
     if (field?.errors && field.touched) {
       if (field.errors['required']) {
         return `${this.getFieldLabel(fieldName)} is required`;
@@ -162,7 +163,7 @@ export class EmployeeForm implements OnInit, OnDestroy {
 
   getFieldLabel(fieldName: string): string {
     const labels: { [key: string]: string } = {
-      name: 'Employee Name',
+      name: 'HR Name',
       address: 'Address',
       phoneNumber: 'Phone Number',
       gender: 'Gender',
@@ -187,7 +188,7 @@ export class EmployeeForm implements OnInit, OnDestroy {
   }
 
   isFieldInvalid(fieldName: string): boolean {
-    const field = this.employeeForm.get(fieldName);
+    const field = this.hrForm.get(fieldName);
     return !!(field?.invalid && field?.touched);
   }
 
@@ -195,7 +196,7 @@ export class EmployeeForm implements OnInit, OnDestroy {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
       const file = input.files[0];
-      this.employeeForm.get('image')?.setValue(file);
+      this.hrForm.get('image')?.setValue(file);
       this.selectedImageName = file.name;
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -206,13 +207,13 @@ export class EmployeeForm implements OnInit, OnDestroy {
     } else {
       this.imagePreviewUrl = null;
       this.selectedImageName = '';
-      this.employeeForm.get('image')?.setValue(null);
+      this.hrForm.get('image')?.setValue(null);
     }
   }
 
   resetForm(): void {
-    this.employeeForm.reset();
-    this.employeeForm.patchValue({
+    this.hrForm.reset();
+    this.hrForm.patchValue({
       gender: '',
       departmentId: '',
     });

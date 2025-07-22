@@ -1,1 +1,52 @@
-<p>hr-dashboard works!</p>
+<div class="dashboard-layout">
+  
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Header -->
+      <header class="dashboard-header">
+        <div class="welcome">Welcome back, Ali!</div>
+      </header>
+  
+      <!-- Top Cards -->
+      <div class="dashboard-cards">
+        <div class="card">
+          <div class="card-title">Total Employees</div>
+          <div class="card-value">{{totalEmployees}}</div>
+          <div class="card-desc">Fulltime Employee</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Total Departments</div>
+          <div class="card-value">{{totalDepartments}}</div>
+          <div class="card-desc">Departments</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Attendance Today</div>
+          <div class="card-value">{{attendanceToday}}</div>
+          <div class="card-desc">Present</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Absentees Today</div>
+          <div class="card-value">{{absenteesToday}}</div>
+          <div class="card-desc">Absent</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Pending Leave Requests</div>
+          <div class="card-value">5</div>
+          <div class="card-desc">Pending</div>
+        </div>
+      </div>
+  
+      <!-- Middle Row: Real Charts -->
+      <div class="dashboard-row">
+        <div class="chart-card">
+          <div class="chart-title">Attendance Statistics</div>
+          <canvas #attendanceChartCanvas></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Employee Performance Ratings</div>
+          <canvas #performanceChartCanvas></canvas>
+        </div>
+      </div>
+  
+    </main>
+  </div> 

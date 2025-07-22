@@ -53,16 +53,19 @@ export class Login implements OnInit, OnDestroy {
     this.subs.push(this.authService.login(loginData).subscribe({
       next: (resp) => {
         if (resp && resp.token) {
+          console.log(resp);
           if (typeof window !== 'undefined' && localStorage) {
             localStorage.setItem('token', resp.token);
             localStorage.setItem('role', resp.role);
             localStorage.setItem('email', resp.email);
             localStorage.setItem('userName', resp.fullName);
+            localStorage.setItem('userId', resp.employeeId);
           }
           this.authService.saveUserData();
           this.authService.userEmail.next(resp.email);
           this.authService.userRole.next(resp.role);
           this.authService.userName.next(resp.fullName);
+          this.authService.userId.next(resp.employeeId);
           this.cdr.detectChanges();
           if (resp.role === "Employee") {
             this.router.navigate(['/empdash']);

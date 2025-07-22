@@ -20,7 +20,7 @@ export class AttendanceService {
   }
 
   deleteAttendance(id: number): Observable<IAttendance> {
-    return this.http.delete<IAttendance>(`${this.apiUrl}/${id}`);
+    return this.http.delete<IAttendance>(`${this.apiUrl}/delete/${id}`);
   }
 
 

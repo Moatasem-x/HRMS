@@ -3,12 +3,14 @@
       <div class="form-header">
         <h1 class="form-title">
           <i class="bi bi-person-plus"></i>
-          Add New Employee
+          Add New HR
         </h1>
-        <p class="form-subtitle">Fill in the employee information below</p>
+        <p class="form-subtitle">Fill in the HR information below</p>
       </div>
   
-      <form [formGroup]="employeeForm" (ngSubmit)="onSubmit()" class="employee-form">
+    
+  
+      <form [formGroup]="hrForm" (ngSubmit)="onSubmit()" class="employee-form">
         <!-- Personal Information Section -->
         <div class="form-section">
           <h2 class="section-title">
@@ -17,14 +19,14 @@
           </h2>
           <div class="form-row">
             <div class="form-group">
-              <label for="fullName" class="form-label">Employee Name</label>
+              <label for="fullName" class="form-label">HR Name</label>
               <input
                 type="text"
                 id="fullName"
                 formControlName="fullName"
                 class="form-input"
                 [class.invalid]="isFieldInvalid('fullName')"
-                placeholder="Enter employee full name">
+                placeholder="Enter HR full name">
               @if (getFieldError('fullName')) {
               <div class="error-message">
                 <i class="bi bi-exclamation-circle"></i>
@@ -176,7 +178,7 @@
             </div>
           </div>
           <div class="form-group full-width">
-            <label for="image" class="form-label">Employee Image</label>
+            <label for="image" class="form-label">HR Image</label>
             <div class="custom-file-input-wrapper input-with-image-preview">
               <input id="image" type="file" class="form-input custom-file-input" #imageInput (change)="onImageChange($event)" />
               <label for="image" class="custom-file-label">Browse</label>
@@ -244,9 +246,9 @@
           <button
             type="submit"
             class="btn btn-primary"
-            [disabled]="employeeForm.invalid">
+            [disabled]="hrForm.invalid">
             <i class="bi bi-person-check"></i>
-            Add Employee
+            Add HR
           </button>
         </div>
       </form>

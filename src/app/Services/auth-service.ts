@@ -17,6 +17,7 @@ export class AuthService {
   userEmail = new BehaviorSubject<string | null>(null);
   userRole = new BehaviorSubject<string | null>(null);
   userName = new BehaviorSubject<string | null>(null);
+  userId = new BehaviorSubject<number | null>(null);
 
   constructor(private http: HttpClient, private router: Router) {
     if (typeof window !== 'undefined' && localStorage) {
@@ -37,6 +38,7 @@ export class AuthService {
     this.userRole.next(localStorage.getItem('role'));
     this.userEmail.next(localStorage.getItem('email'));
     this.userName.next(localStorage.getItem('userName'));
+    this.userId.next(Number(localStorage.getItem('userId')));
     this.isAuthenticated = true;
   }
 
@@ -59,13 +61,13 @@ export class AuthService {
     return this.userName.getValue();
   }
 
-  getName() {
-    return this.userName.getValue();
+  getUserId() {
+    return this.userId.getValue();
   }
 
   logout() {
     if (typeof window !== 'undefined' && localStorage) {  
-      localStorage.removeItem('token');
+      localStorage.clear()
     }
     this.userData.next(null);
     this.isAuthenticated = false;
