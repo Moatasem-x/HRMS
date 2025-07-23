@@ -14,6 +14,14 @@ export class EmployeeService {
     return this.http.get<IEmployee[]>(this.apiUrl);
   }
 
+  getEmployeeById(id: number): Observable<IEmployee> {
+    return this.http.get<IEmployee>(`${this.apiUrl}/${id}`);
+  }
+
+  getCurrentEmployee(): Observable<IEmployee> {
+    return this.http.get<IEmployee>(`${this.apiUrl}/my-profile`);
+  }
+
   addEmployee(employee: FormData): Observable<any> {
     return this.http.post(this.apiUrl, employee);
   }

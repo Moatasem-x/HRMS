@@ -1,6 +1,13 @@
 import { Component, AfterViewInit, ChangeDetectorRef, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import Chart from 'chart.js/auto';
+import { AuthService } from '../../Services/auth-service';
+import { EmployeeService } from '../../Services/employee-service';
+import { IEmployee } from '../../Interfaces/iemployee';
+import { Subscription } from 'rxjs';
+import { AttendanceService } from '../../Services/attendance-service';
+import { IAttendance } from '../../Interfaces/iattendance';
+import { RequestHolidayService } from '../../Services/request-holiday-service';
 
 const chartFont = { size: 16, family: 'Inter, Arial, sans-serif' };
 const chartFontColor = '#111';
@@ -12,20 +19,19 @@ const chartFontColor = '#111';
   styleUrl: './employee-dashboard.css'
 })
 export class EmployeeDashboard implements AfterViewInit, OnInit, OnDestroy {
-  employee: any = {
-    employeeId: 1,
-    fullName: 'Mohamed Ahmed Ismail',
-    email: 'mohamed.ismail@example.com',
-    departmentName: 'Development',
-    phoneNumber: '+201234567890'
-  };
-  attendanceData: any[] = [
-    { attendanceDate: this.getDateOffset(0) },
-    { attendanceDate: this.getDateOffset(1) },
-    { attendanceDate: this.getDateOffset(2) },
-    { attendanceDate: this.getDateOffset(4) },
-    { attendanceDate: this.getDateOffset(6) }
-  ]; // 5/7 days present
+
+  constructor(
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef,
+    private employeeService: EmployeeService,
+    private attendanceService: AttendanceService,
+    private requestHolidayService: RequestHolidayService
+  ) {}
+
+  employeeId: number = 0;
+  employee!: IEmployee;
+  subs: Subscription[] = [];
+  attendanceData: IAttendance[] = []; // 5/7 days present
   salaryData: any = {
     netSalary: 5000,
     totalDeduction: 200,
@@ -40,12 +46,20 @@ export class EmployeeDashboard implements AfterViewInit, OnInit, OnDestroy {
   attendanceChart: Chart | null = null;
   salaryChart: Chart | null = null;
   tasksChart: Chart | null = null;
+  totalAttendancesThisMonth: number = 0;
+  totalAbsencesThisMonth: number = 0;
   @ViewChild('attendanceChartCanvas') attendanceChartCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('salaryChartCanvas') salaryChartCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('tasksChartCanvas') tasksChartCanvas!: ElementRef<HTMLCanvasElement>;
   viewInitialized = false;
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.getEmployee();
+    this.getAttendance();
+    this.getPendingLeaves();
+    this.cdr.detectChanges();
+
+  }
 
   ngAfterViewInit() {
     this.viewInitialized = true;
@@ -54,10 +68,64 @@ export class EmployeeDashboard implements AfterViewInit, OnInit, OnDestroy {
     this.updateTasksChart();
   }
 
+  getEmployee() {
+    this.subs.push(this.employeeService.getCurrentEmployee().subscribe({
+      next: (employee) => {
+        this.employee = employee;
+        this.cdr.detectChanges();
+      }
+    }));
+  }
+
+  getAttendance() {
+    this.subs.push(this.attendanceService.getAttendanceForEmployee().subscribe({
+      next: (attendance) => {
+        this.attendanceData = attendance;
+        this.calculateMonthlyAttendance();
+        this.updateAttendanceChart();
+        this.cdr.detectChanges();
+      }
+    }));
+  }
+
+  getPendingLeaves() {
+    this.subs.push(this.requestHolidayService.getRequestHolidays().subscribe({
+      next: (leaves) => {
+        if (!this.employee?.fullName) {
+          this.pendingLeaves = 0;
+        } else {
+          this.pendingLeaves = leaves.filter(l => l.employeeName === this.employee.fullName && l.status?.toLowerCase() === 'pending').length;
+        }
+        this.cdr.detectChanges();
+      }
+    }));
+  }
+
+  calculateMonthlyAttendance() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+    const days: string[] = [];
+    for (let d = 1; d <= now.getDate(); d++) {
+      const date = new Date(year, month, d);
+      const dayOfWeek = date.getDay();
+      if (dayOfWeek !== 5 && dayOfWeek !== 6) {
+        days.push(date.toLocaleDateString('en-CA'));
+      }
+    }
+    const attendedDays = days.filter(day =>
+      this.attendanceData.some(a => new Date(a.attendanceDate).toLocaleDateString('en-CA') === day)
+    );
+    this.totalAttendancesThisMonth = attendedDays.length;
+    this.totalAbsencesThisMonth = days.length - attendedDays.length;
+    // console.log("Total Att", this.totalAttendancesThisMonth);
+    // console.log("Total Absence", this.totalAbsencesThisMonth);
+  }
+
   updateAttendanceChart() {
     if (!this.viewInitialized) return;
-    const present = this.attendanceData.length;
-    const absent = 7 - present;
+    const present = this.totalAttendancesThisMonth;
+    const absent = this.totalAbsencesThisMonth;
     if (this.attendanceChart) this.attendanceChart.destroy();
     if (this.attendanceChartCanvas && this.attendanceChartCanvas.nativeElement) {
       this.attendanceChart = new Chart(this.attendanceChartCanvas.nativeElement, {

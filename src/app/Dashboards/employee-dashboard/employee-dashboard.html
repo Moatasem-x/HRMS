@@ -6,23 +6,37 @@
     </header>
 
     <!-- Employee Info Card -->
-    <div class="card" style="max-width:400px;margin:0 auto 2rem auto;">
-      <div style="font-size:1.2rem;font-weight:600;">Personal Info</div>
-      <div style="margin:0.5rem 0;"><b>Email:</b> {{employee?.email}}</div>
-      <div style="margin:0.5rem 0;"><b>Department:</b> {{employee?.departmentName}}</div>
-      <div style="margin:0.5rem 0;"><b>Phone:</b> {{employee?.phoneNumber}}</div>
+    <div class="card first-card">
+      <div class="first-card-title">Personal Info</div>
+      <div class="first-card-info-list">
+        <div class="first-card-info-row">
+          <i class="bi bi-envelope"></i>
+          <span class="info-label">Email:</span>
+          <span class="info-value">{{employee?.email}}</span>
+        </div>
+        <div class="first-card-info-row">
+          <i class="bi bi-building"></i>
+          <span class="info-label">Dept:</span>
+          <span class="info-value">{{employee?.departmentName}}</span>
+        </div>
+        <div class="first-card-info-row">
+          <i class="bi bi-telephone"></i>
+          <span class="info-label">Phone:</span>
+          <span class="info-value">{{employee?.phoneNumber}}</span>
+        </div>
+      </div>
     </div>
 
     <!-- Top Cards -->
     <div class="dashboard-cards">
       <div class="card">
-        <div class="card-title">Attendance (7d)</div>
-        <div class="card-value">{{attendanceData.length}}</div>
+        <div class="card-title">Attendance (This Month)</div>
+        <div class="card-value">{{totalAttendancesThisMonth}}</div>
         <div class="card-desc">Days Present</div>
       </div>
       <div class="card">
-        <div class="card-title">Absences (7d)</div>
-        <div class="card-value">{{7 - attendanceData.length}}</div>
+        <div class="card-title">Absences (This Month)</div>
+        <div class="card-value">{{totalAbsencesThisMonth}}</div>
         <div class="card-desc">Days Absent</div>
       </div>
       <div class="card">

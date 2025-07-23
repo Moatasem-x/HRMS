@@ -23,5 +23,9 @@ export class AttendanceService {
     return this.http.delete<IAttendance>(`${this.apiUrl}/delete/${id}`);
   }
 
+  getAttendanceForEmployee(): Observable<IAttendance[]> {
+    return this.http.get<IAttendance[]>(`${this.apiUrl}/my-attendance`);
+  }
+
 
 }
