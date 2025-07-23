@@ -49,5 +49,18 @@
     </div>
   </div>
 </div>
+<div *ngIf="showWebcam" class="webcam-modal-overlay">
+  <div class="webcam-modal">
+    <webcam [trigger]="triggerObservable" (imageCapture)="handleImage($event)" [imageQuality]="0.92" [videoOptions]="{facingMode: 'user'}" [width]="320" [height]="240"></webcam>
+    <div *ngIf="capturedImage" class="webcam-preview">
+      <img [src]="capturedImage.imageAsDataUrl" alt="Captured Image" />
+    </div>
+    <div class="webcam-modal-actions">
+      <button type="button" (click)="triggerSnapshot()" [disabled]="!!capturedImage">Take Image</button>
+      <button type="button" (click)="submitWithImage()" [disabled]="!capturedImage || loading">Submit</button>
+      <button type="button" (click)="showWebcam = false; capturedImage = null;" [disabled]="loading">Cancel</button>
+    </div>
+  </div>
+</div>
 </div>
 

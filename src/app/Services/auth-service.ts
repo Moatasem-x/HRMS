@@ -27,7 +27,8 @@ export class AuthService {
     }
   }
 
-  login(loginData: ILoginData): Observable<any> {
+  login(loginData: any): Observable<any> {
+    // Accept FormData or ILoginData
     return this.http.post<any>(`${this.apiUrl}/login`, loginData);
   }
 

@@ -4,10 +4,11 @@ import { AuthService } from './Services/auth-service';
 import { Sidebar } from './Components/sidebar/sidebar';
 import { RouterOutlet } from '@angular/router';
 import { EmployeeDashboard } from "./Dashboards/employee-dashboard/employee-dashboard";
+import { TestImage } from "./Components/test-image/test-image";
 
 @Component({
   selector: 'app-root',
-  imports: [Sidebar, RouterOutlet, EmployeeDashboard],
+  imports: [Sidebar, RouterOutlet, EmployeeDashboard, TestImage],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
