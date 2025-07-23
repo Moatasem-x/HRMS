@@ -3,10 +3,11 @@ import { Router } from '@angular/router';
 import { AuthService } from './Services/auth-service';
 import { Sidebar } from './Components/sidebar/sidebar';
 import { RouterOutlet } from '@angular/router';
+import { EmployeeDashboard } from "./Dashboards/employee-dashboard/employee-dashboard";
 
 @Component({
   selector: 'app-root',
-  imports: [Sidebar, RouterOutlet],
+  imports: [Sidebar, RouterOutlet, EmployeeDashboard],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
