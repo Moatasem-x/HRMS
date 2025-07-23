@@ -8,6 +8,8 @@ import { Subscription } from 'rxjs';
 import { AttendanceService } from '../../Services/attendance-service';
 import { IAttendance } from '../../Interfaces/iattendance';
 import { RequestHolidayService } from '../../Services/request-holiday-service';
+import { SalaryReportService } from '../../Services/salary-report-service';
+import { ISalaryReport } from '../../Interfaces/isalary-report';
 
 const chartFont = { size: 16, family: 'Inter, Arial, sans-serif' };
 const chartFontColor = '#111';
@@ -25,18 +27,16 @@ export class EmployeeDashboard implements AfterViewInit, OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private employeeService: EmployeeService,
     private attendanceService: AttendanceService,
-    private requestHolidayService: RequestHolidayService
+    private requestHolidayService: RequestHolidayService,
+    private salaryReportService:SalaryReportService
   ) {}
 
   employeeId: number = 0;
   employee!: IEmployee;
   subs: Subscription[] = [];
   attendanceData: IAttendance[] = []; // 5/7 days present
-  salaryData: any = {
-    netSalary: 5000,
-    totalDeduction: 200,
-    totalOvertime: 300
-  };
+  salaryData!: ISalaryReport ;
+  
   pendingLeaves: number = 2;
   tasksData: any = {
     completed: 12,
@@ -57,6 +57,7 @@ export class EmployeeDashboard implements AfterViewInit, OnInit, OnDestroy {
     this.getEmployee();
     this.getAttendance();
     this.getPendingLeaves();
+    this.getSalaryReport(); 
     this.cdr.detectChanges();
 
   }
@@ -72,6 +73,7 @@ export class EmployeeDashboard implements AfterViewInit, OnInit, OnDestroy {
     this.subs.push(this.employeeService.getCurrentEmployee().subscribe({
       next: (employee) => {
         this.employee = employee;
+        console.log("ABC",employee);
         this.cdr.detectChanges();
       }
     }));
@@ -98,6 +100,20 @@ export class EmployeeDashboard implements AfterViewInit, OnInit, OnDestroy {
         }
         this.cdr.detectChanges();
       }
+    }));
+  }
+//HERE
+  getSalaryReport(){
+        this.subs.push(this.salaryReportService.getSalaryReportForSpecificEmployeeInMonth(25,6,2025).subscribe({
+      next: (report) => {
+        console.log(report); 
+        this.salaryData = report;
+        this.cdr.detectChanges();
+      },
+      error:(err)=>{
+        console.log(err);  
+      }
+
     }));
   }
 
@@ -159,7 +175,7 @@ export class EmployeeDashboard implements AfterViewInit, OnInit, OnDestroy {
         data: {
           labels: ['Net Salary', 'Deductions', 'Overtime'],
           datasets: [{
-            data: [this.salaryData.netSalary, this.salaryData.totalDeduction, this.salaryData.totalOvertime],
+            data: [this.salaryData.netSalary, this.salaryData.deductionAmount, this.salaryData.overtimeAmount],
             backgroundColor: ['#3b82f6', '#ef5350', '#66bb6a']
           }]
         },
