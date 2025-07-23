@@ -25,6 +25,6 @@ export class RequestHolidayService {
   }
 
   takeActionOnRequest(requestId: number, action: string): Observable<IRequestHoliday> {
-    return this.http.put<IRequestHoliday>(`${this.apiUrl}/${requestId}`, action);
+    return this.http.put<IRequestHoliday>(`${this.apiUrl}/${requestId}?Status=${action}`, {});
   }
 }

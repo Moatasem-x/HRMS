@@ -1,5 +1,4 @@
-@import 'bootstrap/dist/css/bootstrap.min.css';
-@import 'bootstrap-icons/font/bootstrap-icons.css';
+
 
 /* GLOBAL REUSABLE FORM STYLES */
 
@@ -246,7 +245,7 @@ input[type="date"]::-moz-focus-inner {
 
 /* Space between icon and text in buttons */
 .btn > i {
-  margin-right: 0.5rem;
+  margin-right: 0.2rem;
 }
 
 .password-toggle {

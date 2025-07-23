@@ -30,6 +30,7 @@
 
 .filter-row {
   display: flex;
+  justify-content: center;
   align-items: center;
   gap: 18px;
   margin-bottom: 18px;
@@ -100,19 +101,22 @@
   margin-left: 4px;
 }
 .badge-approved {
-  background: #d1fae5;
-  color: #059669;
-  border: 1.5px solid #059669;
+  background: #e6f9ed;
+  color: #1a7f37;
+  border: 1.5px solid #1a7f37;
+  box-shadow: 0 1px 4px rgba(26, 127, 55, 0.08);
 }
 .badge-pending {
-  background: #fef9c3;
+  background: #fffbe6;
   color: #b45309;
-  border: 1.5px solid #f59e42;
+  border: 1.5px solid #fbbf24;
+  box-shadow: 0 1px 4px rgba(251, 191, 36, 0.08);
 }
-.badge-denied {
-  background: #fee2e2;
+.badge-rejected {
+  background: #fde8e8;
   color: #b91c1c;
-  border: 1.5px solid #ef4444;
+  border: 1.5px solid #b91c1c;
+  box-shadow: 0 1px 4px rgba(185, 28, 28, 0.08);
 }
 .badge-default {
   background: #e0e7ef;
@@ -141,6 +145,134 @@
   100% { transform: rotate(360deg); }
 }
 
+.custom-request-card {
+  background: #f8fafc;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(59, 130, 246, 0.08);
+  margin-bottom: 28px;
+  padding: 24px 18px 18px 18px;
+  border-left: 6px solid #3b82f6;
+  transition: box-shadow 0.2s, border-color 0.2s;
+  position: relative;
+}
+.custom-request-card:hover {
+  box-shadow: 0 6px 24px rgba(59, 130, 246, 0.16);
+  border-left: 6px solid #2563eb;
+}
+.card-main-info {
+  padding-right: 18px;
+}
+.card-status-action {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+  height: 100%;
+  min-width: 160px;
+  gap: 18px;
+}
+.status-badge-row {
+  margin-bottom: 18px;
+  margin-top: 8px;
+}
+.card-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.card-row .label {
+  color: #3b82f6;
+  font-weight: 600;
+  margin-right: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.card-row .value {
+  color: #222;
+  font-weight: 500;
+  margin-right: 16px;
+}
+.btn-action {
+  min-width: 110px;
+  margin-right: 8px;
+  margin-bottom: 0;
+  font-size: 1rem;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(59, 130, 246, 0.07);
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-action:last-child {
+  margin-right: 0;
+}
+.btn-primary.btn-action {
+  background: #3b82f6;
+  color: #fff;
+}
+.btn-primary.btn-action:hover {
+  background: #2563eb;
+}
+.btn-secondary.btn-action {
+  background: #e0e7ef;
+  color: #3b82f6;
+}
+.btn-secondary.btn-action:hover {
+  background: #c7d2fe;
+  color: #1e40af;
+}
+.action-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 0;
+}
+
+.filter-row-extra {
+  margin-bottom: 18px;
+  gap: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.filter-input {
+  max-width: 240px;
+  min-width: 120px;
+  margin-right: 8px;
+}
+.filter-input:last-child {
+  margin-right: 0;
+}
+
+.btn-clear-filter {
+  margin-left: 8px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  background: #f3f4f6;
+  color: #b91c1c;
+  border: 1.5px solid #e5e7eb;
+  transition: background 0.2s, color 0.2s, border 0.2s;
+  box-shadow: 0 1px 4px rgba(185, 28, 28, 0.06);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-clear-filter:hover {
+  background: #b91c1c;
+  color: #fff;
+  border: 1.5px solid #b91c1c;
+}
+
 @media (max-width: 900px) {
   .form-card {
     padding: 2rem 2vw;
@@ -150,6 +282,16 @@
   }
   .request-card {
     padding: 12px 4px 8px 4px;
+  }
+  .custom-request-card {
+    padding: 16px 6px 12px 6px;
+  }
+  .card-main-info {
+    padding-right: 0;
+  }
+  .card-status-action {
+    min-width: 120px;
+    gap: 10px;
   }
 }
 @media (max-width: 700px) {
@@ -180,5 +322,38 @@
   }
   .action-row {
     gap: 8px;
+  }
+  .custom-request-card {
+    padding: 10px 2px 8px 2px;
+    margin-bottom: 16px;
+  }
+  .card-main-info, .card-status-action {
+    padding-right: 0;
+    align-items: flex-start;
+    min-width: unset;
+    gap: 8px;
+  }
+  .status-badge-row {
+    margin-bottom: 10px;
+    margin-top: 4px;
+  }
+  .btn-action {
+    min-width: 90px;
+    font-size: 0.97rem;
+    padding: 7px 10px;
+  }
+  .filter-row-extra {
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+  }
+  .filter-input {
+    max-width: 100%;
+    margin-right: 0;
+  }
+  .btn-clear-filter {
+    margin-left: 0;
+    width: 100%;
+    justify-content: center;
   }
 }

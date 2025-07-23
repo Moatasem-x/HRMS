@@ -14,6 +14,8 @@ export class ManageHolidayRequests implements OnInit {
   requests: IRequestHoliday[] = [];
   filteredRequests: IRequestHoliday[] = [];
   filter: string = 'all';
+  filterName: string = '';
+  filterDate: string = '';
   isLoading = false;
   error = '';
 
@@ -29,23 +31,29 @@ export class ManageHolidayRequests implements OnInit {
       next: (data) => {
         this.requests = data;
         this.applyFilter();
+        this.isLoading = false;
         this.cdr.detectChanges();
       },
       error: () => {
         this.error = 'Failed to load requests.';
-      },
-      complete: () => {
-        this.isLoading = false;
       }
     });
   }
 
   applyFilter(): void {
-    if (this.filter === 'all') {
-      this.filteredRequests = this.requests;
-    } else {
-      this.filteredRequests = this.requests.filter(r => r.status?.toLowerCase() === this.filter);
+    let filtered = this.requests;
+    if (this.filter !== 'all') {
+      filtered = filtered.filter(r => r.status?.toLowerCase() === this.filter);
     }
+    if (this.filterName.trim()) {
+      const name = this.filterName.trim().toLowerCase();
+      filtered = filtered.filter(r => (r.employeeName || '').toLowerCase().includes(name));
+    }
+    if (this.filterDate) {
+      filtered = filtered.filter(r => r.requestedAt && r.requestedAt.startsWith(this.filterDate));
+    }
+    this.filteredRequests = filtered;
+    this.cdr.detectChanges();
   }
 
   setFilter(status: string): void {
@@ -53,11 +61,28 @@ export class ManageHolidayRequests implements OnInit {
     this.applyFilter();
   }
 
+  setNameFilter(name: string): void {
+    this.filterName = name;
+    this.applyFilter();
+  }
+
+  setDateFilter(date: string): void {
+    this.filterDate = date;
+    this.applyFilter();
+  }
+
+  clearFilters(): void {
+    this.filter = 'all';
+    this.filterName = '';
+    this.filterDate = '';
+    this.applyFilter();
+  }
+
   getBadgeClass(status: string | undefined): string {
     switch ((status || '').toLowerCase()) {
       case 'approved': return 'badge-approved';
       case 'pending': return 'badge-pending';
-      case 'denied': return 'badge-denied';
+      case 'rejected': return 'badge-rejected';
       default: return 'badge-default';
     }
   }
@@ -67,12 +92,12 @@ export class ManageHolidayRequests implements OnInit {
     if (!request.id) return;
     this.requestHolidayService.takeActionOnRequest(request.id, action).subscribe({
       next: (updated) => {
-        // Update the request in the list
-        const idx = this.requests.findIndex(r => r.id === updated.id);
-        if (idx !== -1) this.requests[idx] = updated;
+        let idx = this.requests.findIndex(r => r.id === request.id);
+        this.filteredRequests[idx].status = updated.status;
         this.applyFilter();
+        this.cdr.detectChanges();
       },
-      error: () => {
+      error: (err) => {
         this.error = 'Failed to update request.';
       },
       complete: () => {
