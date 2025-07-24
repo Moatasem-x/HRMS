@@ -6,10 +6,11 @@ import { RouterOutlet } from '@angular/router';
 import { EmployeeDashboard } from "./Dashboards/employee-dashboard/employee-dashboard";
 import { TestImage } from "./Components/test-image/test-image";
 import { Departments } from "./Pages/Department/departments/departments";
+import { Tasks } from "./Pages/Tasks/tasks/tasks";
 
 @Component({
   selector: 'app-root',
-  imports: [Sidebar, RouterOutlet, EmployeeDashboard, TestImage, Departments],
+  imports: [Sidebar, RouterOutlet, EmployeeDashboard, TestImage, Departments, Tasks],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
