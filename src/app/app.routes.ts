@@ -13,6 +13,7 @@ import { HRDashboard } from './Dashboards/hr-dashboard/hr-dashboard';
 import { HRForm } from './Pages/hr-form/hr-form';
 import { RequestHoliday } from './Pages/request-holiday/request-holiday';
 import { ManageHolidayRequests } from './Pages/manage-holiday-requests/manage-holiday-requests';
+import { Departments } from './Pages/Department/departments/departments';
 
 export const routes: Routes = [
   {path: '', redirectTo: '/login', pathMatch: 'full'},
@@ -29,4 +30,5 @@ export const routes: Routes = [
   {path: 'addhr', component: HRForm, canActivate: [adminGuard]},
   {path: 'requestholiday', component: RequestHoliday, canActivate: [employeeGuard]},
   {path: 'holidayrequests', component: ManageHolidayRequests, canActivate: [adminGuard]},
+  {path: 'departments', component: Departments, canActivate: [adminGuard]},
 ];

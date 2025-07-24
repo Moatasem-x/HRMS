@@ -14,4 +14,8 @@ export class DepartmentService {
   getDepartments(): Observable<IDepartment[]> {
     return this.http.get<IDepartment[]>(this.apiUrl);
   }
+
+  addDepartment(department: IDepartment): Observable<IDepartment> {
+    return this.http.post<IDepartment>(this.apiUrl, department);
+  }
 }

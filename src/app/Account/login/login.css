@@ -235,6 +235,47 @@ filter: blur(6px) ;
   border-radius: 8px;
   border: 2px solid #f7a60044;
 }
+.webcam-frame, .preview-frame {
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+.webcam-frame {
+  border: 3px solid #0d6efd33;
+  background: #f8f9fa;
+}
+.preview-frame {
+  border: 3px solid #0d6efd;
+  background: #fff;
+}
+.card.webcam-modal {
+  border: none;
+}
+.btn i {
+  margin-right: 6px;
+}
+
+.btn-take-image {
+  background: linear-gradient(90deg, #ff9800 0%, #ffc107 100%);
+  color: #fff !important;
+  font-weight: 600;
+  border: none;
+  box-shadow: 0 2px 8px rgba(255, 152, 0, 0.15);
+}
+.btn-take-image:hover, .btn-take-image:focus {
+  background: linear-gradient(90deg, #ffc107 0%, #ff9800 100%);
+  color: #fff !important;
+  transform: scale(1.04);
+  box-shadow: 0 4px 16px rgba(255, 152, 0, 0.25);
+}
+.btn-take-image i {
+  color: #fff !important;
+}
 
 
 @media (max-width: 1100px) {
@@ -269,4 +310,11 @@ filter: blur(6px) ;
 .login-avatar {
   background-color: #f0f0f0; /* fallback */
   border: 2px solid #f7a60033;
+}
+
+@media (max-width: 500px) {
+  .webcam-frame, .preview-frame {
+    width: 160px;
+    height: 160px;
+  }
 }

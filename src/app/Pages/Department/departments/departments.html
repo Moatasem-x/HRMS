@@ -1,0 +1,121 @@
+<div class="container-fluid p-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0 fw-bold text-primary">Departments</h2>
+        <button class="btn btn-primary" (click)="showAddDepartmentForm()">
+          <i class="bi bi-plus-circle"></i> Add New Department
+        </button>
+      </div>
+
+      <!-- Error Message -->
+      <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ error }}
+        <button type="button" class="btn-close" (click)="error = null"></button>
+      </div>
+
+      <!-- Loading Spinner -->
+      <div *ngIf="loading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+
+      <!-- Departments Table -->
+      <div *ngIf="!loading" class="card shadow-sm">
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th class="border-0 px-4 py-3">#</th>
+                  <th class="border-0 px-4 py-3">Department Name</th>
+                  <th class="border-0 px-4 py-3">Description</th>
+                  <th class="border-0 px-4 py-3 text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let department of departments; let i = index" class="border-bottom">
+                  <td class="px-4 py-3">{{ department.departmentId }}</td>
+                  <td class="px-4 py-3 fw-semibold">{{ department.departmentName }}</td>
+                  <td class="px-4 py-3 text-muted">{{ department.description }}</td>
+                  <td class="px-4 py-3 text-end">
+                    <button class="btn btn-sm btn-outline-primary me-2">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr *ngIf="departments.length === 0">
+                  <td colspan="4" class="text-center py-5 text-muted">
+                    <i class="bi bi-inbox display-4 d-block mb-3"></i>
+                    No departments found
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Department Modal -->
+<div *ngIf="showAddForm" class="modal-overlay">
+  <div class="modal-content">
+    <div class="card shadow-lg border-0" style="max-width: 500px; width: 100%; border-radius: 1rem;">
+      <div class="card-header bg-primary text-white border-0 rounded-top">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Add New Department</h5>
+          <button type="button" class="btn-close btn-close-white" (click)="hideAddDepartmentForm()"></button>
+        </div>
+      </div>
+      <div class="card-body p-4">
+        <form [formGroup]="departmentForm" (ngSubmit)="onSubmit()">
+          <div class="mb-3">
+            <label for="departmentName" class="form-label fw-semibold">Department Name</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              id="departmentName" 
+              formControlName="departmentName"
+              [class.is-invalid]="departmentName?.invalid && (departmentName?.touched || departmentName?.dirty)"
+              placeholder="Enter department name">
+            <div *ngIf="departmentName?.invalid && (departmentName?.touched || departmentName?.dirty)" class="invalid-feedback">
+              <div *ngIf="departmentName?.errors?.['required']">Department name is required.</div>
+              <div *ngIf="departmentName?.errors?.['minlength']">Department name must be at least 2 characters.</div>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label for="description" class="form-label fw-semibold">Description</label>
+            <textarea 
+              class="form-control" 
+              id="description" 
+              rows="4"
+              formControlName="description"
+              [class.is-invalid]="description?.invalid && (description?.touched || description?.dirty)"
+              placeholder="Enter department description"></textarea>
+            <div *ngIf="description?.invalid && (description?.touched || description?.dirty)" class="invalid-feedback">
+              <div *ngIf="description?.errors?.['required']">Description is required.</div>
+              <div *ngIf="description?.errors?.['minlength']">Description must be at least 10 characters.</div>
+            </div>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-secondary flex-fill" (click)="hideAddDepartmentForm()" [disabled]="formLoading">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary flex-fill" [disabled]="departmentForm.invalid || formLoading">
+              <span *ngIf="formLoading" class="spinner-border spinner-border-sm me-2"></span>
+              {{ formLoading ? 'Adding...' : 'Add Department' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div> 
