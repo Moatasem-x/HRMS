@@ -11,7 +11,7 @@
       <button *ngIf="attendanceStatus === 'not_checked_in'" (click)="checkIn()" class="btn btn-primary">
         Check In
       </button>
-      <button *ngIf="attendanceStatus === 'checked_in'" (click)="checkOut()" class="btn btn-success">
+      <button *ngIf="attendanceStatus === 'checked_in'" (click)="checkOut()" class="btn btn-secondary">
         Check Out
       </button>
       <span *ngIf="attendanceStatus === 'checked_out'" class="checked-out-message" style="font-weight: bold; color: #4caf50;">

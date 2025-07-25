@@ -10,6 +10,8 @@ import { TasksService } from '../../Services/tasks-service';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { AuthService } from '../../Services/auth-service';
 import { IEmployee } from '../../Interfaces/iemployee';
+import Swal from 'sweetalert2';
+import { IAttendance } from '../../Interfaces/iattendance';
 
 @Component({
   selector: 'app-hr-dashboard',
@@ -47,6 +49,10 @@ export class HRDashboard implements AfterViewInit, OnInit, OnDestroy {
   userId:number = 0;
   myData!:IEmployee;
   userRole:string="";
+  todayAttendance: IAttendance | null = null;
+  attendanceStatus: 'not_checked_in' | 'checked_in' | 'checked_out' = 'not_checked_in';
+
+
   ngOnInit(): void {
     this.spinner.show();
     
@@ -57,6 +63,7 @@ export class HRDashboard implements AfterViewInit, OnInit, OnDestroy {
           if(this.userId!=0){
             this.userRole = this.authService.getRole()||"";
             this.getEmployee(this.userId);
+            console.log("userRole", this.userRole);
           }
         this.cdr.detectChanges();
       }
@@ -98,16 +105,18 @@ export class HRDashboard implements AfterViewInit, OnInit, OnDestroy {
       }
     }));
   }
+
   getEmployee(id:number){
     this.subs.push(this.employeeService.getEmployeeById(id).subscribe({
       next: (resp) => {        
         this.myData = resp;
-        console.log(this.myData);
+        this.getAttendance();
         this.cdr.detectChanges();
       }
     }));
     
   }
+
   ngAfterViewInit() {
     this.viewInitialized = true;
     this.updateAttendanceStatsAndChart();
@@ -258,6 +267,138 @@ export class HRDashboard implements AfterViewInit, OnInit, OnDestroy {
     }
     this.cdr.detectChanges();
   }
+
+  getAttendance() {
+    this.subs.push(this.attendanceService.getAttendanceForEmployee().subscribe({
+      next: (attendance) => {
+        this.attendanceData = attendance;
+        this.setTodayAttendanceStatus();
+        this.cdr.detectChanges();
+      }
+    }));
+  }
+
+  setTodayAttendanceStatus() {
+    const todayStr = new Date().toLocaleDateString('en-CA');
+    console.log("todayStr", todayStr);
+    this.todayAttendance = this.attendanceData.find(a => a.attendanceDate && new Date(a.attendanceDate).toLocaleDateString('en-CA') === todayStr) || null;
+    if (!this.todayAttendance) {
+      this.attendanceStatus = 'not_checked_in';
+    } else if (this.todayAttendance && this.todayAttendance.checkInTime && !this.todayAttendance.checkOutTime) {
+      this.attendanceStatus = 'checked_in';
+    } else if (this.todayAttendance && this.todayAttendance.checkOutTime ) {
+      this.attendanceStatus = 'checked_out';
+    }
+    console.log("todayAttendance", this.todayAttendance);
+  }
+
+  private getCurrentTimeString(): string {
+    const now = new Date();
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    return `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+  }
+
+  checkIn() {
+    if (!this.myData) return;
+    this.spinner.show();
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const attendance: any = {
+          employeeId: this.myData.employeeId,
+          checkInTime: this.getCurrentTimeString(),
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude
+        };
+        console.log("attendance", attendance);
+        this.attendanceService.checkIn(attendance).subscribe({
+          next: (resp) => {
+            this.getAttendance();
+          },
+          error: (err) => {
+            console.log("Error", err.error.message);
+            if (err.error.message == "You are outside the allowed location range.") {
+              Swal.fire({
+                title: "Error!",
+                text: "You are outside the allowed location range.",
+                icon: "error",
+              });
+            }
+            else if (err.error.message == "Invalid check-in or check-out time.") {
+              Swal.fire({
+                title: "Error!",
+                text: "Invalid check-in or check-out time.",
+                icon: "error",
+              });
+            }
+          },
+          complete: () => {
+            this.cdr.detectChanges();
+            this.spinner.hide();
+          }
+        });
+      },
+      (error) => {
+        this.spinner.hide();
+        Swal.fire({
+          title: "Error!",
+          text: "Could not get your location. Please allow location access to check in.",
+          icon: "error"
+        });
+      }
+    );
+  }
+
+  checkOut() {
+    if (!this.myData) return;
+    this.spinner.show();
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const attendance: any = {
+          employeeId: this.myData.employeeId,
+          checkOutTime: this.getCurrentTimeString(),
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude
+        };
+        console.log("attendance", attendance);
+        this.attendanceService.checkOut(attendance).subscribe({
+          next: (resp) => {
+            this.getAttendance();
+          },
+          error: (err) => {
+            if (err.error.message == "You are outside the allowed location range.") {
+              Swal.fire({
+                title: "Error!",
+                text: "You are outside the allowed location range.",
+                icon: "error",
+                
+              });
+            }
+            else if (err.error.message == "Invalid check-in or check-out time.") {
+              Swal.fire({
+                title: "Error!",
+                text: "Invalid check-in or check-out time.",
+                icon: "error",
+              });
+            }
+          },
+          complete: () => {
+            this.cdr.detectChanges();
+            this.spinner.hide();
+          }
+        });
+      },
+      (error) => {
+        this.spinner.hide();
+        Swal.fire({
+          title: "Error!",
+          text: "Could not get your location. Please allow location access to check out.",
+          icon: "error"
+        });
+      }
+    );
+  }
+
+  
 
   ngOnDestroy(): void {
     this.subs.forEach(sub => sub.unsubscribe());

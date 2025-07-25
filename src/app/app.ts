@@ -4,10 +4,11 @@ import { AuthService } from './Services/auth-service';
 import { Sidebar } from './Components/sidebar/sidebar';
 import { RouterOutlet } from '@angular/router';
 import { ChatBot } from "./Components/chat-bot/chat-bot";
+import { HRDashboard } from "./Dashboards/hr-dashboard/hr-dashboard";
 
 @Component({
   selector: 'app-root',
-  imports: [Sidebar, RouterOutlet, ChatBot],
+  imports: [Sidebar, RouterOutlet, ChatBot, HRDashboard],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

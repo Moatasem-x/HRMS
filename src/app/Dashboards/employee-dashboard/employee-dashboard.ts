@@ -203,12 +203,12 @@ export class EmployeeDashboard implements AfterViewInit, OnInit, OnDestroy {
 
   checkIn() {
     if (!this.employee) return;
+    this.spinner.show();
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const attendance: any = {
           employeeId: this.employee.employeeId,
           checkInTime: this.getCurrentTimeString(),
-          // checkOutTime: "",
           latitude: position.coords.latitude,
           longitude: position.coords.longitude
         };
@@ -224,7 +224,6 @@ export class EmployeeDashboard implements AfterViewInit, OnInit, OnDestroy {
                 title: "Error!",
                 text: "You are outside the allowed location range.",
                 icon: "error",
-                
               });
             }
             else if (err.error.message == "Invalid check-in or check-out time.") {
@@ -237,10 +236,12 @@ export class EmployeeDashboard implements AfterViewInit, OnInit, OnDestroy {
           },
           complete: () => {
             this.cdr.detectChanges();
+            this.spinner.hide();
           }
         });
       },
       (error) => {
+        this.spinner.hide();
         Swal.fire({
           title: "Error!",
           text: "Could not get your location. Please allow location access to check in.",
@@ -252,6 +253,7 @@ export class EmployeeDashboard implements AfterViewInit, OnInit, OnDestroy {
 
   checkOut() {
     if (!this.employee) return;
+    this.spinner.show();
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const attendance: any = {
@@ -284,10 +286,12 @@ export class EmployeeDashboard implements AfterViewInit, OnInit, OnDestroy {
           },
           complete: () => {
             this.cdr.detectChanges();
+            this.spinner.hide();
           }
         });
       },
       (error) => {
+        this.spinner.hide();
         console.log(error);
         Swal.fire({
           title: "Error!",
@@ -451,23 +455,6 @@ export class EmployeeDashboard implements AfterViewInit, OnInit, OnDestroy {
       });
     }
     this.cdr.detectChanges();
-  }
-
-  getLastNDays(n: number) {
-    const days = [];
-    let d = new Date();
-    for (let i = 0; i < n; i++) {
-      const date = new Date(d);
-      days.unshift({ date: date.toISOString().slice(0,10), label: date.toLocaleDateString('en-US', { weekday: 'short' }) });
-      d.setDate(d.getDate() - 1);
-    }
-    return days;
-  }
-
-  getDateOffset(offset: number) {
-    const d = new Date();
-    d.setDate(d.getDate() - offset);
-    return d.toISOString().slice(0,10);
   }
 
   ngOnDestroy(): void {

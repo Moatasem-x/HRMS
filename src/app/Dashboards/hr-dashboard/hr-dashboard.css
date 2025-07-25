@@ -236,6 +236,11 @@ body, html {
     background: #f59e42;
     color: #fff;
   }
+  .checked-out-message {
+    font-weight: bold;
+    color: #4caf50;
+    margin-left: 1rem;
+  }
   @media (max-width: 900px) {
     .dashboard-row {
       grid-template-columns: 1fr;
