@@ -1,3 +1,4 @@
+<ngx-spinner bdColor = "rgba(0, 0, 0, 0.8)" size = "medium" color = "#fff" type = "square-jelly-box" [fullScreen] = "true"><p style="color: white" > Loading... </p></ngx-spinner>
 <div class="employee-salary-table-container">
   <table class="app-table">
     <thead>
@@ -13,7 +14,7 @@
       </tr>
     </thead>
     <tbody>
-      @for (report of paginatedReports; track report.employeeId) {
+      @for (report of filteredReports; track report.employeeId) {
         <tr>
           <!-- Employee Name -->
           <td>{{ report.employeeName }}</td>
@@ -42,40 +43,4 @@
       }
     </tbody>
   </table>
-
-  <!-- Pagination -->
-  @if (totalPages > 1) {
-    <div class="pagination">
-      <div class="pagination-info">
-        Page {{ currentPage }} of {{ totalPages }} ({{ filteredReports.length }} records)
-      </div>
-      <div class="pagination-controls">
-        <button 
-          (click)="previousPage()" 
-          [disabled]="currentPage === 1"
-          class="pagination-btn"
-        >
-          ‹
-        </button>
-        
-        @for (page of getPageNumbers(); track page) {
-          <button 
-            (click)="goToPage(page)"
-            [class.active]="page === currentPage"
-            class="pagination-btn"
-          >
-            {{ page }}
-          </button>
-        }
-        
-        <button 
-          (click)="nextPage()" 
-          [disabled]="currentPage === totalPages"
-          class="pagination-btn"
-        >
-          ›
-        </button>
-      </div>
-    </div>
-  }
 </div> 

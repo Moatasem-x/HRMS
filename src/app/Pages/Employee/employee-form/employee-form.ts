@@ -8,18 +8,18 @@ import { Subscription } from 'rxjs';
 import { IEmployee } from '../../../Interfaces/iemployee';
 import { AuthService } from '../../../Services/auth-service';
 import Swal from 'sweetalert2';
+import { ActivatedRoute } from '@angular/router';
+import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 
 
 @Component({
   selector: 'app-employee-form',
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, NgxSpinnerModule],
   templateUrl: './employee-form.html',
   styleUrl: './employee-form.css'
 })
 export class EmployeeForm implements OnInit, OnDestroy {
   employeeForm!: FormGroup;
-  isSubmitting = false;
-  submitSuccess = false;
   textType = false;
   selectedImageName = '';
   imagePreviewUrl: string | ArrayBuffer | null = null;
@@ -29,20 +29,31 @@ export class EmployeeForm implements OnInit, OnDestroy {
     { value: 'female', label: 'Female' },
   ];
 
+  employee!: IEmployee;
   departmentOptions: IDepartment[] = [];
   subs: Subscription[] = [];
+  editMode: boolean = false;
 
   constructor(
     private fb: FormBuilder, 
     private employeeService: EmployeeService, 
     private departmentService: DepartmentService, 
     private cdr: ChangeDetectorRef,
-    private authService: AuthService) {}
+    private authService: AuthService,
+    private activatedRoute: ActivatedRoute,
+    private spinner: NgxSpinnerService
+  ) {}
 
   ngOnInit(): void {
+    this.spinner.show();
     this.loadDepartments();
     this.initForm();
-    
+    this.activatedRoute.params.subscribe(params => {
+      if (params['id'] && params['id'] !== '0') {
+        this.getEmployee(parseInt(params['id']));
+        this.editMode = true;
+      }
+    });
   }
 
   initForm(): void {
@@ -64,8 +75,21 @@ export class EmployeeForm implements OnInit, OnDestroy {
       ],
       hireDate: ['', Validators.required],
       salary: ['', [Validators.required, Validators.min(0)]],
-      image: [null, Validators.required]
+      image: [null]
     });
+  }
+
+  getEmployee(id: number): void {
+    const sub = this.employeeService.getEmployeeById(id).subscribe({
+      next: (resp) => {
+        this.employee = resp;
+        this.employeeForm.patchValue(this.employee);
+        this.cdr.detectChanges();
+      },
+      complete: () => {
+      }
+    });
+    this.subs.push(sub);
   }
 
   loadDepartments(): void {
@@ -74,7 +98,10 @@ export class EmployeeForm implements OnInit, OnDestroy {
         this.departmentOptions = resp;
       },
       error: (err) => {
-        console.error('Error loading departments:', err);
+        this.spinner.hide();
+      },
+      complete: () => {
+        this.spinner.hide();
       }
     });
     this.subs.push(sub);
@@ -84,46 +111,74 @@ export class EmployeeForm implements OnInit, OnDestroy {
     if (this.employeeForm.valid) {
       const formValue = this.employeeForm.value;
       const employeeData: IEmployee = { ...formValue };
+      this.spinner.show();
       const formData = new FormData();
-
-      // Append all fields except image
       Object.keys(employeeData).forEach(key => {
         if (key !== 'image' && employeeData[key as keyof IEmployee] !== undefined && employeeData[key as keyof IEmployee] !== null) {
           formData.append(key, employeeData[key as keyof IEmployee] as any);
         }
       });
-
-      // Append the image file if present
       if (employeeData.image) {
         formData.append('image', employeeData.image);
+      }      
+      if (this.editMode) {
+        formData.append('employeeId', this.employee.employeeId.toString());
+        const sub = this.employeeService.editEmployee(formData, this.employee.employeeId).subscribe({
+          next: (resp) => {
+            Swal.fire({
+              title: "Success!",
+              text: "Employee Has Been Updated Successfully.",
+              icon: "success",
+              timer: 1500,
+              showConfirmButton: false
+            });
+          },
+          error: (err) => {
+            this.spinner.hide();
+            console.error('Error updating employee:', err);
+          },
+          complete: () => {
+            this.spinner.hide();
+          }
+        });
+        this.subs.push(sub);
+      } 
+      else {
+        const sub = this.employeeService.addEmployee(formData).subscribe({
+          next: (resp) => {
+            Swal.fire({
+              title: "Success!",
+              text: "Employee Has Been Added Successfully.",
+              icon: "success",
+              timer: 1500,
+              showConfirmButton: false
+            });
+          },
+          error: (err) => {
+            this.spinner.hide();
+            if (err.error[1].code == "DuplicateEmail" || err.error[0].code == "DuplicateUserName") {
+              Swal.fire({
+                title: "Error!",
+                text: "Email already exists.",
+                icon: "error"
+              });
+            } 
+            else {
+              Swal.fire({
+                title: "Error!",
+                text: "Failed to add employee. Please try again.",
+                icon: "error"
+              });
+            }
+          },
+          complete: () => {
+            this.resetForm();
+            this.spinner.hide();
+          }
+        });
+        this.subs.push(sub);
       }
-      console.log(formData);
-
-      this.isSubmitting = true;
-      const sub = this.employeeService.addEmployee(formData).subscribe({
-        next: (resp) => {
-          Swal.fire({
-            title: "Success!",
-            text: "Employee Has Been Added Successfully.",
-            icon: "success",
-            timer: 1500,
-            showConfirmButton: false
-          });
-        },
-        error: (err) => {
-          console.error('Error adding employee:', err);
-        },
-        complete: () => {
-          this.isSubmitting = false;
-          this.submitSuccess = true;
-          this.resetForm();
-        }
-      });
-      this.subs.push(sub);
-    } 
-    else {
-      console.log('Form is invalid:', this.employeeForm.errors);
-      console.log('Form values when invalid:', this.employeeForm.value);
+    } else {
       this.markFormGroupTouched();
     }
   }
@@ -216,7 +271,6 @@ export class EmployeeForm implements OnInit, OnDestroy {
       gender: '',
       departmentId: '',
     });
-    this.submitSuccess = false;
     this.imagePreviewUrl = null;
     this.selectedImageName = '';
   }

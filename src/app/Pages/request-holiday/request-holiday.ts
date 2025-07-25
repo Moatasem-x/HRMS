@@ -7,11 +7,12 @@ import { IHolidayType } from '../../Interfaces/iholiday-type';
 import { IRequestHoliday } from '../../Interfaces/irequest-holiday';
 import Swal from 'sweetalert2';
 import { Subscription } from 'rxjs';
+import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
   selector: 'app-request-holiday',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, NgxSpinnerModule],
   templateUrl: './request-holiday.html',
   styleUrl: './request-holiday.css'
 })
@@ -25,17 +26,19 @@ export class RequestHoliday implements OnInit {
     private fb: FormBuilder,
     private requestHolidayService: RequestHolidayService,
     private authService: AuthService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private spinner: NgxSpinnerService
   ) {}
 
   ngOnInit(): void {
+    this.spinner.show();
     this.initForm();
     this.fetchHolidayTypes();
   }
 
   initForm(): void {
     this.holidayForm = this.fb.group({
-      leaveTypeId: [null, Validators.required],
+      leaveTypeId: ['', Validators.required],
       startDate: ['', Validators.required],
       endDate: ['', Validators.required],
       reason: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(300)]]
@@ -46,9 +49,14 @@ export class RequestHoliday implements OnInit {
     const sub = this.requestHolidayService.getHolidayTypes().subscribe({
       next: (types) => {
         this.holidayTypes = types;
-        this.cdr.detectChanges();
       },
-      error: () => this.holidayTypes = []
+      error: () => {
+        this.holidayTypes = []
+      },
+      complete: () => {
+        this.spinner.hide();
+        this.cdr.detectChanges();
+      }
     });
     this.subs.push(sub);
   }
@@ -59,6 +67,7 @@ export class RequestHoliday implements OnInit {
       this.holidayForm.markAllAsTouched();
       return;
     }
+    this.spinner.show();
     const employeeId = this.authService.getUserId();
     const formValue = this.holidayForm.value;
     const request: IRequestHoliday = {
@@ -81,9 +90,38 @@ export class RequestHoliday implements OnInit {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        this.submitError = 'Failed to submit request. Please try again.';
+        this.spinner.hide();
+        if (err.error.message == "You cannot request leave for a past date.") {
+          Swal.fire({
+            title: "Error!",
+            text: "You cannot request leave for a past date.",
+            icon: "error"
+          });
+        }
+        else if (err.error.message == "Insufficient annual leave balance") {
+          Swal.fire({
+            title: "Error!",
+            text: "Insufficient annual leave balance",
+            icon: "error"
+          });
+        }
+        else if (err.error.message == "Insufficient sick leave balance") {
+          Swal.fire({
+            title: "Error!",
+            text: "Insufficient sick leave balance",
+            icon: "error"
+          });
+        }
+        else {
+          Swal.fire({
+            title: "Error!",
+            text: "Failed to submit request. Please try again.",
+            icon: "error"
+          });
+        }
       },
       complete: () => {
+        this.spinner.hide();
       }
     });
     this.subs.push(sub);

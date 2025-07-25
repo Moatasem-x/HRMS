@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { ISalaryReport } from '../../Interfaces/isalary-report';
 import { SalaryReportService } from '../../Services/salary-report-service';
 import { Subscription } from 'rxjs';
+import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
   selector: 'app-employee-salary-table',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NgxSpinnerModule],
   templateUrl: './employee-salary-table.html',
   styleUrls: ['./employee-salary-table.css']
 })
@@ -29,16 +30,17 @@ export class EmployeeSalaryTable implements OnInit, OnChanges, OnDestroy {
   currentPage = 1;
   itemsPerPage = 10;
 
-  constructor(private salaryReportService: SalaryReportService, private cdr: ChangeDetectorRef) {}
+  constructor(private salaryReportService: SalaryReportService, private cdr: ChangeDetectorRef, private spinner: NgxSpinnerService) {}
 
   ngOnInit(): void {
+    this.spinner.show();
     this.loadSalaryReports();
 
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['filter']) {
-      console.log('Filter changed:', this.filter);
+      this.spinner.show();
       this.applyFilter();
     }
   }
@@ -47,12 +49,13 @@ export class EmployeeSalaryTable implements OnInit, OnChanges, OnDestroy {
     this.subs.push(this.salaryReportService.getSalaryReports().subscribe({
       next: (data) => {
         this.salaryReports = data;
-        console.log('Loaded salary reports:', data.length);
-        this.applyFilter();
-        this.cdr.detectChanges();
       },
       error: (error) => {
-        console.error('Error loading salary reports:', error);
+        this.spinner.hide();
+      },
+      complete: () => {
+        this.applyFilter();
+        this.cdr.detectChanges();
       }
     }));
   }
@@ -73,54 +76,8 @@ export class EmployeeSalaryTable implements OnInit, OnChanges, OnDestroy {
       
       return matchesEmployeeName && matchesMonth && matchesYear;
     });
-    console.log(this.salaryReports);
-    
-    this.currentPage = 1; // Reset to first page when filter changes
-  }
-
-  get paginatedReports(): ISalaryReport[] {
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    const endIndex = startIndex + this.itemsPerPage;
-    return this.filteredReports.slice(startIndex, endIndex);
-  }
-
-  get totalPages(): number {
-    return Math.ceil(this.filteredReports.length / this.itemsPerPage);
-  }
-
-  nextPage(): void {
-    if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-    }
-  }
-
-  previousPage(): void {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-    }
-  }
-
-  goToPage(page: number): void {
-    if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
-    }
-  }
-
-  getPageNumbers(): number[] {
-    const pages: number[] = [];
-    const maxVisiblePages = 5;
-    let startPage = Math.max(1, this.currentPage - Math.floor(maxVisiblePages / 2));
-    let endPage = Math.min(this.totalPages, startPage + maxVisiblePages - 1);
-    
-    if (endPage - startPage + 1 < maxVisiblePages) {
-      startPage = Math.max(1, endPage - maxVisiblePages + 1);
-    }
-    
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(i);
-    }
-    
-    return pages;
+    this.cdr.detectChanges();
+    this.spinner.hide();
   }
 
   getMonthName(month: number): string {

@@ -30,15 +30,12 @@ export class AttendanceReportTable {
 
   saveRecord(index: number) {
     if (this.editedRecord) {
+      console.log("editedRecord", this.editedRecord);
       this.subs.push(this.attendanceService.editAttendance(this.editedRecord).subscribe({
         next: (resp) => {
           this.records[index] = resp;
           this.editIndex = null;
           this.editedRecord = null;
-          console.log(this.records[index]);
-          console.log(resp);
-
-          
           Swal.fire({
             title: "Success!",
             text: "Record has been updated successfully.",
@@ -78,7 +75,7 @@ export class AttendanceReportTable {
       confirmButtonText: "Yes, delete it!"
     }).then((result) => {
       if (result.isConfirmed) {
-        this.subs.push(this.attendanceService.deleteAttendance(this.records[index].attendanceId).subscribe({
+        this.subs.push(this.attendanceService.deleteAttendance(this.records[index].attendanceId!).subscribe({
           next: (resp) => {
             Swal.fire({
               title: "Deleted!",

@@ -5,11 +5,13 @@ import { AuthService } from '../../Services/auth-service';
 import { ILoginData } from '../../Interfaces/ilogin-data';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { WebcamImage, WebcamModule } from 'ngx-webcam';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, WebcamModule],
   templateUrl: './login.html',
   styleUrl: './login.css'
 })
@@ -18,6 +20,9 @@ export class Login implements OnInit, OnDestroy {
   loading = false;
   error: string | null = null;
   subs: Subscription[] = [];
+  showWebcam = false;
+  capturedImage: WebcamImage | null = null;
+  private trigger: Subject<void> = new Subject<void>();
 
   constructor(private fb: FormBuilder, private authService: AuthService, private router: Router, private cdr: ChangeDetectorRef) {
     
@@ -48,12 +53,34 @@ export class Login implements OnInit, OnDestroy {
       this.loginForm.markAllAsTouched();
       return;
     }
+    // Show webcam modal instead of logging in immediately
+    this.showWebcam = true;
+  }
+
+  triggerSnapshot(): void {
+    this.trigger.next();
+  }
+
+  handleImage(webcamImage: WebcamImage): void {
+    this.capturedImage = webcamImage;
+  }
+
+  get triggerObservable() {
+    return this.trigger.asObservable();
+  }
+
+  submitWithImage() {
+    if (!this.capturedImage) return;
     this.loading = true;
-    const loginData: ILoginData = this.loginForm.value;
-    this.subs.push(this.authService.login(loginData).subscribe({
+    const formData = new FormData();
+    formData.append('email', this.loginForm.value.email);
+    formData.append('password', this.loginForm.value.password);
+    // Convert base64 to Blob
+    const blob = this.dataURLtoBlob(this.capturedImage.imageAsDataUrl);
+    formData.append('image', blob, 'image.jpg');
+    this.subs.push(this.authService.login(formData).subscribe({
       next: (resp) => {
         if (resp && resp.token) {
-          console.log(resp);
           if (typeof window !== 'undefined' && localStorage) {
             localStorage.setItem('token', resp.token);
             localStorage.setItem('role', resp.role);
@@ -69,23 +96,38 @@ export class Login implements OnInit, OnDestroy {
           this.cdr.detectChanges();
           if (resp.role === "Employee") {
             this.router.navigate(['/empdash']);
-          }
-          else {
+          } else {
             this.router.navigate(['/hrdash']);
           }
-        } 
-        else {
+        } else {
           this.error = 'Invalid response from server.';
         }
+        this.showWebcam = false;
+        this.capturedImage = null;
       },
       error: (err) => {
         this.error = err?.error?.message || 'Login failed. Please try again.';
         this.loading = false;
+        this.showWebcam = false;
+        this.capturedImage = null;
       },
       complete: () => {
         this.loading = false;
       }
     }));
+  }
+
+  dataURLtoBlob(dataurl: string) {
+    const arr = dataurl.split(','),
+      match = arr[0].match(/:(.*?);/),
+      mime = match ? match[1] : 'image/jpeg',
+      bstr = atob(arr[1]),
+      n = bstr.length,
+      u8arr = new Uint8Array(n);
+    for (let i = 0; i < n; i++) {
+      u8arr[i] = bstr.charCodeAt(i);
+    }
+    return new Blob([u8arr], { type: mime });
   }
 
   ngOnDestroy(): void {

@@ -27,5 +27,13 @@ export class AttendanceService {
     return this.http.get<IAttendance[]>(`${this.apiUrl}/my-attendance`);
   }
 
+  checkIn(attendance: IAttendance): Observable<IAttendance> {
+    return this.http.post<IAttendance>(`${this.apiUrl}/new`, attendance);
+  }
+
+  checkOut(attendance: IAttendance): Observable<IAttendance> {
+    return this.http.put<IAttendance>(`${this.apiUrl}`, attendance);
+  }
+
 
 }

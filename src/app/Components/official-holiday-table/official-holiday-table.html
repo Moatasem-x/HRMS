@@ -1,3 +1,4 @@
+<ngx-spinner bdColor = "rgba(0, 0, 0, 0.8)" size = "medium" color = "#fff" type = "square-jelly-box" [fullScreen] = "true"><p style="color: white" > Loading... </p></ngx-spinner>
 <div class="official-holiday-table-container">
   <table class="app-table">
     <thead>
@@ -37,8 +38,8 @@
               }
             </td>
             <td>
-              <button class="app-table-action-btn edit" (click)="saveHoliday(holiday, i)" [disabled]="editForm.invalid"><span>💾</span></button>
-              <button class="app-table-action-btn delete" (click)="cancelEdit()"><span>✖️</span></button>
+              <button class="app-table-action-btn edit" (click)="saveHoliday(holiday, i)" [disabled]="editForm.invalid" title="Save"><i class="bi bi-save"></i></button>
+              <button class="app-table-action-btn delete" (click)="cancelEdit()" title="Delete"><i class="bi bi-trash"></i></button>
             </td>
           </tr>
         } @else {
@@ -47,8 +48,8 @@
             <td>{{ holiday?.holidayDate | date:'dd-MM-yyyy' }}</td>
             <td>{{ holiday?.description || '-' }}</td>
             <td>
-              <button class="app-table-action-btn edit" (click)="editHoliday(holiday, i)"><span>✏️</span></button>
-              <button class="app-table-action-btn delete" (click)="deleteHoliday(holiday.holidayId)"><span>🗑️</span></button>
+              <button class="app-table-action-btn edit" (click)="editHoliday(holiday, i)" title="Edit"><i class="bi bi-pencil"></i></button>
+              <button class="app-table-action-btn delete" (click)="deleteHoliday(holiday.holidayId)" title="Delete"><i class="bi bi-trash"></i></button>
             </td>
           </tr>
         }

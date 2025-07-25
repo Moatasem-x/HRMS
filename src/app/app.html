@@ -1,9 +1,9 @@
 
 @if (!(router.url === '/login')) {
   <app-sidebar></app-sidebar>
+  <app-chat-bot></app-chat-bot>
 }
-<section class="main-content">
-  <router-outlet></router-outlet>
+<section class="main-content" style="position: relative; min-height: 100vh;">
+  <router-outlet #routerOutlet="outlet" [@routeAnimations]="prepareRoute(routerOutlet)"></router-outlet>
 </section>
 
-<!-- <app-employee-dashboard></app-employee-dashboard> -->

@@ -7,8 +7,9 @@ import { Subscription } from 'rxjs';
 import { EmployeeService } from '../../../Services/employee-service';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import Swal from 'sweetalert2';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../Services/auth-service';
+import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 
 interface BoardMember {
   name: string;
@@ -20,7 +21,7 @@ interface BoardMember {
 @Component({
   selector: 'app-employees',
   standalone: true,
-  imports: [FormsModule, CommonModule, SweetAlert2Module, RouterLink],
+  imports: [FormsModule, CommonModule, SweetAlert2Module, RouterLink, NgxSpinnerModule],
   templateUrl: './employees.html',
   styleUrls: ['./employees.css'],
   animations: [
@@ -54,13 +55,17 @@ interface BoardMember {
 })
 export class Employees implements OnInit, OnDestroy {
 
-  constructor(private employeeService: EmployeeService, private cdr: ChangeDetectorRef, private authService: AuthService) {}
+  constructor(private employeeService: EmployeeService, private cdr: ChangeDetectorRef, private authService: AuthService, private router: Router, private spinner: NgxSpinnerService) {}
 
   ngOnInit(): void {
+    this.subs.push(this.authService.userRole.subscribe({
+      next: () => {
+        this.userRole = this.authService.userRole.getValue() || "";
+        console.log("User Role", this.userRole); 
+      }
+    }));
+    this.spinner.show();
     this.loadEmployees();
-    console.log(this.authService.getEmail());
-    console.log(this.authService.getRole());
-    console.log(this.authService.getUserName());
   }
 
 
@@ -74,6 +79,7 @@ export class Employees implements OnInit, OnDestroy {
 
   employees: IEmployee[] = [];
   subs: Subscription[] = [];
+  userRole: string= "";
 
   searchTerm = '';
 
@@ -101,11 +107,12 @@ export class Employees implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.log(err);
+        this.spinner.hide();
       },
       complete: () => {
         this.expandedGroups.add('All');
         this.cdr.detectChanges();
+        this.spinner.hide();
       }
     }));
   }
@@ -122,9 +129,13 @@ export class Employees implements OnInit, OnDestroy {
     }
   }
 
-  editEmployee(employee: IEmployee) {
-    // Placeholder for edit action
-    alert('Edit ' + employee.fullName);
+  isNavigatingAway = false;
+
+  editEmployee(employeeId: number) {
+    this.isNavigatingAway = true;
+    setTimeout(() => {
+      this.router.navigate(['/addemployee', employeeId]);
+    }, 200); // match your collapse animation duration
   }
 
   deleteEmployee(empId: number) {
@@ -135,7 +146,7 @@ export class Employees implements OnInit, OnDestroy {
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!"
+      confirmButtonText: "Yes"
     }).then((result) => {
       if (result.isConfirmed) {
         this.subs.push(this.employeeService.deleteEmployee(empId).subscribe({

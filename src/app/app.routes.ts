@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 import { Employees } from './Pages/Employee/employees/employees';
-import { EmployeeDetails } from './Pages/Employee/employee-details/employee-details';
 import { AttendanceReportCombine } from './Pages/AttendanceReport/attendance-report-combine/attendance-report-combine';
 import { EmployeeSalaryCombine } from './Pages/EmployeeSalary/employee-salary-combine/employee-salary-combine';
 import { OfficialHolidayCombine } from './Pages/OfficialHoliday/official-holiday-combine/official-holiday-combine';
@@ -13,13 +12,15 @@ import { HRDashboard } from './Dashboards/hr-dashboard/hr-dashboard';
 import { HRForm } from './Pages/hr-form/hr-form';
 import { RequestHoliday } from './Pages/request-holiday/request-holiday';
 import { ManageHolidayRequests } from './Pages/manage-holiday-requests/manage-holiday-requests';
+import { Tasks } from './Pages/Tasks/tasks/tasks';
+import { Departments } from './Pages/Department/departments/departments';
+import { EmployeeTasks } from './Pages/Tasks/employee-tasks/employee-tasks';
 
 export const routes: Routes = [
   {path: '', redirectTo: '/login', pathMatch: 'full'},
-  {path: 'employees', component: Employees, canActivate: [adminGuard]},
-  {path: 'employees/:id', component: EmployeeDetails, canActivate: [adminGuard]},
-  {path: 'addemployee/0', component: EmployeeForm, canActivate: [adminGuard]},
-  {path: 'addemployee/:id', component: EmployeeForm, canActivate: [adminGuard]},
+  {path: 'employees', component: Employees, canActivate: [adminGuard], data: { animation: 'Employees' }},
+  {path: 'addemployee/0', component: EmployeeForm, canActivate: [adminGuard], data: { animation: 'EmployeeForm' }},
+  {path: 'addemployee/:id', component: EmployeeForm, canActivate: [adminGuard], data: { animation: 'EmployeeForm' }},
   {path: 'attendance', component: AttendanceReportCombine, canActivate: [adminGuard]},
   {path: 'salaryreports', component: EmployeeSalaryCombine, canActivate: [adminGuard]},
   {path: 'holidays', component: OfficialHolidayCombine, canActivate: [adminGuard]},
@@ -29,4 +30,7 @@ export const routes: Routes = [
   {path: 'addhr', component: HRForm, canActivate: [adminGuard]},
   {path: 'requestholiday', component: RequestHoliday, canActivate: [employeeGuard]},
   {path: 'holidayrequests', component: ManageHolidayRequests, canActivate: [adminGuard]},
+  {path: 'departments', component: Departments, canActivate: [adminGuard]},
+  {path: 'managetasks', component: Tasks, canActivate: [adminGuard]},
+  {path: 'mytasks', component: EmployeeTasks, canActivate: [employeeGuard]},
 ];

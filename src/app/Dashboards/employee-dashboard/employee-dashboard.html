@@ -1,9 +1,63 @@
+<ngx-spinner bdColor = "rgba(0, 0, 0, 0.8)" size = "medium" color = "#fff" type = "square-jelly-box" [fullScreen] = "true"><p style="color: white" > Loading... </p></ngx-spinner>
 <div class="dashboard-layout">
   <main class="main-content">
     <!-- Header -->
     <header class="dashboard-header">
       <div class="welcome">Welcome, {{employee?.fullName}}!</div>
     </header>
+
+    <!-- Attendance Actions -->
+    <div class="attendance-action" style="margin: 20px 0; text-align: center;">
+      <button *ngIf="attendanceStatus === 'not_checked_in'" (click)="checkIn()" class="btn btn-primary">
+        Check In
+      </button>
+      <button *ngIf="attendanceStatus === 'checked_in'" (click)="checkOut()" class="btn btn-success">
+        Check Out
+      </button>
+      <span *ngIf="attendanceStatus === 'checked_out'" class="checked-out-message" style="font-weight: bold; color: #4caf50;">
+        You have checked out for today. Have a great day!
+      </span>
+    </div>
+
+    <!-- Profile Update Button and Form -->
+    <div style="text-align:center; margin-bottom: 1.5rem;">
+      <button *ngIf="!isEditingProfile" class="btn btn-primary" (click)="openProfileEdit()">
+        <i class="bi bi-pencil"></i> Update Profile
+      </button>
+    </div>
+    <div *ngIf="isEditingProfile" class="profile-edit-overlay">
+      <div class="profile-edit-form-modal">
+        <form [formGroup]="profileForm" (ngSubmit)="saveProfileEdit()">
+          <div class="form-group">
+            <label for="address" class="form-label">Address</label>
+            <input type="text" id="address" formControlName="address" class="form-input" [class.invalid]="profileForm.get('address')?.invalid && profileForm.get('address')?.touched" placeholder="Enter address">
+            <div *ngIf="profileForm.get('address')?.invalid && profileForm.get('address')?.touched" class="error-message">
+              <i class="bi bi-exclamation-circle"></i>
+              <span *ngIf="profileForm.get('address')?.errors?.['required']">Address is required.</span>
+              <span *ngIf="profileForm.get('address')?.errors?.['minlength']">Address must be at least 4 characters.</span>
+              <span *ngIf="profileForm.get('address')?.errors?.['maxlength']">Address must not exceed 25 characters.</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="phoneNumber" class="form-label">Phone Number</label>
+            <input type="tel" id="phoneNumber" formControlName="phoneNumber" class="form-input" [class.invalid]="profileForm.get('phoneNumber')?.invalid && profileForm.get('phoneNumber')?.touched" placeholder="+201xxxxxxxxx" maxlength="13">
+            <div *ngIf="profileForm.get('phoneNumber')?.invalid && profileForm.get('phoneNumber')?.touched" class="error-message">
+              <i class="bi bi-exclamation-circle"></i>
+              <span *ngIf="profileForm.get('phoneNumber')?.errors?.['required']">Phone number is required.</span>
+              <span *ngIf="profileForm.get('phoneNumber')?.errors?.['pattern']">Please enter a valid phone number starting with +20, followed by 0, 1, 2, or 5, then 9 digits.</span>
+            </div>
+          </div>
+          <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
+            <button type="button" class="btn btn-secondary" (click)="cancelProfileEdit()">
+              <i class="bi bi-x"></i> Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="profileForm.invalid">
+              <i class="bi bi-save"></i> Save
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
 
     <!-- Employee Info Card -->
     <div class="card first-card">
@@ -45,8 +99,8 @@
         <div class="card-desc">Requests</div>
       </div>
       <div class="card">
-        <div class="card-title">Net Salary</div>
-        <div class="card-value">{{salaryData?.netSalary || 0}}</div>
+        <div class="card-title">Basic Salary</div>
+        <div class="card-value">{{salaryData?.basicSalary || 0}}</div>
         <div class="card-desc">This Month</div>
       </div>
     </div>

@@ -10,17 +10,16 @@ import { ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HRService } from '../../Services/hr-service';
 import Swal from 'sweetalert2';
+import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
   selector: 'app-hr-form',
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, NgxSpinnerModule],
   templateUrl: './hr-form.html',
   styleUrl: './hr-form.css'
 })
 export class HRForm implements OnInit, OnDestroy {
   hrForm!: FormGroup;
-  isSubmitting = false;
-  submitSuccess = false;
   textType = false;
   selectedImageName = '';
   imagePreviewUrl: string | ArrayBuffer | null = null;
@@ -38,9 +37,12 @@ export class HRForm implements OnInit, OnDestroy {
     private HRService: HRService,
     private departmentService: DepartmentService, 
     private cdr: ChangeDetectorRef,
-    private authService: AuthService) {}
+    private authService: AuthService,
+    private spinner: NgxSpinnerService
+  ) {}
 
   ngOnInit(): void {
+    this.spinner.show();
     this.loadDepartments();
     this.initForm();
     
@@ -75,7 +77,10 @@ export class HRForm implements OnInit, OnDestroy {
         this.departmentOptions = resp;
       },
       error: (err) => {
-        console.error('Error loading departments:', err);
+        this.spinner.hide();
+      },
+      complete: () => {
+        this.spinner.hide();
       }
     });
     this.subs.push(sub);
@@ -85,6 +90,7 @@ export class HRForm implements OnInit, OnDestroy {
     if (this.hrForm.valid) {
       const formValue = this.hrForm.value;
       const hrData: IEmployee = { ...formValue };
+      this.spinner.show();
       const formData = new FormData();
 
       // Append all fields except image
@@ -100,7 +106,6 @@ export class HRForm implements OnInit, OnDestroy {
       }
       console.log(formData);
 
-      this.isSubmitting = true;
       const sub = this.HRService.addHR(formData).subscribe({
         next: (resp) => {
           Swal.fire({
@@ -112,19 +117,30 @@ export class HRForm implements OnInit, OnDestroy {
           });
         },
         error: (err) => {
-          console.error('Error adding HR:', err);
+          this.spinner.hide();
+          if (err.error[1].code == "DuplicateEmail" || err.error[0].code == "DuplicateUserName") {
+            Swal.fire({
+              title: "Error!",
+              text: "Email already exists.",
+              icon: "error"
+            });
+          } 
+          else {
+            Swal.fire({
+              title: "Error!",
+              text: "Failed to add HR. Please try again.",
+              icon: "error"
+            });
+          }
         },
         complete: () => {
-          this.isSubmitting = false;
-          this.submitSuccess = true;
           this.resetForm();
+          this.spinner.hide();
         }
       });
       this.subs.push(sub);
-    } 
+    }
     else {
-      console.log('Form is invalid:', this.hrForm.errors);
-      console.log('Form values when invalid:', this.hrForm.value);
       this.markFormGroupTouched();
     }
   }
@@ -217,7 +233,6 @@ export class HRForm implements OnInit, OnDestroy {
       gender: '',
       departmentId: '',
     });
-    this.submitSuccess = false;
     this.imagePreviewUrl = null;
     this.selectedImageName = '';
   }

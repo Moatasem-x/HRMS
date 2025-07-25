@@ -1,3 +1,4 @@
+<ngx-spinner bdColor = "rgba(0, 0, 0, 0.8)" size = "medium" color = "#fff" type = "square-jelly-box" [fullScreen] = "true"><p style="color: white" > Loading... </p></ngx-spinner>
 <div class="add-employee-container">
     <div class="form-card">
       <div class="form-header">
@@ -70,7 +71,7 @@
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label for="password" class="form-label">Password</label>
+              <label for="password" class="form-label">{{ editMode ? 'New Password' : 'Password' }}</label>
               <div class="position-relative">
                 <input
                 [type]="textType ? 'text' : 'password'"
@@ -175,17 +176,19 @@
               }
             </div>
           </div>
-          <div class="form-group full-width">
-            <label for="image" class="form-label">Employee Image</label>
-            <div class="custom-file-input-wrapper input-with-image-preview">
-              <input id="image" type="file" class="form-input custom-file-input" #imageInput (change)="onImageChange($event)" />
-              <label for="image" class="custom-file-label">Browse</label>
-              <span class="selected-file-name">{{ selectedImageName }}</span>
-              @if (imagePreviewUrl) {
-                <img [src]="imagePreviewUrl" alt="Preview" class="image-preview-icon input-suffix-image" />
-              }
+          @if (!editMode) {
+            <div class="form-group full-width">
+              <label for="image" class="form-label">Employee Image</label>
+              <div class="custom-file-input-wrapper input-with-image-preview">
+                <input id="image" type="file" class="form-input custom-file-input" #imageInput (change)="onImageChange($event)" />
+                <label for="image" class="custom-file-label">Browse</label>
+                <span class="selected-file-name">{{ selectedImageName }}</span>
+                @if (imagePreviewUrl) {
+                  <img [src]="imagePreviewUrl" alt="Preview" class="image-preview-icon input-suffix-image" />
+                }
+              </div>
             </div>
-          </div>
+          }
         </div>
         <!-- Employment Information Section -->
         <div class="form-section">
@@ -201,7 +204,9 @@
                 id="hireDate"
                 formControlName="hireDate"
                 class="form-input"
-                [class.invalid]="isFieldInvalid('hireDate')">
+                [class.invalid]="isFieldInvalid('hireDate')"
+                [readonly]="editMode"
+              >
               @if (getFieldError('hireDate')) {
               <div class="error-message">
                 <i class="bi bi-exclamation-circle"></i>
@@ -246,7 +251,7 @@
             class="btn btn-primary"
             [disabled]="employeeForm.invalid">
             <i class="bi bi-person-check"></i>
-            Add Employee
+            {{ editMode ? 'Save' : 'Add Employee' }}
           </button>
         </div>
       </form>

@@ -5,18 +5,25 @@ import { EmployeeService } from '../../Services/employee-service';
 import { DepartmentService } from '../../Services/department-service';
 import { AttendanceService } from '../../Services/attendance-service';
 import { Subscription } from 'rxjs';
+import { IDepartment } from '../../Interfaces/idepartment';
+import { TasksService } from '../../Services/tasks-service';
+import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
   selector: 'app-hr-dashboard',
-  imports: [CommonModule],
+  imports: [CommonModule, NgxSpinnerModule],
   templateUrl: './hr-dashboard.html',
   styleUrl: './hr-dashboard.css'
 })
 export class HRDashboard implements AfterViewInit, OnInit, OnDestroy {
-  constructor(private employeeService: EmployeeService,
-              private departmentService: DepartmentService,
-              private attendanceService: AttendanceService,
-              private cdr: ChangeDetectorRef) {}
+  constructor(
+    private employeeService: EmployeeService,
+    private departmentService: DepartmentService,
+    private attendanceService: AttendanceService,
+    private tasksService: TasksService,
+    private cdr: ChangeDetectorRef,
+    private spinner: NgxSpinnerService
+  ) {}
 
 
   totalEmployees: number = 0;
@@ -32,33 +39,46 @@ export class HRDashboard implements AfterViewInit, OnInit, OnDestroy {
   performanceChart: Chart | null = null;
   viewInitialized = false;
   attendanceLoaded = false;
+  departments: IDepartment[] = [];
+  allTasks: any[] = [];
 
   ngOnInit(): void {
+    this.spinner.show();
     this.subs.push(this.employeeService.getEmployees().subscribe({
       next: (employees) => {
         this.totalEmployees = employees.length;
-        console.log("Total Employees: ", this.totalEmployees);
         this.cdr.detectChanges();
       }
     }));
+
     this.subs.push(this.departmentService.getDepartments().subscribe({
       next: (departments) => {
+        this.departments = departments;
         this.totalDepartments = departments.length;
-        console.log("Total Departments: ", this.totalDepartments);
         this.cdr.detectChanges();
       }
     }));
+
     this.subs.push(this.attendanceService.getAttendances().subscribe({
       next: (attendances) => {
         this.attendanceData = attendances;
         this.attendanceLoaded = true;
         this.updateAttendanceStatsAndChart();
-        console.log("Attendance Data: ", this.attendanceData);
       }
     }));
 
-    // Employee Performance Ratings Horizontal Bar Chart
-    this.createPerformanceChart();
+    this.subs.push(this.tasksService.getAllTasks().subscribe({
+      next: (tasks) => {
+        this.allTasks = tasks || [];
+        this.createPerformanceChart();
+      },
+      error: (err) => {
+        this.spinner.hide();
+      },
+      complete: () => {
+        this.spinner.hide();
+      }
+    }));
   }
 
   ngAfterViewInit() {
@@ -166,30 +186,32 @@ export class HRDashboard implements AfterViewInit, OnInit, OnDestroy {
     if (this.performanceChart) {
       this.performanceChart.destroy();
     }
+    // Prepare department names
+    const departmentNames = this.departments.map(d => d.departmentName);
+    // Prepare done and pending counts for each department
+    const doneCounts = departmentNames.map(name =>
+      this.allTasks.filter(t => t.departmentName === name && t.status === 'Done').length
+    );
+    const pendingCounts = departmentNames.map(name =>
+      this.allTasks.filter(t => t.departmentName === name && t.status === 'Pending').length
+    );
     if (this.performanceChartCanvas && this.performanceChartCanvas.nativeElement) {
       this.performanceChart = new Chart(this.performanceChartCanvas.nativeElement, {
         type: 'bar',
         data: {
-          labels: ['Hazel Nutt', 'Simon Cyrene', 'Aida Bugg', 'Peg Legge', 'Barb Akew'],
+          labels: departmentNames,
           datasets: [
             {
-              label: 'Task completed',
-              data: [38, 32, 28, 25, 20],
+              label: 'Done Tasks',
+              data: doneCounts,
               backgroundColor: '#3b82f6',
               borderRadius: 8,
               barPercentage: 0.5
             },
             {
-              label: 'Presence',
-              data: [35, 30, 25, 22, 18],
-              backgroundColor: '#66bb6a',
-              borderRadius: 8,
-              barPercentage: 0.5
-            },
-            {
-              label: 'Completed Meeting',
-              data: [30, 28, 20, 18, 15],
-              backgroundColor: '#f59e42',
+              label: 'Pending Tasks',
+              data: pendingCounts,
+              backgroundColor: '#eab308',
               borderRadius: 8,
               barPercentage: 0.5
             }
@@ -207,6 +229,7 @@ export class HRDashboard implements AfterViewInit, OnInit, OnDestroy {
         }
       });
     }
+    this.cdr.detectChanges();
   }
 
   ngOnDestroy(): void {

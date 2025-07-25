@@ -1,3 +1,4 @@
+<ngx-spinner bdColor = "rgba(0, 0, 0, 0.8)" size = "medium" color = "#fff" type = "square-jelly-box" [fullScreen] = "true"><p style="color: white" > Loading... </p></ngx-spinner>
 <div class="employees-container">
   <main class="main-content">
     <header class="header">
@@ -39,7 +40,7 @@
           </span>
           <span class="group-title">All Employees</span>
         </div>
-        @if (isGroupExpanded("All")) {
+        @if (!isNavigatingAway && isGroupExpanded("All")) {
           <div @expand class="overflow-hidden">
             <div class="details">
               <table class="app-table">
@@ -68,12 +69,8 @@
                       <td>{{ emp.address }}</td>
                       <td>{{ emp.departmentName }}</td>
                       <td>
-                        <button (click)="editEmployee(emp)" class="app-table-action-btn edit"><span>✏️</span></button>
-                        <button 
-                        (click)="deleteEmployee(emp.employeeId)" 
-                        class="app-table-action-btn delete">
-                          <span>🗑️</span>
-                        </button>
+                        <button (click)="editEmployee(emp.employeeId)" class="app-table-action-btn edit" [disabled]="userRole != 'Admin' && emp.departmentName == 'HR'"><i class="bi bi-pencil"></i></button>
+                        <button (click)="deleteEmployee(emp.employeeId)" class="app-table-action-btn delete"><i class="bi bi-trash"></i></button>
                       </td>
                     </tr>
                   }
@@ -94,7 +91,7 @@
             </span>
             <span class="group-title">{{ group }}</span>
           </div>
-          @if (isGroupExpanded(group)) {
+          @if (!isNavigatingAway && isGroupExpanded(group)) {
             <div @expand class="overflow-hidden">
               <div class="details">
                 <table class="app-table">
@@ -121,12 +118,8 @@
                         <td>{{ emp.salary }}</td>
                         <td>{{ emp.address }}</td>
                         <td>
-                          <button (click)="editEmployee(emp)" class="app-table-action-btn edit"><span>✏️</span></button>
-                          <button 
-                          (click)="deleteEmployee(emp.employeeId)" 
-                          class="app-table-action-btn delete">
-                            <span>🗑️</span>
-                          </button>
+                          <button (click)="editEmployee(emp.employeeId)" class="app-table-action-btn edit" [disabled]="userRole != 'Admin' && emp.departmentName == 'HR'"><i class="bi bi-pencil"></i></button>
+                          <button (click)="deleteEmployee(emp.employeeId)" class="app-table-action-btn delete"><i class="bi bi-trash"></i></button>
                         </td>
                       </tr>
                     }

@@ -366,8 +366,9 @@ input[type="date"]::-moz-focus-inner {
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 1.1rem;
+  font-size: 1.3rem;
   margin-right: 8px;
+  border-radius: 6px;
   transition: color 0.2s, transform 0.2s;
 }
 .app-table-action-btn.edit {
@@ -377,10 +378,20 @@ input[type="date"]::-moz-focus-inner {
   color: #ef4444;
 }
 .app-table-action-btn.edit:hover {
-  color: #1d4ed8;
+  background: rgba(59, 130, 246, 0.15);
   transform: scale(1.15);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
 }
 .app-table-action-btn.delete:hover {
-  color: #b91c1c;
-  transform: scale(1.15);
+  background: rgba(239, 68, 68, 0.15);
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2);
+}
+
+.app-table-action-btn:disabled {
+  color: #bdbdbd !important;
+  background: none !important;
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
 }

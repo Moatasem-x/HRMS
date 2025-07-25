@@ -15,6 +15,10 @@ export class SalaryReportService {
     return this.http.get<ISalaryReport[]>(`${this.apiUrl}/all`);
   }
 
+  getSalaryReportForSpecificEmployeeInMonth(id:number , m:number,y:number ): Observable<ISalaryReport> {
+    return this.http.post<ISalaryReport>(`${this.apiUrl}/SpecificSalary`, {employeeId: id, month: m, year: y});
+  }
+
   getSalaryReportsByMonthYear(month: number, year: number): Observable<ISalaryReport[]> {
     return this.http.get<ISalaryReport[]>(`${this.apiUrl}/byMonthYear?month=${month}&year=${year}`);
   }

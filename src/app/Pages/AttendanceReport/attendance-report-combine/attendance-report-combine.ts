@@ -3,12 +3,13 @@ import { AttendanceReportFilter } from '../../../Components/attendance-report-fi
 import { AttendanceReportTable } from '../../../Components/attendance-report-table/attendance-report-table';
 import { AttendanceService } from '../../../Services/attendance-service';
 import { IAttendance } from '../../../Interfaces/iattendance';
+import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-attendance-report-combine',
   standalone: true,
-  imports: [AttendanceReportFilter, AttendanceReportTable],
+  imports: [AttendanceReportFilter, AttendanceReportTable, NgxSpinnerModule],
   templateUrl: './attendance-report-combine.html',
   styleUrls: ['./attendance-report-combine.css']
 })
@@ -22,9 +23,10 @@ export class AttendanceReportCombine implements OnInit, OnDestroy {
   private lastFromDate = '';
   private lastToDate = '';
 
-  constructor(private attendanceService: AttendanceService, private cdr: ChangeDetectorRef) {}
+  constructor(private attendanceService: AttendanceService, private cdr: ChangeDetectorRef, private spinner: NgxSpinnerService) {}
 
   ngOnInit() {
+    this.spinner.show();
     this.loadRecords();
   }
 
@@ -34,23 +36,21 @@ export class AttendanceReportCombine implements OnInit, OnDestroy {
         this.allRecords = records;
         this.filteredRecords = records;
         this.cdr.detectChanges();
-        console.log(this.allRecords);
       },
       error: (error) => {
-        console.error('Error loading records:', error);
       },
       complete: () => {
-        console.log('Records loaded successfully');
+        this.spinner.hide();
       }
     }));
   }
 
   onFilterChange(filter: { fromDate: string; toDate: string; search: string }) {
-    
+    this.spinner.show();
     if (filter.fromDate === '' && filter.toDate === '') {
       this.lastSearch = filter.search;
       this.filteredRecords = this.allRecords.filter(r =>
-        r.employeeName.toLowerCase().includes(this.lastSearch.toLowerCase())
+        r.employeeName?.toLowerCase().includes(this.lastSearch.toLowerCase())
       );
     } 
     else {
@@ -60,17 +60,18 @@ export class AttendanceReportCombine implements OnInit, OnDestroy {
       this.lastSearch = filter.search;
       let filtered = this.allRecords;
       if (this.lastFromDate) {
-        filtered = filtered.filter(r => r.attendanceDate >= this.lastFromDate);
+        filtered = filtered.filter(r => r.attendanceDate && r.attendanceDate >= this.lastFromDate);
       }
       if (this.lastToDate) {
-        filtered = filtered.filter(r => r.attendanceDate <= this.lastToDate);
+        filtered = filtered.filter(r => r.attendanceDate && r.attendanceDate <= this.lastToDate);
       }
       if (this.lastSearch) {
-        filtered = filtered.filter(r => r.employeeName.toLowerCase().includes(this.lastSearch.toLowerCase()));
+        filtered = filtered.filter(r => r.employeeName?.toLowerCase().includes(this.lastSearch.toLowerCase()));
       }
       this.filteredRecords = filtered;
     }
     this.cdr.detectChanges();
+    this.spinner.hide();
   }
 
   ngOnDestroy(): void {

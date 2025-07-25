@@ -7,6 +7,10 @@
         <span class="sidebar-icon"><i class="bi bi-activity"></i></span>
         <span class="sidebar-label-container" [@labelSlide]="isExpanded ? 'visible' : 'hidden'">Dashboard</span>
       </li>
+      <li routerLink="/mytasks" routerLinkActive="active">
+        <span class="sidebar-icon"><i class="bi bi-list-task"></i></span>
+        <span class="sidebar-label-container" [@labelSlide]="isExpanded ? 'visible' : 'hidden'">My Tasks</span>
+      </li>
       <li routerLink="/requestholiday" routerLinkActive="active">
         <span class="sidebar-icon"><i class="bi bi-umbrella"></i></span>
         <span class="sidebar-label-container" [@labelSlide]="isExpanded ? 'visible' : 'hidden'">Request Holiday</span>
@@ -46,6 +50,14 @@
       <li routerLink="/holidayrequests" routerLinkActive="active">
         <span class="sidebar-icon"><i class="bi bi-calendar-check"></i></span>
         <span class="sidebar-label-container" [@labelSlide]="isExpanded ? 'visible' : 'hidden'">Holiday Requests</span>
+      </li>
+      <li routerLink="/managetasks" routerLinkActive="active">
+        <span class="sidebar-icon"><i class="bi bi-list-task"></i></span>
+        <span class="sidebar-label-container" [@labelSlide]="isExpanded ? 'visible' : 'hidden'">Manage Tasks</span>
+      </li>
+      <li routerLink="/departments" routerLinkActive="active">
+        <span class="sidebar-icon"><i class="bi bi-building"></i></span>
+        <span class="sidebar-label-container" [@labelSlide]="isExpanded ? 'visible' : 'hidden'">Departments</span>
       </li>
     }
     @if (isloggedin) {

@@ -45,12 +45,12 @@
 
           <td>
             @if (editIndex !== i) {
-              <button class="app-table-action-btn edit" (click)="editRecord(i)" title="Edit"><span>✏️</span></button>
-              <button class="app-table-action-btn delete" (click)="deleteRecord(i)" title="Delete"><span>🗑️</span></button>
+              <button class="app-table-action-btn edit" (click)="editRecord(i)" title="Edit"><i class="bi bi-pencil"></i></button>
+              <button class="app-table-action-btn delete" (click)="deleteRecord(i)" title="Delete"><i class="bi bi-trash"></i></button>
             }
             @if (editIndex === i && editedRecord) {
-              <button class="app-table-action-btn edit" (click)="saveRecord(i)" title="Save"><span>💾</span></button>
-              <button class="app-table-action-btn delete" (click)="cancelEdit()" title="Cancel"><span>❌</span></button>
+              <button class="app-table-action-btn edit" (click)="saveRecord(i)" title="Save"><i class="bi bi-save"></i></button>
+              <button class="app-table-action-btn delete" (click)="cancelEdit()" title="Cancel"><i class="bi bi-x"></i></button>
             }
           </td>
           

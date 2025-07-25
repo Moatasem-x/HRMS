@@ -5,13 +5,14 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import Swal from 'sweetalert2';
+import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
   selector: 'app-official-holiday-table',
   templateUrl: './official-holiday-table.html',
   styleUrl: './official-holiday-table.css',
   standalone: true,
-  imports: [DatePipe, CommonModule, FormsModule, ReactiveFormsModule]
+  imports: [DatePipe, CommonModule, FormsModule, ReactiveFormsModule, NgxSpinnerModule]
 })
 export class OfficialHolidayTable implements OnInit, OnDestroy, OnChanges {
   holidays: IOfficialHoliday[] = [];
@@ -26,10 +27,12 @@ export class OfficialHolidayTable implements OnInit, OnDestroy, OnChanges {
   constructor(
     private holidayService: OfficialHolidayService,
     private cdr: ChangeDetectorRef,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private spinner: NgxSpinnerService
   ) {}
 
   ngOnInit(): void {
+    this.spinner.show();
     this.loadHolidays();
   }
 
@@ -47,9 +50,11 @@ export class OfficialHolidayTable implements OnInit, OnDestroy, OnChanges {
         this.cdr.detectChanges();
       },
       error: (err) => {
+        this.spinner.hide();
         this.error = 'Failed to load holidays.';
       },
       complete: () => {
+        this.spinner.hide();
       }
     }));
   }
@@ -77,7 +82,7 @@ export class OfficialHolidayTable implements OnInit, OnDestroy, OnChanges {
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, update it!"
+      confirmButtonText: "Yes"
     }).then((result) => {
       if (result.isConfirmed) {
 

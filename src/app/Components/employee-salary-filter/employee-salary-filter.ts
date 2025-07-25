@@ -70,11 +70,10 @@ export class EmployeeSalaryFilter implements OnInit {
   }
 
   onClear(): void {
-    const currentDate = new Date();
     this.filter = {
       employeeName: '',
-      month: (currentDate.getMonth() + 1).toString(),
-      year: currentDate.getFullYear().toString()
+      month: '',
+      year: ''
     };
     this.filterChanged.emit(this.filter);
   }

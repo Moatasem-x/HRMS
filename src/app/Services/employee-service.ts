@@ -30,7 +30,12 @@ export class EmployeeService {
     return this.http.delete<IEmployee>(`${this.apiUrl}/${id}`);
   }
 
-  editEmployee(employee: IEmployee, id: number): Observable<IEmployee> {
-    return this.http.put<IEmployee>(`${this.apiUrl}/${id}`, employee);
+  editEmployee(Emp: FormData, id: number): Observable<IEmployee> {
+    console.log("employee: ", Emp);
+    return this.http.put<IEmployee>(`${this.apiUrl}/${id}`, Emp);
+  }
+
+  editCurrentEmployeeProfile(employee: IEmployee): Observable<IEmployee> {
+    return this.http.put<IEmployee>(`${this.apiUrl}/update-profile`, employee);
   }
 }

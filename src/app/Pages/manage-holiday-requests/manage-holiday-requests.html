@@ -1,3 +1,4 @@
+<ngx-spinner bdColor = "rgba(0, 0, 0, 0.8)" size = "medium" color = "#fff" type = "square-jelly-box" [fullScreen] = "true"><p style="color: white" > Loading... </p></ngx-spinner>
 <div class="manage-holiday-container">
   <div class="form-card">
     <div class="form-header">
@@ -22,7 +23,7 @@
         <button class="btn btn-secondary" [class.active]="filter==='rejected'" (click)="setFilter('rejected')">Rejected</button>
       </div>
     </div>
-    @if (!isLoading && !error) {
+    @if (!error) {
       @if (filteredRequests.length === 0) {
         <div class="no-requests-row"><i class="bi bi-inbox"></i> No requests found for this filter.</div>
       }

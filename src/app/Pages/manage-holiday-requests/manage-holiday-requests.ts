@@ -1,43 +1,45 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { RequestHolidayService } from '../../Services/request-holiday-service';
 import { IRequestHoliday } from '../../Interfaces/irequest-holiday';
 import { CommonModule } from '@angular/common';
+import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
+import { Subscription } from 'rxjs';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-manage-holiday-requests',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, NgxSpinnerModule],
   templateUrl: './manage-holiday-requests.html',
   styleUrl: './manage-holiday-requests.css'
 })
-export class ManageHolidayRequests implements OnInit {
+export class ManageHolidayRequests implements OnInit, OnDestroy {
   requests: IRequestHoliday[] = [];
   filteredRequests: IRequestHoliday[] = [];
+  subs: Subscription[] = [];
   filter: string = 'all';
   filterName: string = '';
   filterDate: string = '';
-  isLoading = false;
   error = '';
 
-  constructor(private requestHolidayService: RequestHolidayService, private cdr: ChangeDetectorRef) {}
+  constructor(private requestHolidayService: RequestHolidayService, private cdr: ChangeDetectorRef, private spinner: NgxSpinnerService) {}
 
   ngOnInit(): void {
+    this.spinner.show();
     this.fetchRequests();
   }
 
   fetchRequests(): void {
-    this.isLoading = true;
-    this.requestHolidayService.getRequestHolidays().subscribe({
+    this.subs.push(this.requestHolidayService.getRequestHolidays().subscribe({
       next: (data) => {
         this.requests = data;
         this.applyFilter();
-        this.isLoading = false;
         this.cdr.detectChanges();
       },
       error: () => {
-        this.error = 'Failed to load requests.';
+        this.spinner.hide();
       }
-    });
+    }));
   }
 
   applyFilter(): void {
@@ -54,6 +56,7 @@ export class ManageHolidayRequests implements OnInit {
     }
     this.filteredRequests = filtered;
     this.cdr.detectChanges();
+    this.spinner.hide();
   }
 
   setFilter(status: string): void {
@@ -88,20 +91,40 @@ export class ManageHolidayRequests implements OnInit {
   }
 
   takeAction(request: IRequestHoliday, action: string): void {
-    console.log(request);
-    if (!request.id) return;
-    this.requestHolidayService.takeActionOnRequest(request.id, action).subscribe({
-      next: (updated) => {
-        let idx = this.requests.findIndex(r => r.id === request.id);
-        this.filteredRequests[idx].status = updated.status;
-        this.applyFilter();
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        this.error = 'Failed to update request.';
-      },
-      complete: () => {
+    if (!request.id) {
+      Swal.fire({
+        title: 'Error!',
+        text: 'An Error Occured. Please try again.',
+        icon: 'error'
+      });
+      return;
+    }
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'You want to ' + action + ' this request.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.subs.push(this.requestHolidayService.takeActionOnRequest(request.id || 0, action).subscribe({
+          next: (updated) => {
+            let idx = this.requests.findIndex(r => r.id === request.id);
+            this.requests[idx].status = updated.status;
+            this.applyFilter();
+            this.cdr.detectChanges();
+          },
+          error: (err) => {
+            this.error = 'Failed to update request.';
+          },
+          complete: () => {
+          }
+        }));
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.subs.forEach(sub => sub.unsubscribe());
   }
 }
