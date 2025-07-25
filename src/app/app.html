@@ -1,9 +1,9 @@
 
-@if (!(router.url === '/login')) {
+@if (isLoggedIn && !(router.url === '/login')) {
   <app-sidebar></app-sidebar>
   <app-chat-bot></app-chat-bot>
 }
-<section class="main-content" style="position: relative; min-height: 100vh;">
-  <router-outlet #routerOutlet="outlet" [@routeAnimations]="prepareRoute(routerOutlet)"></router-outlet>
+<section class="main-content" [class.with-sidebar]="isLoggedIn && !(router.url === '/login')">
+  <router-outlet></router-outlet>
 </section>
 

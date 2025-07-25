@@ -18,9 +18,9 @@ import { EmployeeTasks } from './Pages/Tasks/employee-tasks/employee-tasks';
 
 export const routes: Routes = [
   {path: '', redirectTo: '/login', pathMatch: 'full'},
-  {path: 'employees', component: Employees, canActivate: [adminGuard], data: { animation: 'Employees' }},
-  {path: 'addemployee/0', component: EmployeeForm, canActivate: [adminGuard], data: { animation: 'EmployeeForm' }},
-  {path: 'addemployee/:id', component: EmployeeForm, canActivate: [adminGuard], data: { animation: 'EmployeeForm' }},
+  {path: 'employees', component: Employees, canActivate: [adminGuard]},
+  {path: 'addemployee/0', component: EmployeeForm, canActivate: [adminGuard]},
+  {path: 'addemployee/:id', component: EmployeeForm, canActivate: [adminGuard]},
   {path: 'attendance', component: AttendanceReportCombine, canActivate: [adminGuard]},
   {path: 'salaryreports', component: EmployeeSalaryCombine, canActivate: [adminGuard]},
   {path: 'holidays', component: OfficialHolidayCombine, canActivate: [adminGuard]},
