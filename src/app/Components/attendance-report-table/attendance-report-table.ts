@@ -31,7 +31,7 @@ export class AttendanceReportTable {
   saveRecord(index: number) {
     if (this.editedRecord) {
       console.log("editedRecord", this.editedRecord);
-      this.subs.push(this.attendanceService.editAttendance(this.editedRecord).subscribe({
+      this.subs.push(this.attendanceService.adminUpdatesAttendance(this.editedRecord).subscribe({
         next: (resp) => {
           this.records[index] = resp;
           this.editIndex = null;

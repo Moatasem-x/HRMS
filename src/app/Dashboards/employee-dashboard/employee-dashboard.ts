@@ -111,11 +111,22 @@ export class EmployeeDashboard implements AfterViewInit, OnInit, OnDestroy {
             this.getEmployee();
           },
           error: (err) => {
+
+            if (err.error.message == "Duplicate phone number") {
             Swal.fire({
+              title: "Error!",
+              text: "Phone number already exists.",
+              icon: "error"
+            });
+            }
+            else
+            {
+              Swal.fire({
               title: "Error!",
               text: "Failed to update profile.",
               icon: "error"
-            });
+              });
+          }
           }
         }));
       }
@@ -176,9 +187,9 @@ export class EmployeeDashboard implements AfterViewInit, OnInit, OnDestroy {
     this.todayAttendance = this.attendanceData.find(a => a.attendanceDate && new Date(a.attendanceDate).toLocaleDateString('en-CA') === todayStr) || null;
     if (!this.todayAttendance) {
       this.attendanceStatus = 'not_checked_in';
-    } else if (this.todayAttendance && this.todayAttendance.checkInTime == this.todayAttendance.checkOutTime) {
+    } else if (this.todayAttendance && this.todayAttendance.checkInTime && !this.todayAttendance.checkOutTime) {
       this.attendanceStatus = 'checked_in';
-    } else if (this.todayAttendance && this.todayAttendance.checkOutTime != this.todayAttendance.checkInTime) {
+    } else if (this.todayAttendance && this.todayAttendance.checkOutTime ) {
       this.attendanceStatus = 'checked_out';
     }
     console.log("todayAttendance", this.todayAttendance);
@@ -197,7 +208,7 @@ export class EmployeeDashboard implements AfterViewInit, OnInit, OnDestroy {
         const attendance: any = {
           employeeId: this.employee.employeeId,
           checkInTime: this.getCurrentTimeString(),
-          checkOutTime: this.getCurrentTimeString(),
+          // checkOutTime: "",
           latitude: position.coords.latitude,
           longitude: position.coords.longitude
         };
@@ -277,6 +288,7 @@ export class EmployeeDashboard implements AfterViewInit, OnInit, OnDestroy {
         });
       },
       (error) => {
+        console.log(error);
         Swal.fire({
           title: "Error!",
           text: "Could not get your location. Please allow location access to check out.",

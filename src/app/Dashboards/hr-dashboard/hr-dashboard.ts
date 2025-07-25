@@ -8,6 +8,8 @@ import { Subscription } from 'rxjs';
 import { IDepartment } from '../../Interfaces/idepartment';
 import { TasksService } from '../../Services/tasks-service';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
+import { AuthService } from '../../Services/auth-service';
+import { IEmployee } from '../../Interfaces/iemployee';
 
 @Component({
   selector: 'app-hr-dashboard',
@@ -22,7 +24,8 @@ export class HRDashboard implements AfterViewInit, OnInit, OnDestroy {
     private attendanceService: AttendanceService,
     private tasksService: TasksService,
     private cdr: ChangeDetectorRef,
-    private spinner: NgxSpinnerService
+    private spinner: NgxSpinnerService,
+    private authService: AuthService,
   ) {}
 
 
@@ -41,9 +44,24 @@ export class HRDashboard implements AfterViewInit, OnInit, OnDestroy {
   attendanceLoaded = false;
   departments: IDepartment[] = [];
   allTasks: any[] = [];
-
+  userId:number = 0;
+  myData!:IEmployee;
+  userRole:string="";
   ngOnInit(): void {
     this.spinner.show();
+    
+    this.subs.push(this.authService.userId.subscribe({
+      next: (resp) => {
+        console.log(resp);
+          this.userId = this.authService.userId.getValue() || 0;
+          if(this.userId!=0){
+            this.userRole = this.authService.getRole()||"";
+            this.getEmployee(this.userId);
+          }
+        this.cdr.detectChanges();
+      }
+    }));
+
     this.subs.push(this.employeeService.getEmployees().subscribe({
       next: (employees) => {
         this.totalEmployees = employees.length;
@@ -66,7 +84,7 @@ export class HRDashboard implements AfterViewInit, OnInit, OnDestroy {
         this.updateAttendanceStatsAndChart();
       }
     }));
-
+    
     this.subs.push(this.tasksService.getAllTasks().subscribe({
       next: (tasks) => {
         this.allTasks = tasks || [];
@@ -80,7 +98,16 @@ export class HRDashboard implements AfterViewInit, OnInit, OnDestroy {
       }
     }));
   }
-
+  getEmployee(id:number){
+    this.subs.push(this.employeeService.getEmployeeById(id).subscribe({
+      next: (resp) => {        
+        this.myData = resp;
+        console.log(this.myData);
+        this.cdr.detectChanges();
+      }
+    }));
+    
+  }
   ngAfterViewInit() {
     this.viewInitialized = true;
     this.updateAttendanceStatsAndChart();

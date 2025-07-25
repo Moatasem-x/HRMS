@@ -34,6 +34,11 @@ export class AttendanceService {
   checkOut(attendance: IAttendance): Observable<IAttendance> {
     return this.http.put<IAttendance>(`${this.apiUrl}`, attendance);
   }
+  
+  adminUpdatesAttendance(attendance:IAttendance):Observable<IAttendance>{
+    return this.http.put<IAttendance>(`${this.apiUrl}/Updateatt`, attendance);
+    
+  }
 
 
 }

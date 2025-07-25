@@ -118,13 +118,27 @@ export class HRForm implements OnInit, OnDestroy {
         },
         error: (err) => {
           this.spinner.hide();
-          if (err.error[1].code == "DuplicateEmail" || err.error[0].code == "DuplicateUserName") {
-            Swal.fire({
-              title: "Error!",
-              text: "Email already exists.",
-              icon: "error"
-            });
-          } 
+          if (err.error.message == "DuplicateEmail") {
+              Swal.fire({
+                title: "Error!",
+                text: "Email already exists.",
+                icon: "error"
+              });
+            } 
+            else  if (err.error.message == "Duplicate phone number") {
+              Swal.fire({
+                title: "Error!",
+                text: "Phone number already exists.",
+                icon: "error"
+              });
+            }
+            else if (err.error.message == "Duplicate National ID") {
+              Swal.fire({
+                title: "Error!",
+                text: "National ID already exists.",
+                icon: "error"
+              });
+            }
           else {
             Swal.fire({
               title: "Error!",

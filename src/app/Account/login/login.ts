@@ -7,24 +7,24 @@ import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { WebcamImage, WebcamModule } from 'ngx-webcam';
 import { Subject } from 'rxjs';
-
+import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
+import Swal from 'sweetalert2';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, WebcamModule],
+  imports: [ReactiveFormsModule, CommonModule, WebcamModule,NgxSpinnerModule],
   templateUrl: './login.html',
   styleUrl: './login.css'
 })
 export class Login implements OnInit, OnDestroy {
   loginForm!: FormGroup;
-  loading = false;
   error: string | null = null;
   subs: Subscription[] = [];
   showWebcam = false;
   capturedImage: WebcamImage | null = null;
   private trigger: Subject<void> = new Subject<void>();
 
-  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router, private cdr: ChangeDetectorRef) {
+  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router, private cdr: ChangeDetectorRef,private spinner:NgxSpinnerService) {
     
   }
 
@@ -71,13 +71,25 @@ export class Login implements OnInit, OnDestroy {
 
   submitWithImage() {
     if (!this.capturedImage) return;
-    this.loading = true;
+    this.spinner.show();
+    
     const formData = new FormData();
     formData.append('email', this.loginForm.value.email);
     formData.append('password', this.loginForm.value.password);
     // Convert base64 to Blob
     const blob = this.dataURLtoBlob(this.capturedImage.imageAsDataUrl);
     formData.append('image', blob, 'image.jpg');
+    const Toast = Swal.mixin({
+  toast: true,
+  position: "top-end",
+  showConfirmButton: false,
+  timer: 3000,
+  timerProgressBar: true,
+  didOpen: (toast) => {
+    toast.onmouseenter = Swal.stopTimer;
+    toast.onmouseleave = Swal.resumeTimer;
+  }
+});
     this.subs.push(this.authService.login(formData).subscribe({
       next: (resp) => {
         if (resp && resp.token) {
@@ -93,6 +105,10 @@ export class Login implements OnInit, OnDestroy {
           this.authService.userRole.next(resp.role);
           this.authService.userName.next(resp.fullName);
           this.authService.userId.next(resp.employeeId);
+          Toast.fire({
+            icon: "success",
+            title: "Signed in successfully"
+            });
           this.cdr.detectChanges();
           if (resp.role === "Employee") {
             this.router.navigate(['/empdash']);
@@ -107,12 +123,16 @@ export class Login implements OnInit, OnDestroy {
       },
       error: (err) => {
         this.error = err?.error?.message || 'Login failed. Please try again.';
-        this.loading = false;
+        this.spinner.hide();
         this.showWebcam = false;
         this.capturedImage = null;
+          Toast.fire({
+            icon: "error",
+            title: "Invalid credentials. Try again please."
+            });
       },
       complete: () => {
-        this.loading = false;
+        this.spinner.hide();
       }
     }));
   }

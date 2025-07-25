@@ -135,8 +135,36 @@ export class EmployeeForm implements OnInit, OnDestroy {
           },
           error: (err) => {
             this.spinner.hide();
-            console.error('Error updating employee:', err);
-          },
+            if (err.error.message == "Duplicate phone number") {
+              Swal.fire({
+                title: "Error!",
+                text: "Phone number already exists.",
+                icon: "error"
+              });
+            }
+            else if (err.error.message == "Duplicate National ID") {
+              Swal.fire({
+                title: "Error!",
+                text: "National ID already exists.",
+                icon: "error"
+              });
+            }
+            else if (err.error[0].code == "DuplicateEmail") {
+              Swal.fire({
+                title: "Error!",
+                text: "Email already exists.",
+                icon: "error"
+              });
+            } 
+            else{
+                Swal.fire({
+                title: "Error!",
+                text: "Failed to update employee. Please try again.",
+                icon: "error"
+              });
+            }
+
+            },
           complete: () => {
             this.spinner.hide();
           }
@@ -163,6 +191,20 @@ export class EmployeeForm implements OnInit, OnDestroy {
                 icon: "error"
               });
             } 
+            else  if (err.error.message == "Duplicate phone number") {
+              Swal.fire({
+                title: "Error!",
+                text: "Phone number already exists.",
+                icon: "error"
+              });
+            }
+            else if (err.error.message == "Duplicate National ID") {
+              Swal.fire({
+                title: "Error!",
+                text: "National ID already exists.",
+                icon: "error"
+              });
+            }
             else {
               Swal.fire({
                 title: "Error!",
