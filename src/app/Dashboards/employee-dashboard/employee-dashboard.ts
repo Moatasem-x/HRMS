@@ -219,6 +219,8 @@ export class EmployeeDashboard implements AfterViewInit, OnInit, OnDestroy {
           },
           error: (err) => {
             console.log("Error", err.error.message);
+            this.spinner.hide();
+
             if (err.error.message == "You are outside the allowed location range.") {
               Swal.fire({
                 title: "Error!",
@@ -268,6 +270,8 @@ export class EmployeeDashboard implements AfterViewInit, OnInit, OnDestroy {
             this.getAttendance();
           },
           error: (err) => {
+            this.spinner.hide();
+
             if (err.error.message == "You are outside the allowed location range.") {
               Swal.fire({
                 title: "Error!",
