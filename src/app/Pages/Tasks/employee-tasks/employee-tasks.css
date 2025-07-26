@@ -92,6 +92,10 @@ tasks-content {
   background: #d1fae5;
   color: #059669;
 }
+.task-status-badge.late {
+  background: #fee2e2;
+  color: #ef4444;
+}
 .task-due-date {
   font-size: 0.98rem;
   color: #667eea;

@@ -15,7 +15,7 @@ import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 export class EmployeeTasks implements OnInit {
   tasks: ITask[] = [];
   filteredTasks: ITask[] = [];
-  statusFilter: 'All' | 'Pending' | 'Done' = 'All';
+  statusFilter: 'All' | 'Pending' | 'Done' | 'Late' = 'All';
 
   constructor(private tasksService: TasksService, private authService: AuthService, private cdr: ChangeDetectorRef, private spinner: NgxSpinnerService) {}
 
@@ -55,7 +55,7 @@ export class EmployeeTasks implements OnInit {
     this.spinner.hide();
   }
 
-  setStatusFilter(status: 'All' | 'Pending' | 'Done') {
+  setStatusFilter(status: 'All' | 'Pending' | 'Done' | 'Late') {
     this.statusFilter = status;
     this.applyFilter();
   }

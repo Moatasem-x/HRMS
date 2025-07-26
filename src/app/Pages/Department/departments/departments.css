@@ -25,6 +25,57 @@
   display: flex;
   gap: 10px;
   align-items: center;
+  justify-content: space-between;
+}
+
+.header-actions .filter-section {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.header-actions .filter-btn {
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+}
+
+.header-actions .clear-btn {
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  transition: background-color 0.2s ease;
+}
+
+.header-actions .clear-btn:hover {
+  background: #dc2626;
+}
+
+.header-actions .clear-btn:active {
+  background: #b91c1c;
+}
+
+.header-actions .new-department-btn {
+  background: #10b981;
+  color: #fff;
+  border: none;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header-actions .new-department-btn:hover {
+  background: #059669;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.header-actions .new-department-btn:active {
+  background: #047857;
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .header-actions input[type="text"] {
@@ -124,32 +175,6 @@
 
 .app-table tbody tr:hover {
   background: #f8fafc;
-}
-
-.app-table-action-btn {
-  background: none;
-  border: none;
-  padding: 6px;
-  margin: 0 2px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.app-table-action-btn.edit {
-  color: #3b82f6;
-}
-
-.app-table-action-btn.edit:hover {
-  background: #dbeafe;
-}
-
-.app-table-action-btn.delete {
-  color: #ef4444;
-}
-
-.app-table-action-btn.delete:hover {
-  background: #fee2e2;
 }
 
 /* Form styling */

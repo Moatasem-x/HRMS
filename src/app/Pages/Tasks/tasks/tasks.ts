@@ -49,6 +49,7 @@ import Swal from 'sweetalert2';
 })
 export class Tasks implements OnInit, OnDestroy {
   tasks: ITask[] = [];
+  displayTasks: ITask[] = []; // Tasks to display (either filtered or all)
   departments: IDepartment[] = [];
   employees: IEmployee[] = [];
   filteredEmployees: IEmployee[] = [];
@@ -102,7 +103,7 @@ export class Tasks implements OnInit, OnDestroy {
   // Get grouped tasks
   get groupedTasks(): { [group: string]: ITask[] } {
     const groups: { [group: string]: ITask[] } = {};
-    for (const task of this.getTasksByGroup()) {
+    for (const task of this.displayTasks) {
       const deptName = task.departmentName || 'Unknown';
       if (!groups[deptName]) groups[deptName] = [];
       groups[deptName].push(task);
@@ -148,6 +149,7 @@ export class Tasks implements OnInit, OnDestroy {
     this.subs.push(this.tasksService.getAllTasks().subscribe({
       next: (tasks) => {
         this.tasks = tasks;
+        this.displayTasks = tasks; // Initially show all tasks
         this.cdr.detectChanges();
       },
       error: () => {
@@ -182,10 +184,25 @@ export class Tasks implements OnInit, OnDestroy {
       const matchesGroup = selected === 'all' || group === selected;
       const term = this.searchTerm.trim().toLowerCase();
       const matchesSearch = !term ||
-        (t.description && t.description.toLowerCase().includes(term)) ||
         (t.employeeName && t.employeeName.toLowerCase().includes(term));
       return matchesGroup && matchesSearch;
     });
+  }
+
+  // Apply filters
+  applyFilters() {
+    this.spinner.show();
+    this.displayTasks = this.getTasksByGroup();
+    this.cdr.detectChanges();
+    this.spinner.hide();
+  }
+
+  // Clear all filters
+  clearFilters() {
+    this.searchTerm = '';
+    this.selectedGroup = 'All';
+    this.displayTasks = [...this.tasks]; // Show all tasks
+    this.cdr.detectChanges();
   }
 
   showAddTaskForm() {
@@ -215,6 +232,7 @@ export class Tasks implements OnInit, OnDestroy {
     this.subs.push(this.tasksService.addTask(newTask).subscribe({
       next: (task: any) => {
         this.tasks.push(task);
+        this.displayTasks.push(task); // Also add to display array
         this.hideAddTaskForm();
         this.cdr.detectChanges();
         Swal.fire({
@@ -268,6 +286,7 @@ export class Tasks implements OnInit, OnDestroy {
               icon: "success"
             });
             this.tasks = this.tasks.filter(t => t.taskId !== taskId);
+            this.displayTasks = this.displayTasks.filter(t => t.taskId !== taskId); // Also remove from display array
             this.cdr.detectChanges();
           },
           error: (err) => {

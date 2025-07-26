@@ -231,6 +231,9 @@ export class HRDashboard implements AfterViewInit, OnInit, OnDestroy {
     const pendingCounts = departmentNames.map(name =>
       this.allTasks.filter(t => t.departmentName === name && t.status === 'Pending').length
     );
+    const lateCounts = departmentNames.map(name =>
+      this.allTasks.filter(t => t.departmentName === name && t.status === 'Late').length
+    );
     if (this.performanceChartCanvas && this.performanceChartCanvas.nativeElement) {
       this.performanceChart = new Chart(this.performanceChartCanvas.nativeElement, {
         type: 'bar',
@@ -240,14 +243,21 @@ export class HRDashboard implements AfterViewInit, OnInit, OnDestroy {
             {
               label: 'Done Tasks',
               data: doneCounts,
-              backgroundColor: '#3b82f6',
+              backgroundColor: '#45a049',
               borderRadius: 8,
               barPercentage: 0.5
             },
             {
               label: 'Pending Tasks',
               data: pendingCounts,
-              backgroundColor: '#eab308',
+              backgroundColor: '#3b82f6',
+              borderRadius: 8,
+              barPercentage: 0.5
+            },
+            {
+              label: 'Late Tasks',
+              data: lateCounts,
+              backgroundColor: '#dc3545',
               borderRadius: 8,
               barPercentage: 0.5
             }
@@ -313,9 +323,16 @@ export class HRDashboard implements AfterViewInit, OnInit, OnDestroy {
         this.attendanceService.checkIn(attendance).subscribe({
           next: (resp) => {
             this.getAttendance();
+            Swal.fire({
+              title: "Success!",
+              text: "You have checked in successfully.",
+              icon: "success",
+              timer: 1500,
+              showConfirmButton: false,
+            });
           },
           error: (err) => {
-            console.log("Error", err.error.message);
+            this.spinner.hide();
             if (err.error.message == "You are outside the allowed location range.") {
               Swal.fire({
                 title: "Error!",
@@ -327,6 +344,13 @@ export class HRDashboard implements AfterViewInit, OnInit, OnDestroy {
               Swal.fire({
                 title: "Error!",
                 text: "Invalid check-in or check-out time.",
+                icon: "error",
+              });
+            }
+            else {
+              Swal.fire({
+                title: "Error!",
+                text: "Something went wrong. Please try again.",
                 icon: "error",
               });
             }
@@ -363,8 +387,16 @@ export class HRDashboard implements AfterViewInit, OnInit, OnDestroy {
         this.attendanceService.checkOut(attendance).subscribe({
           next: (resp) => {
             this.getAttendance();
+            Swal.fire({
+              title: "Success!",
+              text: "You have checked out successfully.",
+              icon: "success",
+              timer: 1500,
+              showConfirmButton: false,
+            });
           },
           error: (err) => {
+            this.spinner.hide();
             if (err.error.message == "You are outside the allowed location range.") {
               Swal.fire({
                 title: "Error!",
@@ -377,6 +409,13 @@ export class HRDashboard implements AfterViewInit, OnInit, OnDestroy {
               Swal.fire({
                 title: "Error!",
                 text: "Invalid check-in or check-out time.",
+                icon: "error",
+              });
+            }
+            else {
+              Swal.fire({
+                title: "Error!",
+                text: "Something went wrong. Please try again.",
                 icon: "error",
               });
             }

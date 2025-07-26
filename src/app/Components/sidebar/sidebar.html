@@ -2,6 +2,9 @@
      [class.expanded]="isExpanded"
      (mouseenter)="onSidebarEnter()" (mouseleave)="onSidebarLeave()">
   <ul>
+    <li class="logo-container">
+      <span class="sidebar-label-container"><img src="/logo.png" alt="logo" class="sidebar-logo"></span>
+    </li>
     @if (role === "Employee") {
       <li routerLink="/empdash" routerLinkActive="active">
         <span class="sidebar-icon"><i class="bi bi-activity"></i></span>
@@ -14,6 +17,10 @@
       <li routerLink="/requestholiday" routerLinkActive="active">
         <span class="sidebar-icon"><i class="bi bi-umbrella"></i></span>
         <span class="sidebar-label-container" [@labelSlide]="isExpanded ? 'visible' : 'hidden'">Request Holiday</span>
+      </li>
+      <li (click)="openUpdateProfile.emit()">
+        <span class="sidebar-icon"><i class="bi bi-person-lines-fill"></i></span>
+        <span class="sidebar-label-container" [@labelSlide]="isExpanded ? 'visible' : 'hidden'">Update Profile</span>
       </li>
     }
     @else if (role === "HR" || role === "Admin") {

@@ -33,4 +33,8 @@ export const routes: Routes = [
   {path: 'departments', component: Departments, canActivate: [adminGuard]},
   {path: 'managetasks', component: Tasks, canActivate: [adminGuard]},
   {path: 'mytasks', component: EmployeeTasks, canActivate: [employeeGuard]},
+  {
+    path: 'update-profile',
+    loadComponent: () => import('./Components/update-profile/update-profile').then(m => m.UpdateProfile)
+  },
 ];

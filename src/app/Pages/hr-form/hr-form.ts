@@ -11,6 +11,7 @@ import { CommonModule } from '@angular/common';
 import { HRService } from '../../Services/hr-service';
 import Swal from 'sweetalert2';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-hr-form',
@@ -31,6 +32,7 @@ export class HRForm implements OnInit, OnDestroy {
 
   departmentOptions: IDepartment[] = [];
   subs: Subscription[] = [];
+  hrDepartmentId: number | null = null;
 
   constructor(
     private fb: FormBuilder, 
@@ -38,7 +40,8 @@ export class HRForm implements OnInit, OnDestroy {
     private departmentService: DepartmentService, 
     private cdr: ChangeDetectorRef,
     private authService: AuthService,
-    private spinner: NgxSpinnerService
+    private spinner: NgxSpinnerService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -75,6 +78,13 @@ export class HRForm implements OnInit, OnDestroy {
     const sub = this.departmentService.getDepartments().subscribe({
       next: (resp) => {
         this.departmentOptions = resp;
+        // Automatically select HR department if it exists
+        const hrDepartment = this.departmentOptions.find(dept => dept.departmentName === 'HR');
+        if (hrDepartment) {
+          this.hrDepartmentId = hrDepartment.departmentId;
+          this.hrForm.get('departmentId')?.setValue(hrDepartment.departmentId);
+          this.hrForm.get('departmentId')?.disable(); // Make it readonly
+        }
       },
       error: (err) => {
         this.spinner.hide();
@@ -88,6 +98,11 @@ export class HRForm implements OnInit, OnDestroy {
 
   onSubmit(): void {
     if (this.hrForm.valid) {
+      // Re-enable department field if it was disabled
+      if (this.hrDepartmentId) {
+        this.hrForm.get('departmentId')?.enable();
+      }
+      
       const formValue = this.hrForm.value;
       const hrData: IEmployee = { ...formValue };
       this.spinner.show();
@@ -115,9 +130,11 @@ export class HRForm implements OnInit, OnDestroy {
             timer: 1500,
             showConfirmButton: false
           });
+          this.router.navigate(['/employees']);
         },
         error: (err) => {
           this.spinner.hide();
+          this.hrForm.get('departmentId')?.disable();
           if (err.error.message == "DuplicateEmail") {
               Swal.fire({
                 title: "Error!",
@@ -243,10 +260,16 @@ export class HRForm implements OnInit, OnDestroy {
 
   resetForm(): void {
     this.hrForm.reset();
+    // Reset all fields except department
     this.hrForm.patchValue({
       gender: '',
-      departmentId: '',
+      // Keep HR department selected
+      departmentId: this.hrDepartmentId || '',
     });
+    // Keep department field disabled for HR
+    if (this.hrDepartmentId) {
+      this.hrForm.get('departmentId')?.disable();
+    }
     this.imagePreviewUrl = null;
     this.selectedImageName = '';
   }

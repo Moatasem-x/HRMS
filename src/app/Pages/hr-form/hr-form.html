@@ -145,7 +145,8 @@
                 id="departmentId"
                 formControlName="departmentId"
                 class="form-select"
-                [class.invalid]="isFieldInvalid('departmentId')">
+                [class.invalid]="isFieldInvalid('departmentId')"
+                [disabled]="hrDepartmentId !== null">
                 <option value="">Select Department</option>
                 @for (dept of departmentOptions; track dept.departmentId) {
                   <option [value]="dept.departmentId">{{ dept.departmentName }}</option>

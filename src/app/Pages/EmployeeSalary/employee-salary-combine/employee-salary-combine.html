@@ -19,6 +19,7 @@
           }
         </select>
         <button class="filter-btn" (click)="applyFilters()">Apply Filters</button>
+        <button class="clear-btn" (click)="clearFilters()" type="button">Clear Filter</button>
       </div>
     </header>
     
@@ -49,7 +50,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  @for (report of getSalaryReportsByGroup(); track report.employeeId) {
+                  @for (report of displayReports; track report.employeeId) {
                     <tr>
                       <td>{{ report.employeeName }}</td>
                       <td><span class="app-table-badge">{{ report.departmentName }}</span></td>

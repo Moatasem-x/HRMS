@@ -71,11 +71,15 @@ export class AuthService {
       localStorage.clear()
     }
     this.userData.next(null);
+    sessionStorage.clear();
     this.isAuthenticated = false;
     this.router.navigate(['/login']);
   }
 
   authenticated() {
-    return this.isAuthenticated;
+    if (typeof window !== 'undefined' && localStorage) {
+      return !!localStorage.getItem('token');
+    }
+    return false;
   }
 }

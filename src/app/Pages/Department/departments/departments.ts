@@ -45,11 +45,13 @@ import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 })
 export class Departments implements OnInit, OnDestroy {
   departments: IDepartment[] = [];
+  displayDepartments: IDepartment[] = [];
   showAddForm = false;
   error: string | null = null;
   departmentForm!: FormGroup;
   subs: Subscription[] = [];
   editIndex: number | null = null;
+  editingDepartmentId: number | null = null;
   editForm!: FormGroup;
 
   // New properties for grouping and search
@@ -90,26 +92,24 @@ export class Departments implements OnInit, OnDestroy {
 
   // Get alphabet groups for grouping
   get alphabetGroups(): string[] {
-    const allFirstLetters = this.departments.map(d => d.departmentName.charAt(0).toUpperCase());
+    const allFirstLetters = this.displayDepartments.map(d => d.departmentName.charAt(0).toUpperCase());
     return ['All', ...Array.from(new Set(allFirstLetters)).sort()];
   }
 
   // Get grouped departments
   get groupedDepartments(): { [group: string]: IDepartment[] } {
     const groups: { [group: string]: IDepartment[] } = {};
-    for (const dept of this.getDepartmentsByGroup()) {
+    for (const dept of this.displayDepartments) {
       const firstLetter = dept.departmentName.charAt(0).toUpperCase();
       if (!groups[firstLetter]) groups[firstLetter] = [];
       groups[firstLetter].push(dept);
     }
-    
     // Sort records within each group by department name
     Object.keys(groups).forEach(letter => {
       groups[letter].sort((a, b) => {
         return a.departmentName.localeCompare(b.departmentName);
       });
     });
-    
     return groups;
   }
 
@@ -129,24 +129,37 @@ export class Departments implements OnInit, OnDestroy {
   // Filter departments by search
   getDepartmentsByGroup(): IDepartment[] {
     let filtered = this.departments;
-    
     // Apply search filter
     if (this.searchTerm.trim()) {
       const term = this.searchTerm.trim().toLowerCase();
       filtered = filtered.filter(d => 
-        d.departmentName.toLowerCase().includes(term) ||
-        d.description.toLowerCase().includes(term)
+        d.departmentName.toLowerCase().includes(term)
       );
     }
-    
     // Sort alphabetically by department name
     return filtered.sort((a, b) => a.departmentName.localeCompare(b.departmentName));
+  }
+
+  // Apply filters
+  applyFilters() {
+    this.spinner.show();
+    this.displayDepartments = this.getDepartmentsByGroup();
+    this.cdr.detectChanges();
+    this.spinner.hide();
+  }
+
+  // Clear all filters
+  clearFilters() {
+    this.searchTerm = '';
+    this.displayDepartments = [...this.departments];
+    this.cdr.detectChanges();
   }
 
   loadDepartments() {
     this.subs.push(this.departmentService.getDepartments().subscribe({
       next: (departments) => {
         this.departments = departments;
+        this.displayDepartments = departments;
         this.cdr.detectChanges();
         this.appRef.tick();
       },
@@ -179,12 +192,11 @@ export class Departments implements OnInit, OnDestroy {
       this.departmentForm.markAllAsTouched();
       return;
     }
-
     const newDepartment: IDepartment = this.departmentForm.value;
-    
     this.subs.push(this.departmentService.addDepartment(newDepartment).subscribe({
       next: (department: IDepartment) => {
         this.departments.push(department);
+        this.displayDepartments.push(department);
         this.hideAddDepartmentForm();
         this.cdr.detectChanges();
         Swal.fire({
@@ -223,6 +235,7 @@ export class Departments implements OnInit, OnDestroy {
         this.subs.push(this.departmentService.deleteDepartment(departmentId).subscribe({
           next: () => {
             this.departments = this.departments.filter(d => d.departmentId != departmentId);
+            this.displayDepartments = this.displayDepartments.filter(d => d.departmentId != departmentId);
             this.cdr.detectChanges();
             Swal.fire({
               title: "Success!",
@@ -232,21 +245,32 @@ export class Departments implements OnInit, OnDestroy {
               showConfirmButton: false
             });
           },
-          error: () => {
-            Swal.fire({
-              icon: "error",
-              title: "Oops...",
-              text: "Failed to delete department. Please try again.",
-            });
+          error: (err) => {
+            if (err.error.message == "Department has employees") {
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Department has employees.",
+              });
+            } 
+            else {
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Failed to delete department. Please try again.",
+              });
+            }
+            
           }
         }));
       }
     });
   }
 
-  startEditDepartment(index: number) {
-    this.editIndex = index;
-    const dept = this.departments[index];
+  startEditDepartment(departmentId: number) {
+    this.editingDepartmentId = departmentId;
+    const dept = this.displayDepartments.find(d => d.departmentId === departmentId);
+    if (!dept) return;
     this.editForm = this.fb.group({
       departmentName: [dept.departmentName, [Validators.required, Validators.minLength(2)]],
       description: [dept.description, [Validators.required, Validators.minLength(10)]]
@@ -254,23 +278,27 @@ export class Departments implements OnInit, OnDestroy {
   }
 
   cancelEditDepartment() {
-    this.editIndex = null;
+    this.editingDepartmentId = null;
   }
 
-  saveEditDepartment(index: number) {
+  saveEditDepartment(departmentId: number) {
     if (this.editForm.invalid) {
       this.editForm.markAllAsTouched();
       return;
     }
+    const deptIndex = this.departments.findIndex(d => d.departmentId === departmentId);
+    const displayIndex = this.displayDepartments.findIndex(d => d.departmentId === departmentId);
+    if (deptIndex === -1 || displayIndex === -1) return;
     const updated: IDepartment = {
-      ...this.departments[index],
+      ...this.departments[deptIndex],
       departmentName: this.editForm.value.departmentName,
       description: this.editForm.value.description
     };
     this.subs.push(this.departmentService.editDepartment(updated).subscribe({
       next: (resp) => {
-        this.departments[index] = resp;
-        this.editIndex = null;
+        this.departments[deptIndex] = resp;
+        this.displayDepartments[displayIndex] = resp;
+        this.editingDepartmentId = null;
         this.cdr.detectChanges();
         Swal.fire({
           title: "Success!",

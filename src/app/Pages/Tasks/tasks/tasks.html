@@ -5,14 +5,17 @@
       <div class="breadcrumbs">Home / Tasks</div>
       <h1>Tasks</h1>
       <div class="header-actions">
-        <input type="text" placeholder="Search task description or employee" [(ngModel)]="searchTerm">
-        <select [(ngModel)]="selectedGroup">
-          @for (group of departmentsForGrouping; track group) {
-            <option [value]="group">{{ group }}</option>
-          }
-        </select>
-
-        <button class="new-task" (click)="showAddTaskForm()">New Task</button>
+        <div class="filter-section">
+          <input type="text" placeholder="Search for employee" [(ngModel)]="searchTerm">
+          <select [(ngModel)]="selectedGroup">
+            @for (group of departmentsForGrouping; track group) {
+              <option [value]="group">{{ group }}</option>
+            }
+          </select>
+          <button class="filter-btn" (click)="applyFilters()">Apply Filters</button>
+          <button class="clear-btn" (click)="clearFilters()" type="button">Clear Filter</button>
+        </div>
+        <button class="new-task-btn" (click)="showAddTaskForm()">New Task</button>
       </div>
     </header>
     
@@ -32,27 +35,26 @@
               <table class="app-table">
                 <thead>
                   <tr>
-                    <th>Task ID</th>
                     <th>Employee</th>
                     <th>Department</th>
                     <th>Description</th>
                     <th>Due Date</th>
                     <th>Status</th>
-                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  @for (task of getTasksByGroup(); track task.taskId) {
+                  @for (task of displayTasks; track task.taskId) {
                     <tr>
-                      <td>{{ task.taskId }}</td>
                       <td>{{ task.employeeName }}</td>
                       <td><span class="app-table-badge">{{ task.departmentName }}</span></td>
                       <td>{{ task.description }}</td>
                       <td>{{ task.dueDate | date:'dd-MM-yyyy' }}</td>
-                      <td>{{ task.status }}</td>
                       <td>
-                        <button (click)="editTask(task.taskId)" class="app-table-action-btn edit"><i class="bi bi-pencil"></i></button>
-                        <button (click)="deleteTask(task.taskId)" class="app-table-action-btn delete"><i class="bi bi-trash"></i></button>
+                        <span class="status-badge" [ngClass]="{
+                          'pending': task.status === 'Pending',
+                          'done': task.status === 'Done',
+                          'late': task.status === 'Late'
+                        }">{{ task.status }}</span>
                       </td>
                     </tr>
                   }
@@ -79,25 +81,24 @@
                 <table class="app-table">
                   <thead>
                     <tr>
-                      <th>Task ID</th>
                       <th>Employee</th>
                       <th>Description</th>
                       <th>Due Date</th>
                       <th>Status</th>
-                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     @for (task of groupedTasks[group]; track task.taskId) {
                       <tr>
-                        <td>{{ task.taskId }}</td>
                         <td>{{ task.employeeName }}</td>
                         <td>{{ task.description }}</td>
                         <td>{{ task.dueDate | date:'dd-MM-yyyy' }}</td>
-                        <td>{{ task.status }}</td>
                         <td>
-                          <button (click)="editTask(task.taskId)" class="app-table-action-btn edit"><i class="bi bi-pencil"></i></button>
-                          <button (click)="deleteTask(task.taskId)" class="app-table-action-btn delete"><i class="bi bi-trash"></i></button>
+                          <span class="status-badge" [ngClass]="{
+                            'pending': task.status === 'Pending',
+                            'done': task.status === 'Done',
+                            'late': task.status === 'Late'
+                          }">{{ task.status }}</span>
                         </td>
                       </tr>
                     }

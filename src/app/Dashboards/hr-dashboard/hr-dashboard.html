@@ -6,22 +6,24 @@
       <!-- Header -->
       <header class="dashboard-header">
         <div class="welcome">Welcome back, {{myData?.fullName}}</div>
+        @if (userRole == 'HR') {
+          <div class="attendance-action" style="margin: 20px 0; text-align: center;">
+            <button *ngIf="attendanceStatus === 'not_checked_in'" (click)="checkIn()" class="action-btn check-in-btn">
+              <i class="bi bi-clock"></i>
+              <span>Check In</span>
+            </button>
+            <button *ngIf="attendanceStatus === 'checked_in'" (click)="checkOut()" class="action-btn check-out-btn">
+              <i class="bi bi-clock-history"></i>
+              <span>Check Out</span>
+            </button>
+            <div *ngIf="attendanceStatus === 'checked_out'" class="checked-out-message">
+              <i class="bi bi-check-circle"></i>
+              <span>You have checked out for today. Have a great day!</span>
+            </div>
+          </div>
+        }
       </header>
 
-      <!-- Attendance Actions -->
-      @if (userRole == 'HR') {
-        <div class="attendance-action" style="margin: 20px 0; text-align: center;">
-          <button *ngIf="attendanceStatus === 'not_checked_in'" (click)="checkIn()" class="btn btn-primary">
-            Check In
-          </button>
-          <button *ngIf="attendanceStatus === 'checked_in'" (click)="checkOut()" class="btn btn-secondary">
-            Check Out
-          </button>
-          <span *ngIf="attendanceStatus === 'checked_out'" class="checked-out-message" style="font-weight: bold; color: #4caf50;">
-            You have checked out for today. Have a great day!
-          </span>
-        </div>
-      }
 
       <!-- Top Cards -->
       <div class="dashboard-cards">

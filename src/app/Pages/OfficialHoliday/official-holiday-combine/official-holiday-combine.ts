@@ -45,7 +45,7 @@ import Swal from 'sweetalert2';
 })
 export class OfficialHolidayCombine implements OnInit, OnDestroy {
   holidays: IOfficialHoliday[] = [];
-  isLoading = false;
+  displayHolidays: IOfficialHoliday[] = []; // Holidays to display (either filtered or all)
   error: string | null = null;
   subs: Subscription[] = [];
   editIndex: number | null = null;
@@ -61,7 +61,6 @@ export class OfficialHolidayCombine implements OnInit, OnDestroy {
   // Form properties
   showAddForm = false;
   holidayForm!: FormGroup;
-  isSubmitting = false;
 
   // Year options
   years: number[] = [];
@@ -95,14 +94,14 @@ export class OfficialHolidayCombine implements OnInit, OnDestroy {
 
   // Get year groups for grouping
   get yearGroups(): string[] {
-    const allYears = this.holidays.map(h => new Date(h.holidayDate).getFullYear().toString());
+    const allYears = this.displayHolidays.map(h => new Date(h.holidayDate).getFullYear().toString());
     return ['All', ...Array.from(new Set(allYears)).sort((a, b) => parseInt(b) - parseInt(a))];
   }
 
   // Get grouped holidays
   get groupedHolidays(): { [group: string]: IOfficialHoliday[] } {
     const groups: { [group: string]: IOfficialHoliday[] } = {};
-    for (const holiday of this.getHolidaysByGroup()) {
+    for (const holiday of this.displayHolidays) {
       const year = new Date(holiday.holidayDate).getFullYear().toString();
       if (!groups[year]) groups[year] = [];
       groups[year].push(holiday);
@@ -139,8 +138,7 @@ export class OfficialHolidayCombine implements OnInit, OnDestroy {
     if (this.searchTerm.trim()) {
       const term = this.searchTerm.trim().toLowerCase();
       filtered = filtered.filter(h => 
-        h.holidayName.toLowerCase().includes(term) ||
-        h.description.toLowerCase().includes(term)
+        h.holidayName.toLowerCase().includes(term)
       );
     }
     
@@ -157,10 +155,27 @@ export class OfficialHolidayCombine implements OnInit, OnDestroy {
     });
   }
 
+  // Apply filters
+  applyFilters() {
+    this.spinner.show();
+    this.displayHolidays = this.getHolidaysByGroup();
+    this.cdr.detectChanges();
+    this.spinner.hide();
+  }
+
+  // Clear all filters
+  clearFilters() {
+    this.searchTerm = '';
+    this.selectedYear = '';
+    this.displayHolidays = [...this.holidays]; // Show all holidays
+    this.cdr.detectChanges();
+  }
+
   loadHolidays(): void {
     this.subs.push(this.holidayService.getOfficialHolidays().subscribe({
       next: (holidays) => {
         this.holidays = holidays;
+        this.displayHolidays = holidays; // Initially show all holidays
         this.cdr.detectChanges();
         this.cdr.markForCheck();
       },
@@ -194,14 +209,15 @@ export class OfficialHolidayCombine implements OnInit, OnDestroy {
       this.holidayForm.markAllAsTouched();
       return;
     }
+    this.spinner.show();
 
-    this.isSubmitting = true;
     const newHoliday: IOfficialHoliday = this.holidayForm.value;
     
     this.subs.push(this.holidayService.addOfficialHoliday(newHoliday).subscribe({
       next: (holiday: IOfficialHoliday) => {
         // Add the new holiday to the array
         this.holidays.push(holiday);
+        this.displayHolidays.push(holiday); // Also add to display array
         // Hide the form
         this.hideAddHolidayForm();
         // Force change detection
@@ -217,6 +233,7 @@ export class OfficialHolidayCombine implements OnInit, OnDestroy {
         });
       },
       error: (err: any) => {
+        this.spinner.hide();
         Swal.fire({
           icon: "error",
           title: "Oops...",
@@ -225,7 +242,7 @@ export class OfficialHolidayCombine implements OnInit, OnDestroy {
         this.error = err?.error?.message || 'Failed to add holiday.';
       },
       complete: () => {
-        this.isSubmitting = false;
+        this.spinner.hide();
       }
     }));
   }
@@ -246,6 +263,7 @@ export class OfficialHolidayCombine implements OnInit, OnDestroy {
       return;
     }
 
+
     Swal.fire({
       title: "Are you sure?",
       text: "Update the holiday details!",
@@ -260,10 +278,19 @@ export class OfficialHolidayCombine implements OnInit, OnDestroy {
           ...this.editForm?.value,
           holidayId: holiday.holidayId
         };
+        this.spinner.show();
         this.subs.push(this.holidayService.editOfficialHoliday(updatedHoliday, updatedHoliday.holidayId).subscribe({
           next: (resp) => {
-            // Update the holiday in the array
-            this.holidays[index] = resp || updatedHoliday;
+            // Update the holiday in the display array by holidayId
+            const displayIdx = this.displayHolidays.findIndex(h => h.holidayId === updatedHoliday.holidayId);
+            if (displayIdx !== -1) {
+              this.displayHolidays[displayIdx] = resp || updatedHoliday;
+            }
+            // Update the holiday in the main array by holidayId
+            const allIdx = this.holidays.findIndex(h => h.holidayId === updatedHoliday.holidayId);
+            if (allIdx !== -1) {
+              this.holidays[allIdx] = resp || updatedHoliday;
+            }
             // Reset edit state
             this.editIndex = null;
             this.editedHoliday = null;
@@ -271,7 +298,7 @@ export class OfficialHolidayCombine implements OnInit, OnDestroy {
             // Force change detection
             this.cdr.detectChanges();
             this.cdr.markForCheck();
-            
+            this.spinner.hide();
             Swal.fire({
               title: "Updated!",
               text: "Holiday has been updated.",
@@ -279,6 +306,7 @@ export class OfficialHolidayCombine implements OnInit, OnDestroy {
             });
           },
           error: (err) => {
+            this.spinner.hide();
             Swal.fire({
               icon: "error",
               title: "Oops...",
@@ -287,6 +315,8 @@ export class OfficialHolidayCombine implements OnInit, OnDestroy {
             this.error = 'Failed to update holiday.';
           }
         }));
+      } else {
+        this.spinner.hide();
       }
     });
   }
@@ -312,6 +342,7 @@ export class OfficialHolidayCombine implements OnInit, OnDestroy {
           next: (resp) => {
             // Remove the holiday from the array
             this.holidays = this.holidays.filter(holiday => holiday.holidayId !== holidayId);
+            this.displayHolidays = this.displayHolidays.filter(holiday => holiday.holidayId !== holidayId); // Also remove from display array
             // Force change detection
             this.cdr.detectChanges();
             this.cdr.markForCheck();

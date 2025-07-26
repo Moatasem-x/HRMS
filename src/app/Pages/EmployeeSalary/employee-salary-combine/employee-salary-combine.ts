@@ -45,6 +45,7 @@ import { Subscription } from 'rxjs';
 export class EmployeeSalaryCombine implements OnInit, OnDestroy {
   salaryReports: ISalaryReport[] = [];
   filteredReports: ISalaryReport[] = [];
+  displayReports: ISalaryReport[] = []; // Reports to display (either filtered or all)
   subs: Subscription[] = [];
 
   // New properties for grouping and search
@@ -94,6 +95,7 @@ export class EmployeeSalaryCombine implements OnInit, OnDestroy {
       next: (data) => {
         this.salaryReports = data;
         this.filteredReports = data;
+        this.displayReports = data; // Initially show all reports
         this.cdr.detectChanges();
       },
       error: (error) => {
@@ -109,14 +111,14 @@ export class EmployeeSalaryCombine implements OnInit, OnDestroy {
 
   // Get department groups for grouping
   get departmentGroups(): string[] {
-    const allDepartments = this.filteredReports.map(r => r.departmentName || 'Unknown');
+    const allDepartments = this.displayReports.map(r => r.departmentName || 'Unknown');
     return ['All', ...Array.from(new Set(allDepartments))];
   }
 
   // Get grouped salary reports
   get groupedSalaryReports(): { [group: string]: ISalaryReport[] } {
     const groups: { [group: string]: ISalaryReport[] } = {};
-    for (const report of this.getSalaryReportsByGroup()) {
+    for (const report of this.displayReports) {
       const dept = report.departmentName || 'Unknown';
       if (!groups[dept]) groups[dept] = [];
       groups[dept].push(report);
@@ -181,9 +183,18 @@ export class EmployeeSalaryCombine implements OnInit, OnDestroy {
   // Apply filters
   applyFilters() {
     this.spinner.show();
-    this.filteredReports = this.getSalaryReportsByGroup();
+    this.displayReports = this.getSalaryReportsByGroup();
     this.cdr.detectChanges();
     this.spinner.hide();
+  }
+
+  // Clear all filters
+  clearFilters() {
+    this.searchTerm = '';
+    this.selectedMonth = '';
+    this.selectedYear = '';
+    this.displayReports = [...this.salaryReports]; // Show all reports
+    this.cdr.detectChanges();
   }
 
   // Get month name

@@ -8,7 +8,7 @@ import { Subscription } from 'rxjs';
 import { IEmployee } from '../../../Interfaces/iemployee';
 import { AuthService } from '../../../Services/auth-service';
 import Swal from 'sweetalert2';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 
 
@@ -33,6 +33,7 @@ export class EmployeeForm implements OnInit, OnDestroy {
   departmentOptions: IDepartment[] = [];
   subs: Subscription[] = [];
   editMode: boolean = false;
+  isHRDepartment: boolean = false;
 
   constructor(
     private fb: FormBuilder, 
@@ -41,7 +42,8 @@ export class EmployeeForm implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private authService: AuthService,
     private activatedRoute: ActivatedRoute,
-    private spinner: NgxSpinnerService
+    private spinner: NgxSpinnerService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -83,7 +85,11 @@ export class EmployeeForm implements OnInit, OnDestroy {
     const sub = this.employeeService.getEmployeeById(id).subscribe({
       next: (resp) => {
         this.employee = resp;
+        this.isHRDepartment = this.employee.departmentName?.toLowerCase() === 'hr';
         this.employeeForm.patchValue(this.employee);
+        if (this.isHRDepartment) {
+          this.employeeForm.get('departmentId')?.disable();
+        }
         this.cdr.detectChanges();
       },
       complete: () => {
@@ -109,6 +115,11 @@ export class EmployeeForm implements OnInit, OnDestroy {
 
   onSubmit(): void {
     if (this.employeeForm.valid) {
+      // Re-enable department field if it was disabled for HR department
+      if (this.isHRDepartment) {
+        this.employeeForm.get('departmentId')?.enable();
+      }
+      
       const formValue = this.employeeForm.value;
       const employeeData: IEmployee = { ...formValue };
       this.spinner.show();
@@ -120,7 +131,8 @@ export class EmployeeForm implements OnInit, OnDestroy {
       });
       if (employeeData.image) {
         formData.append('image', employeeData.image);
-      }      
+      }   
+      console.log("Form Data:", formData);   
       if (this.editMode) {
         formData.append('employeeId', this.employee.employeeId.toString());
         const sub = this.employeeService.editEmployee(formData, this.employee.employeeId).subscribe({
@@ -132,6 +144,7 @@ export class EmployeeForm implements OnInit, OnDestroy {
               timer: 1500,
               showConfirmButton: false
             });
+            this.router.navigate(['/employees']);
           },
           error: (err) => {
             this.spinner.hide();
@@ -149,7 +162,7 @@ export class EmployeeForm implements OnInit, OnDestroy {
                 icon: "error"
               });
             }
-            else if (err.error[0].code == "DuplicateEmail") {
+            else if (err.error[0]?.code == "DuplicateEmail") {
               Swal.fire({
                 title: "Error!",
                 text: "Email already exists.",
@@ -170,7 +183,7 @@ export class EmployeeForm implements OnInit, OnDestroy {
           }
         });
         this.subs.push(sub);
-      } 
+      }
       else {
         const sub = this.employeeService.addEmployee(formData).subscribe({
           next: (resp) => {
@@ -181,10 +194,11 @@ export class EmployeeForm implements OnInit, OnDestroy {
               timer: 1500,
               showConfirmButton: false
             });
+            this.router.navigate(['/employees']);
           },
           error: (err) => {
             this.spinner.hide();
-            if (err.error[1].code == "DuplicateEmail" || err.error[0].code == "DuplicateUserName") {
+            if (err.error[1]?.code == "DuplicateEmail" || err.error[0]?.code == "DuplicateUserName") {
               Swal.fire({
                 title: "Error!",
                 text: "Email already exists.",
@@ -308,11 +322,34 @@ export class EmployeeForm implements OnInit, OnDestroy {
   }
 
   resetForm(): void {
-    this.employeeForm.reset();
-    this.employeeForm.patchValue({
-      gender: '',
-      departmentId: '',
-    });
+    if (this.editMode && this.isHRDepartment) {
+      // In edit mode with HR department, reset everything except department
+      this.employeeForm.patchValue({
+        fullName: this.employee.fullName,
+        address: this.employee.address,
+        phoneNumber: this.employee.phoneNumber,
+        gender: this.employee.gender,
+        nationalId: this.employee.nationalId,
+        departmentId: this.employee.departmentId, // Keep HR department
+        email: this.employee.email,
+        password: '',
+        hireDate: this.employee.hireDate,
+        salary: this.employee.salary,
+        image: null
+      });
+      // Keep department field disabled for HR
+      this.employeeForm.get('departmentId')?.disable();
+    } else {
+      // In add mode or non-HR edit mode, reset everything
+      this.employeeForm.reset();
+      this.employeeForm.patchValue({
+        gender: '',
+        departmentId: '',
+      });
+      this.isHRDepartment = false;
+      this.employeeForm.get('departmentId')?.enable();
+    }
+    
     this.imagePreviewUrl = null;
     this.selectedImageName = '';
   }

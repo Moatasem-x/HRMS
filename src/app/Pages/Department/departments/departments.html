@@ -5,8 +5,12 @@
       <div class="breadcrumbs">Home / Departments</div>
       <h1>Departments</h1>
       <div class="header-actions">
-        <input type="text" placeholder="Search department name" [(ngModel)]="searchTerm">
-        <button class="new-department" (click)="showAddDepartmentForm()">New Department</button>
+        <div class="filter-section">
+          <input type="text" placeholder="Search department name" [(ngModel)]="searchTerm">
+          <button class="filter-btn" (click)="applyFilters()">Apply Filters</button>
+          <button class="clear-btn" (click)="clearFilters()" type="button">Clear Filter</button>
+        </div>
+        <button class="new-department-btn" (click)="showAddDepartmentForm()">New Department</button>
       </div>
     </header>
     
@@ -26,17 +30,15 @@
               <table class="app-table">
                 <thead>
                   <tr>
-                    <th>#</th>
                     <th>Department Name</th>
                     <th>Description</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  @for (department of getDepartmentsByGroup(); track department.departmentId; let i = $index) {
+                  @for (department of displayDepartments; track department.departmentId; let i = $index) {
                     <tr>
-                      <td>{{ department.departmentId }}</td>
-                      @if (editIndex === i) {
+                      @if (editingDepartmentId === department.departmentId) {
                         <ng-container [formGroup]="editForm">
                           <td>
                             <input type="text" class="form-control" formControlName="departmentName" [class.is-invalid]="nameCtrl?.invalid && (nameCtrl?.touched)">
@@ -70,11 +72,11 @@
                         <td>{{ department.description }}</td>
                       }
                       <td>
-                        @if (editIndex === i) {
-                          <button class="app-table-action-btn edit" (click)="saveEditDepartment(i)" title="Save"><i class="bi bi-check"></i></button>
+                        @if (editingDepartmentId === department.departmentId) {
+                          <button class="app-table-action-btn edit" (click)="saveEditDepartment(department.departmentId)" title="Save"><i class="bi bi-check"></i></button>
                           <button class="app-table-action-btn delete" (click)="cancelEditDepartment()" title="Cancel"><i class="bi bi-x"></i></button>
                         } @else {
-                          <button class="app-table-action-btn edit" (click)="startEditDepartment(i)" title="Edit"><i class="bi bi-pencil"></i></button>
+                          <button class="app-table-action-btn edit" (click)="startEditDepartment(department.departmentId)" title="Edit"><i class="bi bi-pencil"></i></button>
                           <button class="app-table-action-btn delete" (click)="deleteDepartment(department.departmentId)" title="Delete"><i class="bi bi-trash"></i></button>
                         }
                       </td>
@@ -103,7 +105,6 @@
                 <table class="app-table">
                   <thead>
                     <tr>
-                      <th>#</th>
                       <th>Department Name</th>
                       <th>Description</th>
                       <th>Actions</th>
@@ -112,12 +113,47 @@
                   <tbody>
                     @for (department of groupedDepartments[group]; track department.departmentId; let i = $index) {
                       <tr>
-                        <td>{{ department.departmentId }}</td>
-                        <td>{{ department.departmentName }}</td>
-                        <td>{{ department.description }}</td>
+                        @if (editingDepartmentId === department.departmentId) {
+                          <ng-container [formGroup]="editForm">
+                            <td>
+                              <input type="text" class="form-control" formControlName="departmentName" [class.is-invalid]="nameCtrl?.invalid && (nameCtrl?.touched)">
+                              @if (nameCtrl?.invalid && (nameCtrl?.touched)) {
+                                <div class="invalid-feedback">
+                                  @if (nameCtrl?.errors?.['required']) {
+                                    <div>Department name is required.</div>
+                                  }
+                                  @if (nameCtrl?.errors?.['minlength']) {
+                                    <div>Department name must be at least 2 characters.</div>
+                                  }
+                                </div>
+                              }
+                            </td>
+                            <td>
+                              <textarea class="form-control" rows="2" formControlName="description" [class.is-invalid]="descCtrl?.invalid && (descCtrl?.touched)"></textarea>
+                              @if (descCtrl?.invalid && (descCtrl?.touched)) {
+                                <div class="invalid-feedback">
+                                  @if (descCtrl?.errors?.['required']) {
+                                    <div>Description is required.</div>
+                                  }
+                                  @if (descCtrl?.errors?.['minlength']) {
+                                    <div>Description must be at least 10 characters.</div>
+                                  }
+                                </div>
+                              }
+                            </td>
+                          </ng-container>
+                        } @else {
+                          <td>{{ department.departmentName }}</td>
+                          <td>{{ department.description }}</td>
+                        }
                         <td>
-                          <button class="app-table-action-btn edit" (click)="startEditDepartment(i)" title="Edit"><i class="bi bi-pencil"></i></button>
-                          <button class="app-table-action-btn delete" (click)="deleteDepartment(department.departmentId)" title="Delete"><i class="bi bi-trash"></i></button>
+                          @if (editingDepartmentId === department.departmentId) {
+                            <button class="app-table-action-btn edit" (click)="saveEditDepartment(department.departmentId)" title="Save"><i class="bi bi-check"></i></button>
+                            <button class="app-table-action-btn delete" (click)="cancelEditDepartment()" title="Cancel"><i class="bi bi-x"></i></button>
+                          } @else {
+                            <button class="app-table-action-btn edit" (click)="startEditDepartment(department.departmentId)" title="Edit"><i class="bi bi-pencil"></i></button>
+                            <button class="app-table-action-btn delete" (click)="deleteDepartment(department.departmentId)" title="Delete"><i class="bi bi-trash"></i></button>
+                          }
                         </td>
                       </tr>
                     }

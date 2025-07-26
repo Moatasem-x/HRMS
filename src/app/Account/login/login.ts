@@ -107,7 +107,11 @@ export class Login implements OnInit, OnDestroy {
           this.authService.userId.next(resp.employeeId);
           Toast.fire({
             icon: "success",
-            title: "Signed in successfully"
+            iconColor: '#ffffff',
+            padding: '1rem 0.75rem',
+            title: "Signed in successfully",
+            background: "#198754",
+            color: '#ffffff',
             });
           this.cdr.detectChanges();
           if (resp.role === "Employee") {

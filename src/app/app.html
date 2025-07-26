@@ -1,9 +1,15 @@
 
-@if (isLoggedIn && !(router.url === '/login')) {
-  <app-sidebar></app-sidebar>
+@if (authReady && isLoggedIn && !(router.url === '/login')) {
+  <app-sidebar (openUpdateProfile)="openUpdateProfileModal()"></app-sidebar>
   <app-chat-bot></app-chat-bot>
 }
-<section class="main-content" [class.with-sidebar]="isLoggedIn && !(router.url === '/login')">
+@if (showUpdateProfileModal) {
+  <div class="modal-backdrop-blur" (click)="closeUpdateProfileModal()"></div>
+  <div class="modal-centered">
+    <app-update-profile (close)="closeUpdateProfileModal()"></app-update-profile>
+  </div>
+}
+<section class="main-content" [class.with-sidebar]="authReady && isLoggedIn && !(router.url === '/login')">
   <router-outlet></router-outlet>
 </section>
 

@@ -46,6 +46,7 @@ import Swal from 'sweetalert2';
 export class AttendanceReportCombine implements OnInit, OnDestroy {
   allRecords: IAttendance[] = [];
   filteredRecords: IAttendance[] = [];
+  displayRecords: IAttendance[] = []; // Records to display (either filtered or all)
   subs: Subscription[] = [];
 
   // New properties for grouping and search
@@ -71,6 +72,7 @@ export class AttendanceReportCombine implements OnInit, OnDestroy {
       next: (records) => {
         this.allRecords = records;
         this.filteredRecords = records;
+        this.displayRecords = records; // Initially show all records
         this.cdr.detectChanges();
       },
       error: (error) => {
@@ -86,7 +88,7 @@ export class AttendanceReportCombine implements OnInit, OnDestroy {
 
   // Get date groups for grouping
   get dateGroups(): string[] {
-    const allDates = this.filteredRecords.map(r => r.attendanceDate || 'Unknown');
+    const allDates = this.displayRecords.map(r => r.attendanceDate || 'Unknown');
     const uniqueDates = Array.from(new Set(allDates));
     // Sort dates in descending order (newest first)
     const sortedDates = uniqueDates.sort((a, b) => {
@@ -99,7 +101,7 @@ export class AttendanceReportCombine implements OnInit, OnDestroy {
   // Get grouped attendance
   get groupedAttendance(): { [group: string]: IAttendance[] } {
     const groups: { [group: string]: IAttendance[] } = {};
-    for (const record of this.getAttendanceByGroup()) {
+    for (const record of this.displayRecords) {
       const date = record.attendanceDate || 'Unknown';
       if (!groups[date]) groups[date] = [];
       groups[date].push(record);
@@ -160,15 +162,25 @@ export class AttendanceReportCombine implements OnInit, OnDestroy {
   // Apply filters
   applyFilters() {
     this.spinner.show();
-    this.filteredRecords = this.getAttendanceByGroup();
+    this.displayRecords = this.getAttendanceByGroup();
     this.cdr.detectChanges();
     this.spinner.hide();
+  }
+
+  // Clear all filters
+  clearFilters() {
+    this.searchTerm = '';
+    this.fromDate = '';
+    this.toDate = '';
+    this.displayRecords = [...this.allRecords]; // Show all records
+    this.cdr.detectChanges();
   }
 
   // Edit functionality
   editRecord(index: number) {
     this.editIndex = index;
-    this.editedRecord = { ...this.filteredRecords[index] };
+    console.log('Editing record:', this.displayRecords[index]);
+    this.editedRecord = { ...this.displayRecords[index] };
   }
 
   saveRecord(index: number) {
@@ -178,12 +190,12 @@ export class AttendanceReportCombine implements OnInit, OnDestroy {
     this.spinner.show();
     this.subs.push(this.attendanceService.adminUpdatesAttendance(this.editedRecord).subscribe({
       next: (updatedRecord) => {
-        this.filteredRecords[index] = updatedRecord;
+        this.displayRecords[index] = updatedRecord;
         this.allRecords = this.allRecords.map(r => 
           r.attendanceId === updatedRecord.attendanceId ? updatedRecord : r
         );
         this.cancelEdit();
-        this.cdr.detectChanges();
+        this.applyFilters();
         Swal.fire({
           title: "Success!",
           text: "Attendance record updated successfully",
@@ -211,7 +223,7 @@ export class AttendanceReportCombine implements OnInit, OnDestroy {
   }
 
   deleteRecord(index: number) {
-    const record = this.filteredRecords[index];
+    const record = this.displayRecords[index];
     if (!record.attendanceId) return;
 
     Swal.fire({
@@ -232,7 +244,7 @@ export class AttendanceReportCombine implements OnInit, OnDestroy {
               text: "Attendance record has been deleted.",
               icon: "success"
             });
-            this.filteredRecords.splice(index, 1);
+            this.displayRecords.splice(index, 1);
             this.allRecords = this.allRecords.filter(r => r.attendanceId !== record.attendanceId);
             this.cdr.detectChanges();
           },

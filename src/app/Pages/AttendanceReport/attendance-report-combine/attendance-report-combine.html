@@ -9,6 +9,7 @@
         <input type="date" [(ngModel)]="fromDate" placeholder="From Date">
         <input type="date" [(ngModel)]="toDate" placeholder="To Date">
         <button class="filter-btn" (click)="applyFilters()">Apply Filters</button>
+        <button class="clear-btn" (click)="clearFilters()" type="button">Clear Filter</button>
       </div>
     </header>
     
@@ -28,10 +29,10 @@
               <table class="app-table">
                 <thead>
                   <tr>
-                    <th>No.</th>
                     <th>Employee Name</th>
-                    <th>Attendance Time</th>
-                    <th>Leave Time</th>
+                    <th>Department</th>
+                    <th>Check In Time</th>
+                    <th>Check Out Time</th>
                     <th>Over Time</th>
                     <th>Delay Time</th>
                     <th>Date</th>
@@ -39,10 +40,10 @@
                   </tr>
                 </thead>
                 <tbody>
-                  @for (record of getAttendanceByGroup(); track record.attendanceId; let i = $index) {
+                  @for (record of displayRecords; track record.attendanceId; let i = $index) {
                     <tr>
-                      <td>{{ record.attendanceId }}</td>
                       <td>{{ record.employeeName }}</td>
+                      <td><span class="app-table-badge">{{ record.departmentName }}</span></td>
 
                       @if (editIndex !== i) {
                         <td>{{ record.checkInTime }}</td>
@@ -104,10 +105,10 @@
                 <table class="app-table">
                   <thead>
                     <tr>
-                      <th>No.</th>
                       <th>Employee Name</th>
-                      <th>Attendance Time</th>
-                      <th>Leave Time</th>
+                      <th>Department</th>
+                      <th>Check In Time</th>
+                      <th>Check Out Time</th>
                       <th>Over Time</th>
                       <th>Delay Time</th>
                       <th>Actions</th>
@@ -116,8 +117,8 @@
                   <tbody>
                     @for (record of groupedAttendance[group]; track record.attendanceId; let i = $index) {
                       <tr>
-                        <td>{{ record.attendanceId }}</td>
                         <td>{{ record.employeeName }}</td>
+                        <td><span class="app-table-badge">{{ record.departmentName }}</span></td>
 
                         @if (editIndex !== i) {
                           <td>{{ record.checkInTime }}</td>

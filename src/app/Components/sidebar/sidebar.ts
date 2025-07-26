@@ -1,4 +1,4 @@
-import { Component, ChangeDetectorRef, OnInit } from '@angular/core';
+import { Component, ChangeDetectorRef, OnInit, EventEmitter, Output } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../Services/auth-service';
 import { trigger, state, style, animate, transition } from '@angular/animations';
@@ -31,6 +31,7 @@ export class Sidebar implements OnInit {
   private collapseTimeout: any;
   isloggedin = false;
   role: string | null = "";
+  @Output() openUpdateProfile = new EventEmitter<void>();
 
   constructor(private cdr: ChangeDetectorRef, private authService: AuthService) {}
 

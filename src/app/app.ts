@@ -4,11 +4,12 @@ import { AuthService } from './Services/auth-service';
 import { Sidebar } from './Components/sidebar/sidebar';
 import { RouterOutlet } from '@angular/router';
 import { ChatBot } from "./Components/chat-bot/chat-bot";
-import { HRDashboard } from "./Dashboards/hr-dashboard/hr-dashboard";
+import { UpdateProfile } from './Components/update-profile/update-profile';
+import { trigger, transition, style, animate } from '@angular/animations';
 
 @Component({
   selector: 'app-root',
-  imports: [Sidebar, RouterOutlet, ChatBot, HRDashboard],
+  imports: [Sidebar, RouterOutlet, ChatBot, UpdateProfile],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
@@ -16,12 +17,18 @@ export class App implements OnInit {
   protected title = 'HRMS';
   public authReady = false;
   isLoggedIn: boolean = false;
+  showUpdateProfileModal = false;
 
   constructor(public router: Router, private authService: AuthService) {
     
   }
 
   ngOnInit(): void {
+    // Check initial authentication state
+    this.isLoggedIn = this.authService.authenticated();
+    this.authReady = true;
+    
+    // Subscribe to authentication changes
     this.authService.userData.subscribe({
       next: () => {
         this.isLoggedIn = this.authService.authenticated();
@@ -29,5 +36,10 @@ export class App implements OnInit {
     })
   }
 
-  
+  openUpdateProfileModal() {
+    this.showUpdateProfileModal = true;
+  }
+  closeUpdateProfileModal() {
+    this.showUpdateProfileModal = false;
+  }
 }

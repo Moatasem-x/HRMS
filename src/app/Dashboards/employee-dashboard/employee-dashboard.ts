@@ -44,7 +44,8 @@ export class EmployeeDashboard implements AfterViewInit, OnInit, OnDestroy {
   subs: Subscription[] = [];
   attendanceData: IAttendance[] = [];
   salaryData!: ISalaryReport;
-  pendingLeaves: number = 2;
+  pendingLeaves: number = 0;
+  pendingTasks: number = 0;
   employeeTasks: ITask[] = [];
   attendanceChart: Chart | null = null;
   salaryChart: Chart | null = null;
@@ -53,8 +54,6 @@ export class EmployeeDashboard implements AfterViewInit, OnInit, OnDestroy {
   totalAbsencesThisMonth: number = 0;
   todayAttendance: IAttendance | null = null;
   attendanceStatus: 'not_checked_in' | 'checked_in' | 'checked_out' = 'not_checked_in';
-  isEditingProfile = false;
-  profileForm!: FormGroup;
   @ViewChild('attendanceChartCanvas') attendanceChartCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('salaryChartCanvas') salaryChartCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('tasksChartCanvas') tasksChartCanvas!: ElementRef<HTMLCanvasElement>;
@@ -63,75 +62,7 @@ export class EmployeeDashboard implements AfterViewInit, OnInit, OnDestroy {
   ngOnInit(): void {
     this.spinner.show();
     this.getEmployee();
-    this.initProfileForm();
     this.cdr.detectChanges();
-  }
-
-  initProfileForm() {
-    this.profileForm = this.fb.group({
-      address: [this.employee?.address || '', [Validators.required, Validators.minLength(4), Validators.maxLength(25)]],
-      phoneNumber: [this.employee?.phoneNumber || '', [Validators.required, Validators.pattern(/^\+20[0125][0-9]{9}$/)]]
-    });
-  }
-
-  openProfileEdit() {
-    this.isEditingProfile = true;
-    this.profileForm.patchValue({
-      address: this.employee?.address || '',
-      phoneNumber: this.employee?.phoneNumber || ''
-    });
-  }
-
-  cancelProfileEdit() {
-    this.isEditingProfile = false;
-  }
-
-  saveProfileEdit() {
-    if (this.profileForm.invalid || !this.employee) {
-      this.profileForm.markAllAsTouched();
-      return;
-    }
-    Swal.fire({
-      title: "Are you sure?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes"
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.subs.push(this.employeeService.editCurrentEmployeeProfile(this.profileForm.value).subscribe({
-          next: (resp) => {
-            Swal.fire({
-              title: "Success!",
-              text: "Profile Has Been Updated Successfully.",
-              icon: "success"
-            });
-            this.isEditingProfile = false;
-            this.getEmployee();
-          },
-          error: (err) => {
-
-            if (err.error.message == "Duplicate phone number") {
-            Swal.fire({
-              title: "Error!",
-              text: "Phone number already exists.",
-              icon: "error"
-            });
-            }
-            else
-            {
-              Swal.fire({
-              title: "Error!",
-              text: "Failed to update profile.",
-              icon: "error"
-              });
-          }
-          }
-        }));
-      }
-    });
-    
   }
 
   ngAfterViewInit() {
@@ -150,6 +81,9 @@ export class EmployeeDashboard implements AfterViewInit, OnInit, OnDestroy {
         this.loadEmployeeTasks();
         this.cdr.detectChanges();
       },
+      error: (err) => {
+        this.spinner.hide();
+      },
       complete: () => {
         this.spinner.hide();
       }
@@ -161,6 +95,29 @@ export class EmployeeDashboard implements AfterViewInit, OnInit, OnDestroy {
     this.subs.push(this.tasksService.getTasksByEmployeeId(this.employee.employeeId).subscribe({
       next: (tasks) => {
         this.employeeTasks = tasks || [];
+        this.pendingTasks = this.employeeTasks.filter(t => t.status == 'Pending').length;
+        if (this.pendingTasks > 0 && !sessionStorage.getItem('pendingTasksToastShown')) {
+          const Toast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.onmouseenter = Swal.stopTimer;
+              toast.onmouseleave = Swal.resumeTimer;
+            }
+          });
+          Toast.fire({
+            icon: "warning",
+            iconColor: '#ffffff',
+            padding: '1rem 0.75rem',
+            title: "You have " + this.pendingTasks + " pending tasks",
+            background: '#ffaf1c',
+            color: '#ffffff',
+          });
+          sessionStorage.setItem('pendingTasksToastShown', 'true');
+        }
         this.updateTasksChart();
       },
       complete: () => {
@@ -216,6 +173,13 @@ export class EmployeeDashboard implements AfterViewInit, OnInit, OnDestroy {
         this.attendanceService.checkIn(attendance).subscribe({
           next: (resp) => {
             this.getAttendance();
+            Swal.fire({
+              title: "Success!",
+              text: "You have checked in successfully.",
+              icon: "success",
+              timer: 1500,
+              showConfirmButton: false,
+            });
           },
           error: (err) => {
             console.log("Error", err.error.message);
@@ -232,6 +196,13 @@ export class EmployeeDashboard implements AfterViewInit, OnInit, OnDestroy {
               Swal.fire({
                 title: "Error!",
                 text: "Invalid check-in or check-out time.",
+                icon: "error",
+              });
+            }
+            else {
+              Swal.fire({
+                title: "Error!",
+                text: "Something went wrong. Please try again.",
                 icon: "error",
               });
             }
@@ -268,6 +239,13 @@ export class EmployeeDashboard implements AfterViewInit, OnInit, OnDestroy {
         this.attendanceService.checkOut(attendance).subscribe({
           next: (resp) => {
             this.getAttendance();
+            Swal.fire({
+              title: "Success!",
+              text: "You have checked out successfully.",
+              icon: "success",
+              timer: 1500,
+              showConfirmButton: false,
+            });
           },
           error: (err) => {
             this.spinner.hide();
@@ -284,6 +262,13 @@ export class EmployeeDashboard implements AfterViewInit, OnInit, OnDestroy {
               Swal.fire({
                 title: "Error!",
                 text: "Invalid check-in or check-out time.",
+                icon: "error",
+              });
+            }
+            else {
+              Swal.fire({
+                title: "Error!",
+                text: "Something went wrong. Please try again.",
                 icon: "error",
               });
             }

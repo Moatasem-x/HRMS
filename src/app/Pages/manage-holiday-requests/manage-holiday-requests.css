@@ -93,7 +93,7 @@
   font-weight: 500;
 }
 .badge {
-  font-size: 1rem;
+  font-size: 1.2rem;
   padding: 6px 16px;
   border-radius: 12px;
   font-weight: 600;
@@ -149,7 +149,7 @@
   background: #f8fafc;
   border-radius: 16px;
   box-shadow: 0 2px 12px rgba(59, 130, 246, 0.08);
-  margin-bottom: 28px;
+  margin-bottom: 35px;
   padding: 24px 18px 18px 18px;
   border-left: 6px solid #3b82f6;
   transition: box-shadow 0.2s, border-color 0.2s;
@@ -185,6 +185,7 @@
 .card-row .label {
   color: #3b82f6;
   font-weight: 600;
+  font-size: 1.1rem;
   margin-right: 4px;
   display: flex;
   align-items: center;
@@ -193,6 +194,7 @@
 .card-row .value {
   color: #222;
   font-weight: 500;
+  font-size: 1.1rem;
   margin-right: 16px;
 }
 .btn-action {

@@ -5,14 +5,18 @@
       <div class="breadcrumbs">Home / Official Holidays</div>
       <h1>Official Holidays Management</h1>
       <div class="header-actions">
-        <input type="text" placeholder="Search holiday name" [(ngModel)]="searchTerm">
-        <select [(ngModel)]="selectedYear">
-          <option value="">All Years</option>
-          @for (year of years; track year) {
-            <option [value]="year">{{ year }}</option>
-          }
-        </select>
-        <button class="new-holiday" (click)="showAddHolidayForm()">New Holiday</button>
+        <div class="filter-section">
+          <input type="text" placeholder="Search holiday name" [(ngModel)]="searchTerm">
+          <select [(ngModel)]="selectedYear">
+            <option value="">All Years</option>
+            @for (year of years; track year) {
+              <option [value]="year">{{ year }}</option>
+            }
+          </select>
+          <button class="filter-btn" (click)="applyFilters()">Apply Filters</button>
+          <button class="clear-btn" (click)="clearFilters()" type="button">Clear Filter</button>
+        </div>
+        <button class="new-holiday-btn" (click)="showAddHolidayForm()">New Holiday</button>
       </div>
     </header>
     
@@ -39,7 +43,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  @for (holiday of getHolidaysByGroup(); track holiday?.holidayId; let i = $index) {
+                  @for (holiday of displayHolidays; track holiday?.holidayId; let i = $index) {
                     @if (editIndex === i && editedHoliday && editForm) {
                       <tr [formGroup]="editForm">
                         <td>
@@ -179,8 +183,8 @@
             <button type="button" class="btn btn-outline-secondary flex-fill" (click)="hideAddHolidayForm()">
               Cancel
             </button>
-            <button type="submit" class="btn btn-primary flex-fill" [disabled]="holidayForm.invalid || isSubmitting">
-              {{ isSubmitting ? 'Adding...' : 'Add Holiday' }}
+            <button type="submit" class="btn btn-primary flex-fill" [disabled]="holidayForm.invalid">
+              Add Holiday
             </button>
           </div>
         </form>

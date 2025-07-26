@@ -26,6 +26,13 @@
   display: flex;
   gap: 10px;
   align-items: center;
+  justify-content: space-between;
+}
+
+.header-actions .filter-section {
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 
 .header-actions input[type="text"] {
@@ -49,10 +56,48 @@
   width: 10rem;
 }
 
-.header-actions .new-task {
+.header-actions .filter-btn {
   background: #3b82f6;
   color: #fff;
   border: none;
+}
+
+.header-actions .clear-btn {
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  transition: background-color 0.2s ease;
+}
+
+.header-actions .clear-btn:hover {
+  background: #dc2626;
+}
+
+.header-actions .clear-btn:active {
+  background: #b91c1c;
+}
+
+.header-actions .new-task-btn {
+  background: #10b981;
+  color: #fff;
+  border: none;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header-actions .new-task-btn:hover {
+  background: #059669;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.header-actions .new-task-btn:active {
+  background: #047857;
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .task-groups .group {
@@ -138,9 +183,9 @@
   background: #e0f2fe;
   color: #0284c7;
   padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  font-weight: 500;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
 }
 
 .app-table-action-btn {
@@ -207,6 +252,31 @@
 .form-control:focus {
   border-color: #0d6efd;
   box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* Status badge styles */
+.status-badge {
+  display: inline-block;
+  min-width: 70px;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.95em;
+  font-weight: 600;
+  text-align: center;
+  letter-spacing: 0.02em;
+  color: #fff;
+}
+.status-badge.pending {
+  background: #f59e42;
+  color: #fff;
+}
+.status-badge.done {
+  background: #10b981;
+  color: #fff;
+}
+.status-badge.late {
+  background: #ef4444;
+  color: #fff;
 }
 
 @media (max-width: 768px) {
