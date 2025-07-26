@@ -6,24 +6,31 @@
       <div class="welcome">Welcome, {{employee?.fullName}}!</div>
     </header>
 
-    <!-- Attendance Actions -->
-    <div class="attendance-action" style="margin: 20px 0; text-align: center;">
-      <button *ngIf="attendanceStatus === 'not_checked_in'" (click)="checkIn()" class="btn btn-primary">
-        Check In
-      </button>
-      <button *ngIf="attendanceStatus === 'checked_in'" (click)="checkOut()" class="btn btn-secondary">
-        Check Out
-      </button>
-      <span *ngIf="attendanceStatus === 'checked_out'" class="checked-out-message" style="font-weight: bold; color: #4caf50;">
-        You have checked out for today. Have a great day!
-      </span>
-    </div>
+    <!-- Action Buttons Row -->
+    <div class="action-buttons-container">
+      <!-- Attendance Actions -->
+      <div class="attendance-section">
+        <button *ngIf="attendanceStatus === 'not_checked_in'" (click)="checkIn()" class="action-btn check-in-btn">
+          <i class="bi bi-clock"></i>
+          <span>Check In</span>
+        </button>
+        <button *ngIf="attendanceStatus === 'checked_in'" (click)="checkOut()" class="action-btn check-out-btn">
+          <i class="bi bi-clock-history"></i>
+          <span>Check Out</span>
+        </button>
+        <div *ngIf="attendanceStatus === 'checked_out'" class="checked-out-message">
+          <i class="bi bi-check-circle"></i>
+          <span>You have checked out for today. Have a great day!</span>
+        </div>
+      </div>
 
-    <!-- Profile Update Button and Form -->
-    <div style="text-align:center; margin-bottom: 1.5rem;">
-      <button *ngIf="!isEditingProfile" class="btn btn-primary" (click)="openProfileEdit()">
-        <i class="bi bi-pencil"></i> Update Profile
-      </button>
+      <!-- Profile Update Button -->
+      <div class="profile-section">
+        <button *ngIf="!isEditingProfile" class="action-btn profile-btn" (click)="openProfileEdit()">
+          <i class="bi bi-person-gear"></i>
+          <span>Update Profile</span>
+        </button>
+      </div>
     </div>
     <div *ngIf="isEditingProfile" class="profile-edit-overlay">
       <div class="profile-edit-form-modal">

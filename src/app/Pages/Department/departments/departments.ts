@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, ApplicationRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { trigger, style, animate, transition, query, group } from '@angular/animations';
 import { DepartmentService } from '../../../Services/department-service';
 import { IDepartment } from '../../../Interfaces/idepartment';
 import { Subscription } from 'rxjs';
@@ -10,9 +11,37 @@ import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 @Component({
   selector: 'app-departments',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, NgxSpinnerModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, NgxSpinnerModule],
   templateUrl: './departments.html',
-  styleUrl: './departments.css'
+  styleUrl: './departments.css',
+  animations: [
+    trigger("expand",[
+      transition(":enter", [
+        style({height: 0,opacity: 0}),
+        query(".details",[
+          style({translate: "0 -100%"})
+        ]),
+        group([
+          animate("0.8s cubic-bezier(0.4, 0, 0.2, 1)", style({height: "*", opacity: 1})),
+          query(".details",[
+            animate("0.8s cubic-bezier(0.4, 0, 0.2, 1)", style({translate: "0 0"}))
+          ])
+        ])
+      ]),
+      transition(":leave",[
+        style({height: "*", opacity: 1}),
+        query(".details",[
+          style({translate: "0 0"})
+        ]),
+        group([
+          animate("0.8s cubic-bezier(0.4, 0, 0.2, 1)", style({height: 0,opacity: 0})),
+          query(".details",[
+            animate("0.8s cubic-bezier(0.4, 0, 0.2, 1)", style({translate: "0 -100%"}))
+          ])
+        ])
+      ])
+    ])
+  ]
 })
 export class Departments implements OnInit, OnDestroy {
   departments: IDepartment[] = [];
@@ -22,6 +51,11 @@ export class Departments implements OnInit, OnDestroy {
   subs: Subscription[] = [];
   editIndex: number | null = null;
   editForm!: FormGroup;
+
+  // New properties for grouping and search
+  searchTerm = '';
+  expandedGroups = new Set<string>([]);
+  isNavigatingAway = false;
 
   constructor(
     private departmentService: DepartmentService,
@@ -54,6 +88,61 @@ export class Departments implements OnInit, OnDestroy {
     return this.editForm ? this.editForm.get('description') : null;
   }
 
+  // Get alphabet groups for grouping
+  get alphabetGroups(): string[] {
+    const allFirstLetters = this.departments.map(d => d.departmentName.charAt(0).toUpperCase());
+    return ['All', ...Array.from(new Set(allFirstLetters)).sort()];
+  }
+
+  // Get grouped departments
+  get groupedDepartments(): { [group: string]: IDepartment[] } {
+    const groups: { [group: string]: IDepartment[] } = {};
+    for (const dept of this.getDepartmentsByGroup()) {
+      const firstLetter = dept.departmentName.charAt(0).toUpperCase();
+      if (!groups[firstLetter]) groups[firstLetter] = [];
+      groups[firstLetter].push(dept);
+    }
+    
+    // Sort records within each group by department name
+    Object.keys(groups).forEach(letter => {
+      groups[letter].sort((a, b) => {
+        return a.departmentName.localeCompare(b.departmentName);
+      });
+    });
+    
+    return groups;
+  }
+
+  // Group management methods
+  isGroupExpanded(group: string): boolean {
+    return this.expandedGroups.has(group);
+  }
+
+  toggleGroup(group: string): void {
+    if (this.expandedGroups.has(group)) {
+      this.expandedGroups.delete(group);
+    } else {
+      this.expandedGroups.add(group);
+    }
+  }
+
+  // Filter departments by search
+  getDepartmentsByGroup(): IDepartment[] {
+    let filtered = this.departments;
+    
+    // Apply search filter
+    if (this.searchTerm.trim()) {
+      const term = this.searchTerm.trim().toLowerCase();
+      filtered = filtered.filter(d => 
+        d.departmentName.toLowerCase().includes(term) ||
+        d.description.toLowerCase().includes(term)
+      );
+    }
+    
+    // Sort alphabetically by department name
+    return filtered.sort((a, b) => a.departmentName.localeCompare(b.departmentName));
+  }
+
   loadDepartments() {
     this.subs.push(this.departmentService.getDepartments().subscribe({
       next: (departments) => {
@@ -65,6 +154,8 @@ export class Departments implements OnInit, OnDestroy {
         this.error = 'Failed to load departments.';
       },
       complete: () => {
+        this.expandedGroups.add('All');
+        this.cdr.detectChanges();
         this.spinner.hide();
       }
     }));

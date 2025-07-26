@@ -19,6 +19,10 @@ export class TasksService {
     return this.http.post<ITask>(`${this.apiUrl}`, task);
   }
 
+  deleteTask(taskId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${taskId}`);
+  }
+
   getTasksByEmployeeId(employeeId: number): Observable<ITask[]> {
     return this.http.get<ITask[]>(`${this.apiUrl}/Employee/tasks/${employeeId}`);
   }
