@@ -70,7 +70,7 @@
                       <td>{{ emp.departmentName }}</td>
                       <td>
                         <button (click)="editEmployee(emp.employeeId)" class="app-table-action-btn edit" [disabled]="userRole != 'Admin' && emp.departmentName == 'HR'"><i class="bi bi-pencil"></i></button>
-                        <button (click)="deleteEmployee(emp.employeeId)" class="app-table-action-btn delete"><i class="bi bi-trash"></i></button>
+                        <button (click)="deleteEmployee(emp.employeeId)" class="app-table-action-btn delete" [disabled]="userRole != 'Admin' && emp.departmentName == 'HR'"><i class="bi bi-trash"></i></button>
                       </td>
                     </tr>
                   }
@@ -119,7 +119,7 @@
                         <td>{{ emp.address }}</td>
                         <td>
                           <button (click)="editEmployee(emp.employeeId)" class="app-table-action-btn edit" [disabled]="userRole != 'Admin' && emp.departmentName == 'HR'"><i class="bi bi-pencil"></i></button>
-                          <button (click)="deleteEmployee(emp.employeeId)" class="app-table-action-btn delete"><i class="bi bi-trash"></i></button>
+                          <button (click)="deleteEmployee(emp.employeeId)" class="app-table-action-btn delete" [disabled]="userRole != 'Admin' && emp.departmentName == 'HR'"><i class="bi bi-trash"></i></button>
                         </td>
                       </tr>
                     }

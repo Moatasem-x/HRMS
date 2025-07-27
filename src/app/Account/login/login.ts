@@ -132,7 +132,11 @@ export class Login implements OnInit, OnDestroy {
         this.capturedImage = null;
           Toast.fire({
             icon: "error",
-            title: "Invalid credentials. Try again please."
+            title: "Invalid credentials. Try again please.",
+            iconColor: "#fff",
+            background: "#dc3545",
+            color:"#fff",
+            padding: '1rem 0.75rem',
             });
       },
       complete: () => {

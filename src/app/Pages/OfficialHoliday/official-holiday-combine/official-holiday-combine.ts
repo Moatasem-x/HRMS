@@ -214,13 +214,14 @@ export class OfficialHolidayCombine implements OnInit, OnDestroy {
     const newHoliday: IOfficialHoliday = this.holidayForm.value;
     
     this.subs.push(this.holidayService.addOfficialHoliday(newHoliday).subscribe({
-      next: (holiday: IOfficialHoliday) => {
+      next: (holiday) => {
         // Add the new holiday to the array
+        // this.displayHolidays.push(holiday); // Also add to display array
         this.holidays.push(holiday);
-        this.displayHolidays.push(holiday); // Also add to display array
         // Hide the form
         this.hideAddHolidayForm();
         // Force change detection
+        console.log(this.displayHolidays);
         this.cdr.detectChanges();
         this.cdr.markForCheck();
         
@@ -232,7 +233,7 @@ export class OfficialHolidayCombine implements OnInit, OnDestroy {
           showConfirmButton: false
         });
       },
-      error: (err: any) => {
+      error: (err) => {
         this.spinner.hide();
         Swal.fire({
           icon: "error",

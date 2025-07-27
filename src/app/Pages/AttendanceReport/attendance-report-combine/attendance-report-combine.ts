@@ -245,7 +245,7 @@ export class AttendanceReportCombine implements OnInit, OnDestroy {
               icon: "success"
             });
             this.displayRecords.splice(index, 1);
-            this.allRecords = this.allRecords.filter(r => r.attendanceId !== record.attendanceId);
+            this.allRecords = this.allRecords.filter(r => r.attendanceId != record.attendanceId);
             this.cdr.detectChanges();
           },
           error: (err) => {

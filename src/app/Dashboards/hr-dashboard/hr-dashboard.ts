@@ -78,7 +78,7 @@ export class HRDashboard implements AfterViewInit, OnInit, OnDestroy {
 
     this.subs.push(this.departmentService.getDepartments().subscribe({
       next: (departments) => {
-        this.departments = departments;
+        this.departments = departments.filter(d=>d.departmentName!="HR");
         this.totalDepartments = departments.length;
         this.cdr.detectChanges();
       }

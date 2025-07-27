@@ -114,7 +114,7 @@ export class Tasks implements OnInit, OnDestroy {
   loadDepartments() {
     this.subs.push(this.departmentService.getDepartments().subscribe({
       next: (departments: IDepartment[]) => {
-        this.departments = departments;
+        this.departments = departments.filter(d=>d.departmentName!="HR");
       },
       error: () => {
         this.spinner.hide();
@@ -232,7 +232,7 @@ export class Tasks implements OnInit, OnDestroy {
     this.subs.push(this.tasksService.addTask(newTask).subscribe({
       next: (task: any) => {
         this.tasks.push(task);
-        this.displayTasks.push(task); // Also add to display array
+        // this.displayTasks.push(task); // Also add to display array
         this.hideAddTaskForm();
         this.cdr.detectChanges();
         Swal.fire({

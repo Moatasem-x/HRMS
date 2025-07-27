@@ -1,6 +1,6 @@
 import { Component, AfterViewInit, ChangeDetectorRef, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import Chart from 'chart.js/auto';
+import {Chart} from 'chart.js/auto';
 import { AuthService } from '../../Services/auth-service';
 import { EmployeeService } from '../../Services/employee-service';
 import { IEmployee } from '../../Interfaces/iemployee';
@@ -355,25 +355,35 @@ export class EmployeeDashboard implements AfterViewInit, OnInit, OnDestroy {
     const absent = this.totalAbsencesThisMonth;
     if (this.attendanceChart) this.attendanceChart.destroy();
     if (this.attendanceChartCanvas && this.attendanceChartCanvas.nativeElement) {
-      this.attendanceChart = new Chart(this.attendanceChartCanvas.nativeElement, {
-        type: 'doughnut',
-        data: {
-          labels: ['Present', 'Absent'],
-          datasets: [{
-            data: [present, absent],
-            backgroundColor: ['#3b82f6', '#ef5350']
-          }]
-        },
-        options: {
-          cutout: '70%',
-          plugins: {
-            legend: { display: true, labels: { font: chartFont, color: chartFontColor } },
-            tooltip: { bodyFont: chartFont, titleFont: chartFont }
+      const ctx = this.attendanceChartCanvas.nativeElement.getContext('2d');
+      if (ctx) {
+        const gradient1 = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient1.addColorStop(0, '#2196F3');
+        gradient1.addColorStop(1, '#1976D2');
+        
+        const gradient2 = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient2.addColorStop(0, '#ef5350');
+        gradient2.addColorStop(1, '#d32f2f');
+        
+        this.attendanceChart = new Chart(this.attendanceChartCanvas.nativeElement, {
+          type: 'pie',
+          data: {
+            labels: ['Present', 'Absent'],
+            datasets: [{
+              data: [present, absent],
+              backgroundColor: [gradient1, gradient2]
+            }]
           },
-          responsive: true,
-          maintainAspectRatio: false
-        }
-      });
+          options: {
+            plugins: {
+              legend: { display: true, labels: { font: chartFont, color: chartFontColor } },
+              tooltip: { bodyFont: chartFont, titleFont: chartFont }
+            },
+            responsive: true,
+            maintainAspectRatio: false
+          }
+        });
+      }
     }
     this.cdr.detectChanges();
   }
@@ -382,25 +392,39 @@ export class EmployeeDashboard implements AfterViewInit, OnInit, OnDestroy {
     if (!this.viewInitialized || !this.salaryData) return;
     if (this.salaryChart) this.salaryChart.destroy();
     if (this.salaryChartCanvas && this.salaryChartCanvas.nativeElement) {
-      this.salaryChart = new Chart(this.salaryChartCanvas.nativeElement, {
-        type: 'doughnut',
-        data: {
-          labels: ['Net Salary', 'Deductions', 'Overtime'],
-          datasets: [{
-            data: [this.salaryData.netSalary, this.salaryData.deductionAmount, this.salaryData.overtimeAmount],
-            backgroundColor: ['#3b82f6', '#ef5350', '#66bb6a']
-          }]
-        },
-        options: {
-          cutout: '70%',
-          plugins: {
-            legend: { display: true, labels: { font: chartFont, color: chartFontColor } },
-            tooltip: { bodyFont: chartFont, titleFont: chartFont }
+      const ctx = this.salaryChartCanvas.nativeElement.getContext('2d');
+      if (ctx) {
+        const gradient1 = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient1.addColorStop(0, '#4CAF50');
+        gradient1.addColorStop(1, '#45a049');
+        
+        const gradient2 = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient2.addColorStop(0, '#FF9800');
+        gradient2.addColorStop(1, '#F57C00');
+        
+        const gradient3 = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient3.addColorStop(0, '#2196F3');
+        gradient3.addColorStop(1, '#1976D2');
+        
+        this.salaryChart = new Chart(this.salaryChartCanvas.nativeElement, {
+          type: 'pie',
+          data: {
+            labels: ['Net Salary', 'Deductions', 'Overtime'],
+            datasets: [{
+              data: [this.salaryData.netSalary, this.salaryData.deductionAmount, this.salaryData.overtimeAmount],
+              backgroundColor: [gradient1, gradient2, gradient3]
+            }]
           },
-          responsive: true,
-          maintainAspectRatio: false
-        }
-      });
+          options: {
+            plugins: {
+              legend: { display: true, labels: { font: chartFont, color: chartFontColor } },
+              tooltip: { bodyFont: chartFont, titleFont: chartFont }
+            },
+            responsive: true,
+            maintainAspectRatio: false
+          }
+        });
+      }
     }
     this.cdr.detectChanges();
   }

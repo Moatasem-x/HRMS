@@ -63,8 +63,8 @@ export class EmployeeTasks implements OnInit {
   markAsDone(task: ITask) {
     const update: ITask = { taskId: task.taskId, status: 'Done' };
     this.tasksService.takeActionForTask(update).subscribe({
-      next: () => {
-        task.status = 'Done';
+      next: (resp) => {
+        task.status = resp.status;
       },
       error: () => {
         console.log("Error");

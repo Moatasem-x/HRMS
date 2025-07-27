@@ -196,7 +196,7 @@ export class Departments implements OnInit, OnDestroy {
     this.subs.push(this.departmentService.addDepartment(newDepartment).subscribe({
       next: (department: IDepartment) => {
         this.departments.push(department);
-        this.displayDepartments.push(department);
+        // this.displayDepartments.push(department);
         this.hideAddDepartmentForm();
         this.cdr.detectChanges();
         Swal.fire({

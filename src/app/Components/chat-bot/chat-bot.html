@@ -25,7 +25,7 @@
         }
       </div>
       <div class="chat-bot-input-row">
-        <input type="text" [(ngModel)]="userInput" (keydown)="onInputKeydown($event)" placeholder="Type your message..." />
+        <input autocomplete="off" type="text" [(ngModel)]="userInput" (keydown)="onInputKeydown($event)" placeholder="Type your message..." />
         <button (click)="sendMessage()" [disabled]="!userInput.trim() || isTyping">
           <i class="bi bi-send"></i>
         </button>

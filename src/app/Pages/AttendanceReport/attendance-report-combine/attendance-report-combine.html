@@ -59,9 +59,9 @@
                         <td><input [(ngModel)]="editedRecord.checkOutTime" type="time" [class.editing]="editIndex === i" /></td>
                       }
 
-                      <td>{{ record.overtimeHours }}</td>
+                      <td>{{ record.overtimeHours?.toFixed(2)  }}</td>
                       
-                      <td>{{ record.delayHours }}</td>
+                      <td>{{ record.delayHours?.toFixed(2) }}</td>
 
                       @if (editIndex !== i) {
                         <td>{{ record.attendanceDate| date:'dd-MM-yyyy' }}</td>
