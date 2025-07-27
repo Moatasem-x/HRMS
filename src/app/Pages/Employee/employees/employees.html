@@ -145,33 +145,3 @@
     </section>
   </main>
 </div>
-<div id="export-table" [style.display]="showExportTable ? 'block' : 'none'">
-  <table class="app-table">
-    <thead>
-      <tr>
-        <th>Employee ID</th>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Phone</th>
-        <th>Hire Date</th>
-        <th>Salary</th>
-        <th>Address</th>
-        <th>Department</th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (emp of getEmployeesByGroup(); track emp.employeeId) {
-        <tr>
-          <td>{{ emp.nationalId }}</td>
-          <td>{{ emp.fullName }}</td>
-          <td><span class="app-table-badge">{{ emp.email }}</span></td>
-          <td>{{ emp.phoneNumber }}</td>
-          <td>{{ emp.hireDate | date:'dd-MM-yyyy' }}</td>
-          <td>{{ emp.salary }}</td>
-          <td>{{ emp.address }}</td>
-          <td>{{ emp.departmentName }}</td>
-        </tr>
-      }
-    </tbody>
-  </table>
-</div>

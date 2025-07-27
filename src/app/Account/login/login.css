@@ -43,7 +43,7 @@ transform: translate(-50%, -50%);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-color: #000;
 }
 
 .login-left-panel {
@@ -63,13 +63,13 @@ transform: translate(-50%, -50%);
   position: relative;
   height: 100%;
   width: 100%;
-  /* background-color: #e74c3c; */
-background-image: url('/photo2.jpg');
+  background-image: url('/login-image.jpg');
   background-size: cover;
   background-position: center;
-top: 0;
-left: 0; 
-filter: blur(6px) ;
+  top: 0;
+  left: 0; 
+  filter: blur(6px) ;
+  opacity: 0.5;
   z-index: 1;
 }
 
@@ -89,6 +89,25 @@ filter: blur(6px) ;
   max-width: 280px;
   height: auto;
   object-fit: contain;
+}
+
+.login-left-panel p {
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-bottom: 8px;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+.login-left-panel h1 {
+  color: #c78500;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-top: 12px;
+  margin-bottom: 32px;
+  text-align: center;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  letter-spacing: 2px;
 }
 
 .login-signin-title {
@@ -125,6 +144,7 @@ filter: blur(6px) ;
   gap: 16px;
   z-index: 1;
 }
+
 .input-group {
   display: flex;
   align-items: center;
@@ -135,11 +155,13 @@ filter: blur(6px) ;
   margin-bottom: 0;
   box-shadow: 0 1px 4px rgba(60, 80, 120, 0.04);
 }
+
 .input-icon {
   color: #f7a600;
   font-size: 1.1rem;
   margin-right: 8px;
 }
+
 .input-group input {
   border: none;
   outline: none;
@@ -149,6 +171,7 @@ filter: blur(6px) ;
   font-size: 1rem;
   color: #222;
 }
+
 .input-group input.invalid {
   border-bottom: 2px solid #e74c3c;
 }
@@ -167,6 +190,7 @@ filter: blur(6px) ;
   transition: background 0.2s;
   box-shadow: 0 2px 8px rgba(60, 80, 120, 0.08);
 }
+
 .login-btn:disabled {
   opacity: 0.7;
   cursor: not-allowed;
@@ -210,10 +234,20 @@ filter: blur(6px) ;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color:#f4f6fa;
+  background-color:#ff9900;
 }
 .login-bg-image{
-  width: 85%;
+  width: 100%;
+  height: 100%;
+  opacity: 0.7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    object-fit: cover;
+    
+  }
 }
 
 .webcam-modal-overlay {

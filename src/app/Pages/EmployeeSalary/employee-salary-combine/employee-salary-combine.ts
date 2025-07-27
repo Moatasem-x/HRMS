@@ -6,6 +6,9 @@ import { SalaryReportService } from '../../../Services/salary-report-service';
 import { ISalaryReport } from '../../../Interfaces/isalary-report';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { Subscription } from 'rxjs';
+import { Router } from '@angular/router';
+import * as jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 @Component({
   selector: 'app-employee-salary-combine',
@@ -76,7 +79,8 @@ export class EmployeeSalaryCombine implements OnInit, OnDestroy {
   constructor(
     private salaryReportService: SalaryReportService, 
     private cdr: ChangeDetectorRef, 
-    private spinner: NgxSpinnerService
+    private spinner: NgxSpinnerService,
+    private router: Router
   ) {
     // Generate years from 2020 to current year + 1
     const currentYear = new Date().getFullYear();
@@ -184,6 +188,7 @@ export class EmployeeSalaryCombine implements OnInit, OnDestroy {
   applyFilters() {
     this.spinner.show();
     this.displayReports = this.getSalaryReportsByGroup();
+    this.currentPage = 1;
     this.cdr.detectChanges();
     this.spinner.hide();
   }
@@ -193,6 +198,7 @@ export class EmployeeSalaryCombine implements OnInit, OnDestroy {
     this.searchTerm = '';
     this.selectedMonth = '';
     this.selectedYear = '';
+    this.currentPage = 1;
     this.displayReports = [...this.salaryReports]; // Show all reports
     this.cdr.detectChanges();
   }
@@ -204,6 +210,22 @@ export class EmployeeSalaryCombine implements OnInit, OnDestroy {
       'July', 'August', 'September', 'October', 'November', 'December'
     ];
     return months[month - 1] || '';
+  }
+
+  viewEmployeeInfo(employeeId: number): void {
+    this.router.navigate(['/employee-info', employeeId]);
+  }
+
+  pageSize = 10;
+  currentPage = 1;
+
+  get paginatedSalaryReports() {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.displayReports.slice(start, start + this.pageSize);
+  }
+
+  get totalPages() {
+    return Math.ceil(this.displayReports.length / this.pageSize);
   }
 
   ngOnDestroy(): void {

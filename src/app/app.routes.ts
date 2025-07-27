@@ -15,6 +15,7 @@ import { ManageHolidayRequests } from './Pages/manage-holiday-requests/manage-ho
 import { Tasks } from './Pages/Tasks/tasks/tasks';
 import { Departments } from './Pages/Department/departments/departments';
 import { EmployeeTasks } from './Pages/Tasks/employee-tasks/employee-tasks';
+import { EmployeeInfoReport } from './Pages/employee-info-report/employee-info-report';
 
 export const routes: Routes = [
   {path: '', redirectTo: '/login', pathMatch: 'full'},
@@ -33,6 +34,7 @@ export const routes: Routes = [
   {path: 'departments', component: Departments, canActivate: [adminGuard]},
   {path: 'managetasks', component: Tasks, canActivate: [adminGuard]},
   {path: 'mytasks', component: EmployeeTasks, canActivate: [employeeGuard]},
+  {path: 'employee-info/:id', component: EmployeeInfoReport, canActivate: [adminGuard]},
   {
     path: 'update-profile',
     loadComponent: () => import('./Components/update-profile/update-profile').then(m => m.UpdateProfile)

@@ -47,10 +47,11 @@
                     <th>Net Salary</th>
                     <th>Month</th>
                     <th>Year</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  @for (report of displayReports; track report.employeeId) {
+                  @for (report of paginatedSalaryReports; track report.employeeId) {
                     <tr>
                       <td>{{ report.employeeName }}</td>
                       <td><span class="app-table-badge">{{ report.departmentName }}</span></td>
@@ -60,10 +61,21 @@
                       <td>{{ report.netSalary | currency:'EGP':'symbol':'1.2-2' }}</td>
                       <td>{{ getMonthName(report.month) }}</td>
                       <td>{{ report.year }}</td>
+                      <td>
+                        <button class="view-btn" (click)="viewEmployeeInfo(report.employeeId)" title="View Employee Info">
+                          <i class="bi bi-eye"></i>
+                          View Info
+                        </button>
+                      </td>
                     </tr>
                   }
                 </tbody>
               </table>
+              <div class="pagination-controls">
+                <button (click)="currentPage = currentPage - 1" [disabled]="currentPage === 1">Previous</button>
+                <span>Page {{ currentPage }} of {{ totalPages }}</span>
+                <button (click)="currentPage = currentPage + 1" [disabled]="currentPage === totalPages">Next</button>
+              </div>
             </div>
           </div>
         }
@@ -92,6 +104,7 @@
                       <th>Net Salary</th>
                       <th>Month</th>
                       <th>Year</th>
+                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -104,6 +117,12 @@
                         <td>{{ report.netSalary | currency:'EGP':'symbol':'1.2-2' }}</td>
                         <td>{{ getMonthName(report.month) }}</td>
                         <td>{{ report.year }}</td>
+                        <td>
+                          <button class="view-btn" (click)="viewEmployeeInfo(report.employeeId)" title="View Employee Info">
+                            <i class="bi bi-eye"></i>
+                            View Info
+                          </button>
+                        </td>
                       </tr>
                     }
                   </tbody>

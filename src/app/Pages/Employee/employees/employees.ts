@@ -240,36 +240,32 @@ export class Employees implements OnInit, OnDestroy {
   showExportTable = false;
 
   exportPDF() {
-    this.showExportTable = true;
-    this.cdr.detectChanges(); // Force Angular to update the DOM
-    setTimeout(() => {
-      const data = document.getElementById('export-table');
-      html2canvas(data!, {
-        scale: 2, // Higher resolution for clarity
-        useCORS: true
-      }).then(canvas => {
-        const imgWidth = 295; // A4 landscape width in mm
-        const pageHeight = 210; // A4 landscape height in mm
-        const imgHeight = canvas.height * imgWidth / canvas.width;
-        const contentDataURL = canvas.toDataURL('image/png');
-        const pdf = new jsPDF.jsPDF('l', 'mm', 'a4'); // 'l' for landscape
-        let position = 0;
-        let heightLeft = imgHeight;
+    const data = document.getElementById('export-table');
+    html2canvas(data!, {
+      scale: 2, // Higher resolution for clarity
+      useCORS: true
+    }).then(canvas => {
+      const imgWidth = 295; // A4 landscape width in mm
+      const pageHeight = 210; // A4 landscape height in mm
+      const imgHeight = canvas.height * imgWidth / canvas.width;
+      const contentDataURL = canvas.toDataURL('image/png');
+      const pdf = new jsPDF.jsPDF('l', 'mm', 'a4'); // 'l' for landscape
+      let position = 0;
+      let heightLeft = imgHeight;
 
-        // Multi-page support
-        while (heightLeft > 0) {
-          pdf.addImage(contentDataURL, 'PNG', 0, position, imgWidth, imgHeight);
-          heightLeft -= pageHeight;
-          if (heightLeft > 0) {
-            pdf.addPage();
-            position = 0;
-          }
+      // Multi-page support
+      while (heightLeft > 0) {
+        pdf.addImage(contentDataURL, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+        if (heightLeft > 0) {
+          pdf.addPage();
+          position = 0;
         }
-        pdf.save('exported-file.pdf');
-        this.showExportTable = false;
-        this.cdr.detectChanges();
-      });
-    }, 0);
+      }
+      pdf.save('exported-file.pdf');
+      this.showExportTable = false;
+      this.cdr.detectChanges();
+    });
   }
 
   private saveExcelFile(buffer: any, fileName: string): void {
