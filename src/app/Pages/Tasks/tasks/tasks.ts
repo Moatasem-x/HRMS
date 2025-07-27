@@ -192,6 +192,7 @@ export class Tasks implements OnInit, OnDestroy {
   // Apply filters
   applyFilters() {
     this.spinner.show();
+    this.currentPage = 1;
     this.displayTasks = this.getTasksByGroup();
     this.cdr.detectChanges();
     this.spinner.hide();
@@ -201,6 +202,7 @@ export class Tasks implements OnInit, OnDestroy {
   clearFilters() {
     this.searchTerm = '';
     this.selectedGroup = 'All';
+    this.currentPage = 1;
     this.displayTasks = [...this.tasks]; // Show all tasks
     this.cdr.detectChanges();
   }
@@ -300,6 +302,18 @@ export class Tasks implements OnInit, OnDestroy {
         }));
       }
     });
+  }
+
+  pageSize = 10;
+  currentPage = 1;
+
+  get paginatedTasks() {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.displayTasks.slice(start, start + this.pageSize);
+  }
+
+  get totalPages() {
+    return Math.ceil(this.displayTasks.length / this.pageSize);
   }
 
   ngOnDestroy(): void {

@@ -8,8 +8,8 @@
         <input type="text" placeholder="Search employee name" [(ngModel)]="searchTerm">
         <input type="date" [(ngModel)]="fromDate" placeholder="From Date">
         <input type="date" [(ngModel)]="toDate" placeholder="To Date">
-        <button class="filter-btn" (click)="applyFilters()">Apply Filters</button>
-        <button class="clear-btn" (click)="clearFilters()" type="button">Clear Filter</button>
+        <button class="filter-btn" (click)="currentPage = 1; applyFilters()">Apply Filters</button>
+        <button class="clear-btn" (click)="currentPage = 1; clearFilters()" type="button">Clear Filter</button>
       </div>
     </header>
     
@@ -22,11 +22,15 @@
             </svg>
           </span>
           <span class="group-title">All Attendance Records</span>
+          <button (click)="exportArrayToExcel(allRecords, 'AttendanceReport'); $event.stopPropagation()" class="export-btn">
+            <i class="bi bi-file-earmark-excel"></i>
+            Export to Excel
+          </button>
         </div>
         @if (!isNavigatingAway && isGroupExpanded("All")) {
           <div @expand class="overflow-hidden">
             <div class="details">
-              <table class="app-table">
+              <table class="app-table" id="excel-content">
                 <thead>
                   <tr>
                     <th>Employee Name</th>
@@ -40,43 +44,43 @@
                   </tr>
                 </thead>
                 <tbody>
-                  @for (record of displayRecords; track record.attendanceId; let i = $index) {
+                  @for (record of paginatedDisplayRecords; track record.attendanceId; let i = $index) {
                     <tr>
                       <td>{{ record.employeeName }}</td>
                       <td><span class="app-table-badge">{{ record.departmentName }}</span></td>
 
-                      @if (editIndex !== i) {
+                      @if (editAttendanceId !== record.attendanceId) {
                         <td>{{ record.checkInTime }}</td>
                       }
-                      @if (editIndex === i && editedRecord) {
-                        <td><input [(ngModel)]="editedRecord.checkInTime" type="time" [class.editing]="editIndex === i" /></td>
+                      @if (editAttendanceId === record.attendanceId && editedRecord) {
+                        <td><input [(ngModel)]="editedRecord.checkInTime" type="time" /></td>
                       }
 
-                      @if (editIndex !== i) {
+                      @if (editAttendanceId !== record.attendanceId) {
                         <td>{{ record.checkOutTime }}</td>
                       }
-                      @if (editIndex === i && editedRecord) {
-                        <td><input [(ngModel)]="editedRecord.checkOutTime" type="time" [class.editing]="editIndex === i" /></td>
+                      @if (editAttendanceId === record.attendanceId && editedRecord) {
+                        <td><input [(ngModel)]="editedRecord.checkOutTime" type="time" /></td>
                       }
 
                       <td>{{ record.overtimeHours?.toFixed(2)  }}</td>
                       
                       <td>{{ record.delayHours?.toFixed(2) }}</td>
 
-                      @if (editIndex !== i) {
+                      @if (editAttendanceId !== record.attendanceId) {
                         <td>{{ record.attendanceDate| date:'dd-MM-yyyy' }}</td>
                       }
-                      @if (editIndex === i && editedRecord) {
-                        <td><input [(ngModel)]="editedRecord.attendanceDate" type="date" [class.editing]="editIndex === i" /></td>
+                      @if (editAttendanceId === record.attendanceId && editedRecord) {
+                        <td><input [(ngModel)]="editedRecord.attendanceDate" type="date" /></td>
                       }
 
                       <td>
-                        @if (editIndex !== i) {
-                          <button class="app-table-action-btn edit" (click)="editRecord(i)" title="Edit"><i class="bi bi-pencil"></i></button>
-                          <button class="app-table-action-btn delete" (click)="deleteRecord(i)" title="Delete"><i class="bi bi-trash"></i></button>
+                        @if (editAttendanceId !== record.attendanceId) {
+                          <button class="app-table-action-btn edit" (click)="editRecord(record.attendanceId!)" title="Edit"><i class="bi bi-pencil"></i></button>
+                          <button class="app-table-action-btn delete" (click)="deleteRecord(record.attendanceId!)" title="Delete"><i class="bi bi-trash"></i></button>
                         }
-                        @if (editIndex === i && editedRecord) {
-                          <button class="app-table-action-btn edit" (click)="saveRecord(i)" title="Save"><i class="bi bi-save"></i></button>
+                        @if (editAttendanceId === record.attendanceId && editedRecord) {
+                          <button class="app-table-action-btn edit" (click)="saveRecord(record.attendanceId!)" title="Save"><i class="bi bi-save"></i></button>
                           <button class="app-table-action-btn delete" (click)="cancelEdit()" title="Cancel"><i class="bi bi-x"></i></button>
                         }
                       </td>
@@ -84,6 +88,11 @@
                   }
                 </tbody>
               </table>
+              <div class="pagination-controls">
+                <button (click)="currentPage = currentPage - 1" [disabled]="currentPage === 1">Previous</button>
+                <span>Page {{ currentPage }} of {{ totalPages }}</span>
+                <button (click)="currentPage = currentPage + 1" [disabled]="currentPage === totalPages">Next</button>
+              </div>
             </div>
           </div>
         }
@@ -120,18 +129,18 @@
                         <td>{{ record.employeeName }}</td>
                         <td><span class="app-table-badge">{{ record.departmentName }}</span></td>
 
-                        @if (editIndex !== i) {
+                        @if (editAttendanceId !== record.attendanceId) {
                           <td>{{ record.checkInTime }}</td>
                         }
-                        @if (editIndex === i && editedRecord) {
-                          <td><input [(ngModel)]="editedRecord.checkInTime" type="time" [class.editing]="editIndex === i" /></td>
+                        @if (editAttendanceId === record.attendanceId && editedRecord) {
+                          <td><input [(ngModel)]="editedRecord.checkInTime" type="time" /></td>
                         }
 
-                        @if (editIndex !== i) {
+                        @if (editAttendanceId !== record.attendanceId) {
                           <td>{{ record.checkOutTime }}</td>
                         }
-                        @if (editIndex === i && editedRecord) {
-                          <td><input [(ngModel)]="editedRecord.checkOutTime" type="time" [class.editing]="editIndex === i" /></td>
+                        @if (editAttendanceId === record.attendanceId && editedRecord) {
+                          <td><input [(ngModel)]="editedRecord.checkOutTime" type="time" /></td>
                         }
 
                         <td>{{ record.overtimeHours }}</td>
@@ -139,12 +148,12 @@
                         <td>{{ record.delayHours }}</td>
 
                         <td>
-                          @if (editIndex !== i) {
-                            <button class="app-table-action-btn edit" (click)="editRecord(i)" title="Edit"><i class="bi bi-pencil"></i></button>
-                            <button class="app-table-action-btn delete" (click)="deleteRecord(i)" title="Delete"><i class="bi bi-trash"></i></button>
+                          @if (editAttendanceId !== record.attendanceId) {
+                            <button class="app-table-action-btn edit" (click)="editRecord(record.attendanceId!)" title="Edit"><i class="bi bi-pencil"></i></button>
+                            <button class="app-table-action-btn delete" (click)="deleteRecord(record.attendanceId!)" title="Delete"><i class="bi bi-trash"></i></button>
                           }
-                          @if (editIndex === i && editedRecord) {
-                            <button class="app-table-action-btn edit" (click)="saveRecord(i)" title="Save"><i class="bi bi-save"></i></button>
+                          @if (editAttendanceId === record.attendanceId && editedRecord) {
+                            <button class="app-table-action-btn edit" (click)="saveRecord(record.attendanceId!)" title="Save"><i class="bi bi-save"></i></button>
                             <button class="app-table-action-btn delete" (click)="cancelEdit()" title="Cancel"><i class="bi bi-x"></i></button>
                           }
                         </td>

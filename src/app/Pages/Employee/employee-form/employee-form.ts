@@ -48,12 +48,14 @@ export class EmployeeForm implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.spinner.show();
-    this.loadDepartments();
     this.initForm();
     this.activatedRoute.params.subscribe(params => {
-      if (params['id'] && params['id'] !== '0') {
-        this.getEmployee(parseInt(params['id']));
+      if (params['id'] && params['id'] != '0') {
         this.editMode = true;
+        this.getEmployee(parseInt(params['id']));
+      }
+      else {
+        this.loadDepartments(this.editMode);
       }
     });
   }
@@ -90,6 +92,10 @@ export class EmployeeForm implements OnInit, OnDestroy {
         if (this.isHRDepartment) {
           this.employeeForm.get('departmentId')?.disable();
         }
+        else {
+          this.departmentOptions = this.departmentOptions.filter(dept => dept.departmentName.toLocaleLowerCase() != "hr");
+        }
+        this.loadDepartments(this.editMode);
         this.cdr.detectChanges();
       },
       complete: () => {
@@ -98,10 +104,16 @@ export class EmployeeForm implements OnInit, OnDestroy {
     this.subs.push(sub);
   }
 
-  loadDepartments(): void {
+  loadDepartments(edit: boolean): void {
     const sub = this.departmentService.getDepartments().subscribe({
       next: (resp) => {
         this.departmentOptions = resp;
+        console.log("isHRDepartment", this.isHRDepartment);
+        console.log("edit", edit);
+        if (!edit || !this.isHRDepartment) {
+          this.departmentOptions = this.departmentOptions.filter(dept => dept.departmentName.toLocaleLowerCase() != "hr");
+        }
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.spinner.hide();

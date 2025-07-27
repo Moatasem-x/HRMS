@@ -39,43 +39,55 @@
             </svg>
           </span>
           <span class="group-title">All Employees</span>
+          <button (click)="exportArrayToExcel(employees, 'Employees'); $event.stopPropagation()" class="export-btn">
+            <i class="bi bi-file-earmark-excel"></i>
+            Export to Excel
+          </button>
         </div>
         @if (!isNavigatingAway && isGroupExpanded("All")) {
           <div @expand class="overflow-hidden">
-            <div class="details">
-              <table class="app-table">
-                <thead>
-                  <tr>
-                    <th>Employee ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Hire Date</th>
-                    <th>Salary</th>
-                    <th>Address</th>
-                    <th>Department</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (emp of getEmployeesByGroup(); track emp.employeeId) {
+            <div class="details" id="content-to-print">
+              <!-- Main table with Actions and pagination -->
+              <div class="main-table-section">
+                <table class="app-table" id="excel-content">
+                  <thead>
                     <tr>
-                      <td>{{ emp.nationalId }}</td>
-                      <td>{{ emp.fullName }}</td>
-                      <td><span class="app-table-badge">{{ emp.email }}</span></td>
-                      <td>{{ emp.phoneNumber }}</td>
-                      <td>{{ emp.hireDate | date:'dd-MM-yyyy' }}</td>
-                      <td>{{ emp.salary }}</td>
-                      <td>{{ emp.address }}</td>
-                      <td>{{ emp.departmentName }}</td>
-                      <td>
-                        <button (click)="editEmployee(emp.employeeId)" class="app-table-action-btn edit" [disabled]="userRole != 'Admin' && emp.departmentName == 'HR'"><i class="bi bi-pencil"></i></button>
-                        <button (click)="deleteEmployee(emp.employeeId)" class="app-table-action-btn delete" [disabled]="userRole != 'Admin' && emp.departmentName == 'HR'"><i class="bi bi-trash"></i></button>
-                      </td>
+                      <th>Employee ID</th>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Phone</th>
+                      <th>Hire Date</th>
+                      <th>Salary</th>
+                      <th>Address</th>
+                      <th>Department</th>
+                      <th>Actions</th>
                     </tr>
-                  }
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    @for (emp of paginatedEmployees; track emp.employeeId) {
+                      <tr>
+                        <td>{{ emp.nationalId }}</td>
+                        <td>{{ emp.fullName }}</td>
+                        <td><span class="app-table-badge">{{ emp.email }}</span></td>
+                        <td>{{ emp.phoneNumber }}</td>
+                        <td>{{ emp.hireDate | date:'dd-MM-yyyy' }}</td>
+                        <td>{{ emp.salary }}</td>
+                        <td>{{ emp.address }}</td>
+                        <td>{{ emp.departmentName }}</td>
+                        <td>
+                          <button (click)="editEmployee(emp.employeeId)" class="app-table-action-btn edit" [disabled]="userRole != 'Admin' && emp.departmentName == 'HR'"><i class="bi bi-pencil"></i></button>
+                          <button (click)="deleteEmployee(emp.employeeId)" class="app-table-action-btn delete" [disabled]="userRole != 'Admin' && emp.departmentName == 'HR'"><i class="bi bi-trash"></i></button>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+                <div class="pagination-controls">
+                  <button (click)="currentPage = currentPage - 1" [disabled]="currentPage === 1">Previous</button>
+                  <span>Page {{ currentPage }} of {{ totalPages }}</span>
+                  <button (click)="currentPage = currentPage + 1" [disabled]="currentPage === totalPages">Next</button>
+                </div>
+              </div>
             </div>
           </div>
         }
@@ -132,4 +144,34 @@
       }
     </section>
   </main>
-</div> 
+</div>
+<div id="export-table" [style.display]="showExportTable ? 'block' : 'none'">
+  <table class="app-table">
+    <thead>
+      <tr>
+        <th>Employee ID</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Hire Date</th>
+        <th>Salary</th>
+        <th>Address</th>
+        <th>Department</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (emp of getEmployeesByGroup(); track emp.employeeId) {
+        <tr>
+          <td>{{ emp.nationalId }}</td>
+          <td>{{ emp.fullName }}</td>
+          <td><span class="app-table-badge">{{ emp.email }}</span></td>
+          <td>{{ emp.phoneNumber }}</td>
+          <td>{{ emp.hireDate | date:'dd-MM-yyyy' }}</td>
+          <td>{{ emp.salary }}</td>
+          <td>{{ emp.address }}</td>
+          <td>{{ emp.departmentName }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

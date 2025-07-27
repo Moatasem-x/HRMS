@@ -7,6 +7,8 @@ import { IAttendance } from '../../../Interfaces/iattendance';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { Subscription } from 'rxjs';
 import Swal from 'sweetalert2';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 @Component({
   selector: 'app-attendance-report-combine',
@@ -57,7 +59,7 @@ export class AttendanceReportCombine implements OnInit, OnDestroy {
   isNavigatingAway = false;
 
   // Edit functionality
-  editIndex: number | null = null;
+  editAttendanceId: number | null = null;
   editedRecord: IAttendance | null = null;
 
   constructor(private attendanceService: AttendanceService, private cdr: ChangeDetectorRef, private spinner: NgxSpinnerService) {}
@@ -177,20 +179,20 @@ export class AttendanceReportCombine implements OnInit, OnDestroy {
   }
 
   // Edit functionality
-  editRecord(index: number) {
-    this.editIndex = index;
-    console.log('Editing record:', this.displayRecords[index]);
-    this.editedRecord = { ...this.displayRecords[index] };
+  editRecord(attendanceId: number) {
+    const record = this.displayRecords.find(r => r.attendanceId == attendanceId);
+    if (!record) return;
+    this.editAttendanceId = attendanceId;
+    this.editedRecord = { ...record };
   }
 
-  saveRecord(index: number) {
-    console.log('Saving record :', this.editedRecord);
+  saveRecord(attendanceId: number) {
     if (!this.editedRecord) return;
-    
     this.spinner.show();
     this.subs.push(this.attendanceService.adminUpdatesAttendance(this.editedRecord).subscribe({
       next: (updatedRecord) => {
-        this.displayRecords[index] = updatedRecord;
+        const index = this.displayRecords.findIndex(r => r.attendanceId == attendanceId);
+        if (index != -1) this.displayRecords[index] = updatedRecord;
         this.allRecords = this.allRecords.map(r => 
           r.attendanceId === updatedRecord.attendanceId ? updatedRecord : r
         );
@@ -218,11 +220,13 @@ export class AttendanceReportCombine implements OnInit, OnDestroy {
   }
 
   cancelEdit() {
-    this.editIndex = null;
+    this.editAttendanceId = null;
     this.editedRecord = null;
   }
 
-  deleteRecord(index: number) {
+  deleteRecord(attendanceId: number) {
+    const index = this.displayRecords.findIndex(r => r.attendanceId === attendanceId);
+    if (index == -1) return;
     const record = this.displayRecords[index];
     if (!record.attendanceId) return;
 
@@ -263,6 +267,31 @@ export class AttendanceReportCombine implements OnInit, OnDestroy {
         }));
       }
     });
+  }
+
+  private saveExcelFile(buffer: any, fileName: string): void {
+    const data: Blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8' });
+    saveAs(data, fileName + '.xlsx');
+  }
+
+  exportArrayToExcel(data: any[], fileName: string = 'ExportedData') {
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(data);
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+    const excelBuffer: any = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    this.saveExcelFile(excelBuffer, fileName);
+  }
+
+  pageSize = 10;
+  currentPage = 1;
+
+  get paginatedDisplayRecords() {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.displayRecords.slice(start, start + this.pageSize);
+  }
+
+  get totalPages() {
+    return Math.ceil(this.displayRecords.length / this.pageSize);
   }
 
   ngOnDestroy(): void {

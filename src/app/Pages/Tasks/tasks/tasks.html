@@ -12,8 +12,8 @@
               <option [value]="group">{{ group }}</option>
             }
           </select>
-          <button class="filter-btn" (click)="applyFilters()">Apply Filters</button>
-          <button class="clear-btn" (click)="clearFilters()" type="button">Clear Filter</button>
+          <button class="filter-btn" (click)="currentPage = 1; applyFilters()">Apply Filters</button>
+          <button class="clear-btn" (click)="currentPage = 1; clearFilters()" type="button">Clear Filter</button>
         </div>
         <button class="new-task-btn" (click)="showAddTaskForm()">New Task</button>
       </div>
@@ -43,7 +43,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  @for (task of displayTasks; track task.taskId) {
+                  @for (task of paginatedTasks; track task.taskId) {
                     <tr>
                       <td>{{ task.employeeName }}</td>
                       <td><span class="app-table-badge">{{ task.departmentName }}</span></td>
@@ -60,6 +60,11 @@
                   }
                 </tbody>
               </table>
+              <div class="pagination-controls">
+                <button (click)="currentPage = currentPage - 1" [disabled]="currentPage === 1">Previous</button>
+                <span>Page {{ currentPage }} of {{ totalPages }}</span>
+                <button (click)="currentPage = currentPage + 1" [disabled]="currentPage === totalPages">Next</button>
+              </div>
             </div>
           </div>
         }

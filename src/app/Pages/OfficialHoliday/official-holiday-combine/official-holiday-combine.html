@@ -7,11 +7,8 @@
       <div class="header-actions">
         <div class="filter-section">
           <input type="text" placeholder="Search holiday name" [(ngModel)]="searchTerm">
-          <select [(ngModel)]="selectedYear">
-            <option value="">All Years</option>
-            @for (year of years; track year) {
-              <option [value]="year">{{ year }}</option>
-            }
+          <select [(ngModel)]="selectedMonth">
+            <option *ngFor="let month of months" [value]="month.value">{{ month.label }}</option>
           </select>
           <button class="filter-btn" (click)="applyFilters()">Apply Filters</button>
           <button class="clear-btn" (click)="clearFilters()" type="button">Clear Filter</button>
@@ -93,48 +90,6 @@
           </div>
         }
       </div>
-      <!-- Grouped Collapses by Year -->
-      @for (group of yearGroups.slice(1); track group) {
-        <div class="group">
-          <div class="group-header" (click)="toggleGroup(group)" [ngClass]="{expanded: isGroupExpanded(group), collapsed: !isGroupExpanded(group)}">
-            <span class="group-arrow">
-              <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M8 10l4 4 4-4" stroke="#0284c7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </span>
-            <span class="group-title">{{ group }}</span>
-          </div>
-          @if (!isNavigatingAway && isGroupExpanded(group)) {
-            <div @expand class="overflow-hidden">
-              <div class="details">
-                <table class="app-table">
-                  <thead>
-                    <tr>
-                      <th>Holiday Name</th>
-                      <th>Date</th>
-                      <th>Description</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    @for (holiday of groupedHolidays[group]; track holiday?.holidayId; let i = $index) {
-                      <tr>
-                        <td>{{ holiday?.holidayName }}</td>
-                        <td>{{ holiday?.holidayDate | date:'dd-MM-yyyy' }}</td>
-                        <td>{{ holiday?.description || '-' }}</td>
-                        <td>
-                          <button class="app-table-action-btn edit" (click)="editHoliday(holiday, i)" title="Edit"><i class="bi bi-pencil"></i></button>
-                          <button class="app-table-action-btn delete" (click)="deleteHoliday(holiday.holidayId)" title="Delete"><i class="bi bi-trash"></i></button>
-                        </td>
-                      </tr>
-                    }
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          }
-        </div>
-      }
     </section>
   </main>
 </div>

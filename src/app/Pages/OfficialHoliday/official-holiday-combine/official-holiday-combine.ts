@@ -54,7 +54,7 @@ export class OfficialHolidayCombine implements OnInit, OnDestroy {
 
   // New properties for grouping and search
   searchTerm = '';
-  selectedYear = '';
+  selectedMonth = '';
   expandedGroups = new Set<string>([]);
   isNavigatingAway = false;
 
@@ -62,21 +62,29 @@ export class OfficialHolidayCombine implements OnInit, OnDestroy {
   showAddForm = false;
   holidayForm!: FormGroup;
 
-  // Year options
-  years: number[] = [];
+  // Month options
+  months = [
+    { value: '', label: 'All Months' },
+    { value: '0', label: 'January' },
+    { value: '1', label: 'February' },
+    { value: '2', label: 'March' },
+    { value: '3', label: 'April' },
+    { value: '4', label: 'May' },
+    { value: '5', label: 'June' },
+    { value: '6', label: 'July' },
+    { value: '7', label: 'August' },
+    { value: '8', label: 'September' },
+    { value: '9', label: 'October' },
+    { value: '10', label: 'November' },
+    { value: '11', label: 'December' }
+  ];
 
   constructor(
     private holidayService: OfficialHolidayService,
     private cdr: ChangeDetectorRef,
     private fb: FormBuilder,
     private spinner: NgxSpinnerService
-  ) {
-    // Generate years from 2020 to current year + 1
-    const currentYear = new Date().getFullYear();
-    for (let year = 2020; year <= currentYear + 1; year++) {
-      this.years.push(year);
-    }
-  }
+  ) {}
 
   ngOnInit(): void {
     this.spinner.show();
@@ -130,7 +138,6 @@ export class OfficialHolidayCombine implements OnInit, OnDestroy {
     }
   }
 
-  // Filter holidays by search and year
   getHolidaysByGroup(): IOfficialHoliday[] {
     let filtered = this.holidays;
     
@@ -142,10 +149,9 @@ export class OfficialHolidayCombine implements OnInit, OnDestroy {
       );
     }
     
-    // Apply year filter
-    if (this.selectedYear) {
+    if (this.selectedMonth != '') {
       filtered = filtered.filter(h => 
-        new Date(h.holidayDate).getFullYear().toString() === this.selectedYear
+        new Date(h.holidayDate).getMonth().toString() === this.selectedMonth
       );
     }
     
@@ -166,7 +172,7 @@ export class OfficialHolidayCombine implements OnInit, OnDestroy {
   // Clear all filters
   clearFilters() {
     this.searchTerm = '';
-    this.selectedYear = '';
+    this.selectedMonth = '';
     this.displayHolidays = [...this.holidays]; // Show all holidays
     this.cdr.detectChanges();
   }
