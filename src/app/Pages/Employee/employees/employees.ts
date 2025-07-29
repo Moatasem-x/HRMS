@@ -77,10 +77,11 @@ export class Employees implements OnInit, OnDestroy {
 
 
   boardMembers: BoardMember[] = [
-    { name: 'Grace Hall', email: 'name@talenthub.com', role: 'General Director', avatarUrl: '' },
-    { name: 'Bob Brown', email: 'name@talenthub.com', role: 'The CEO', avatarUrl: '' },
-    { name: 'John Doe', email: 'name@talenthub.com', role: 'The CTO', avatarUrl: '' },
-    { name: 'Alice Johnson', email: 'name@talenthub.com', role: 'The CMO', avatarUrl: '' },
+    { name: "Al-Mo'tasem Bellah Emad ", email: 'moatasem@nizamkhr.com', role: 'General Director', avatarUrl: '/moatasem.webp' },
+    { name: 'Amr Ehab', email: 'amrehab@nizamkhr.com', role: 'The CEO', avatarUrl: '/amr.jpg' },
+    { name: 'AbdelRahman Ragae', email: 'abdelrahmanragae@nizamkhr.com', role: 'The CTO', avatarUrl: '' },
+    { name: 'Amera Gomaa', email: 'amera@nizamkhr.com', role: 'The CMO', avatarUrl: '' },
+    { name: 'Somaya Yasser', email: 'Somaya@nizamkhr.com', role: 'The CFO', avatarUrl: '' },
   ];
 
   employees: IEmployee[] = [];

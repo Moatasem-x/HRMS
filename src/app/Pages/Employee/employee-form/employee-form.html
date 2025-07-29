@@ -4,7 +4,11 @@
       <div class="form-header">
         <h1 class="form-title">
           <i class="bi bi-person-plus"></i>
-          Add New Employee
+          @if(!editMode)
+           {Add New Employee}
+           @else{
+            Edit Employee
+           }
         </h1>
         <p class="form-subtitle">Fill in the employee information below</p>
       </div>

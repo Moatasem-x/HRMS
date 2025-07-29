@@ -334,7 +334,8 @@ export class EmployeeForm implements OnInit, OnDestroy {
   }
 
   resetForm(): void {
-    if (this.editMode && this.isHRDepartment) {
+
+    if (this.editMode) {
       // In edit mode with HR department, reset everything except department
       this.employeeForm.patchValue({
         fullName: this.employee.fullName,
@@ -350,6 +351,7 @@ export class EmployeeForm implements OnInit, OnDestroy {
         image: null
       });
       // Keep department field disabled for HR
+      if(this.isHRDepartment)
       this.employeeForm.get('departmentId')?.disable();
     } else {
       // In add mode or non-HR edit mode, reset everything

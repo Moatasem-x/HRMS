@@ -55,7 +55,7 @@ transform: translate(-50%, -50%);
   align-items: center;
   justify-content: center;
   padding: 24px 32px;
-  min-width: 350px;
+  min-width: 550px;
   z-index: 2;
 }
 
@@ -63,7 +63,7 @@ transform: translate(-50%, -50%);
   position: relative;
   height: 100%;
   width: 100%;
-  background-image: url('/login-image.jpg');
+  background-image: url('/19878.jpg');
   background-size: cover;
   background-position: center;
   top: 0;

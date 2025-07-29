@@ -9,6 +9,8 @@ import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import * as jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 @Component({
   selector: 'app-employee-salary-combine',
@@ -227,6 +229,20 @@ export class EmployeeSalaryCombine implements OnInit, OnDestroy {
   get totalPages() {
     return Math.ceil(this.displayReports.length / this.pageSize);
   }
+
+    private saveExcelFile(buffer: any, fileName: string): void {
+      const data: Blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8' });
+      saveAs(data, fileName + '.xlsx');
+    }
+  
+    exportArrayToExcel(data: any[], fileName: string = 'ExportedData') {
+      const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(data);
+      const wb: XLSX.WorkBook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+      const excelBuffer: any = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+      this.saveExcelFile(excelBuffer, fileName);
+    }
+
 
   ngOnDestroy(): void {
     this.subs.forEach(sub => sub.unsubscribe());

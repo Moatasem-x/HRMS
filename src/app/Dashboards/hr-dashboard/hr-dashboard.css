@@ -220,9 +220,32 @@
     color: #3b82f6;
   }
   .card-desc {
-    color: #aaa;
-    font-size: 0.95rem;
-    margin-top: 0.5rem;
+    color: #888;
+    font-size: 0.9rem;
+  }
+
+  .card-update-indicator {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    opacity: 0.8;
+  }
+
+  .card-update-indicator small {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .card-update-indicator small::before {
+    content: "●";
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
   }
   .dashboard-row {
     display: grid;
