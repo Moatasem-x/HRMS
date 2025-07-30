@@ -475,7 +475,6 @@ export class HRDashboard implements AfterViewInit, OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error refreshing attendance data:', err);
-          this.isRefreshingAttendance = false;
         }
       }));
     }, 500); // 500ms delay to ensure backend processing
