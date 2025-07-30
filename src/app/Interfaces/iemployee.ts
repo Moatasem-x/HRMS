@@ -11,5 +11,7 @@ export interface IEmployee {
     salary: number;
     departmentId: number;
     departmentName: string;
-    image?: File; // Optional image property for file upload
+    image?: File;
+    workStartTime?: string;
+    workEndTime?: string;
 }

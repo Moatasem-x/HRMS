@@ -16,6 +16,7 @@ import { Tasks } from './Pages/Tasks/tasks/tasks';
 import { Departments } from './Pages/Department/departments/departments';
 import { EmployeeTasks } from './Pages/Tasks/employee-tasks/employee-tasks';
 import { EmployeeInfoReport } from './Pages/employee-info-report/employee-info-report';
+import { EmployeeDetailedSalaryReport } from './Pages/employee-detailed-salary-report/employee-detailed-salary-report';
 
 export const routes: Routes = [
   {path: '', redirectTo: '/login', pathMatch: 'full'},
@@ -39,4 +40,5 @@ export const routes: Routes = [
     path: 'update-profile',
     loadComponent: () => import('./Components/update-profile/update-profile').then(m => m.UpdateProfile)
   },
+  {path: 'detailedreport', component: EmployeeDetailedSalaryReport, canActivate: [adminGuard]},
 ];

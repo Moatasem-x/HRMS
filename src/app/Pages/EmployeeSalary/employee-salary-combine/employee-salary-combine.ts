@@ -212,8 +212,10 @@ export class EmployeeSalaryCombine implements OnInit, OnDestroy {
     return months[month - 1] || '';
   }
 
-  viewEmployeeInfo(employeeId: number): void {
-    this.router.navigate(['/employee-info', employeeId]);
+  viewEmployeeInfo(employeeId: number, month: number, year: number): void {
+    this.router.navigate(['/employee-info', employeeId], {
+      queryParams: { month: month, year: year }
+    });
   }
 
   pageSize = 10;

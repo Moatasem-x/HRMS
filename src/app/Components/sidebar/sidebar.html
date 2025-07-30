@@ -66,6 +66,10 @@
         <span class="sidebar-icon"><i class="bi bi-building"></i></span>
         <span class="sidebar-label-container" [@labelSlide]="isExpanded ? 'visible' : 'hidden'">Departments</span>
       </li>
+      <li (click)="openSystemSettings.emit()">
+        <span class="sidebar-icon"><i class="bi bi-gear"></i></span>
+        <span class="sidebar-label-container" [@labelSlide]="isExpanded ? 'visible' : 'hidden'">System Settings</span>
+      </li>
     }
     @if (isloggedin) {
       <li (click)="logout()">

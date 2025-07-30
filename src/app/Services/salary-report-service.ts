@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ISalaryReport } from '../Interfaces/isalary-report';
+import { IDetailedSalaryReport } from '../Interfaces/idetailed-salary-report';
 
 @Injectable({
   providedIn: 'root'
@@ -21,6 +22,10 @@ export class SalaryReportService {
 
   getSalaryReportsByMonthYear(month: number, year: number): Observable<ISalaryReport[]> {
     return this.http.get<ISalaryReport[]>(`${this.apiUrl}/byMonthYear?month=${month}&year=${year}`);
+  }
+
+  getDetailedSalaryReport(id: number, month: number, year: number): Observable<IDetailedSalaryReport> {
+    return this.http.post<IDetailedSalaryReport>(`${this.apiUrl}/detailedsalary`, {employeeId: id, month: month, year: year});
   }
   
 }

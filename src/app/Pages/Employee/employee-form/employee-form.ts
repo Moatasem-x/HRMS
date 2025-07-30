@@ -79,8 +79,25 @@ export class EmployeeForm implements OnInit, OnDestroy {
       ],
       hireDate: ['', Validators.required],
       salary: ['', [Validators.required, Validators.min(0)]],
+      workStartTime: ['', Validators.required],
+      workEndTime: ['', Validators.required],
       image: [null]
-    });
+    }, { validators: this.timeValidation });
+  }
+
+  timeValidation(group: FormGroup): {[key: string]: any} | null {
+    const startTime = group.get('workStartTime')?.value;
+    const endTime = group.get('workEndTime')?.value;
+    
+    if (startTime && endTime) {
+      const start = new Date(`2000-01-01T${startTime}`);
+      const end = new Date(`2000-01-01T${endTime}`);
+      
+      if (end <= start) {
+        return { 'invalidTimeRange': true };
+      }
+    }
+    return null;
   }
 
   getEmployee(id: number): void {
@@ -295,6 +312,8 @@ export class EmployeeForm implements OnInit, OnDestroy {
       departmentId: 'Department',
       email: 'Email',
       password: 'Password',
+      workStartTime: 'Work Start Time',
+      workEndTime: 'Work End Time',
     };
     return labels[fieldName] || fieldName;
   }

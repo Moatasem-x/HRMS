@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { Subscription } from 'rxjs';
@@ -14,7 +15,7 @@ import html2canvas from 'html2canvas';
 @Component({
   selector: 'app-employee-info-report',
   standalone: true,
-  imports: [CommonModule, NgxSpinnerModule],
+  imports: [CommonModule, FormsModule, NgxSpinnerModule],
   templateUrl: './employee-info-report.html',
   styleUrls: ['./employee-info-report.css']
 })
@@ -23,6 +24,10 @@ export class EmployeeInfoReport implements OnInit, OnDestroy {
   employee: IEmployee | null = null;
   salaryReport: ISalaryReport | null = null;
   subs: Subscription[] = [];
+  
+  // Month and year from query parameters
+  selectedMonth: number = 0;
+  selectedYear: number = 0;
 
   constructor(
     private route: ActivatedRoute,
@@ -38,7 +43,20 @@ export class EmployeeInfoReport implements OnInit, OnDestroy {
     this.route.params.subscribe(params => {
       this.employeeId = +params['id'];
       if (this.employeeId) {
-        this.loadEmployeeData();
+        // Get query parameters for month and year
+        this.route.queryParams.subscribe(queryParams => {
+          this.selectedMonth = +queryParams['month'] || 0;
+          this.selectedYear = +queryParams['year'] || 0;
+          
+          if (this.selectedMonth && this.selectedYear) {
+            this.loadEmployeeData();
+          } else {
+            console.error('Month and year query parameters are required');
+            this.spinner.hide();
+            // Optionally redirect back or show error
+            this.router.navigate(['/salaryreports']);
+          }
+        });
       }
     });
   }
@@ -63,19 +81,13 @@ export class EmployeeInfoReport implements OnInit, OnDestroy {
   }
 
   loadSalaryReport(): void {
-    const now = new Date();
-    let month = now.getMonth() + 1; // getMonth() returns 0-11, so add 1
-    let year = now.getFullYear();
-    
-    // If it's January, get December of previous year
-    if (month === 1) {
-      month = 12;
-      year = year - 1;
-    } else {
-      month = month - 1; // Get previous month
+    if (!this.selectedMonth || !this.selectedYear) {
+      console.error('Month and year must be provided');
+      this.spinner.hide();
+      return;
     }
 
-    this.subs.push(this.salaryReportService.getSalaryReportForSpecificEmployeeInMonth(this.employeeId, month, year).subscribe({
+    this.subs.push(this.salaryReportService.getSalaryReportForSpecificEmployeeInMonth(this.employeeId, this.selectedMonth, this.selectedYear).subscribe({
       next: (report) => {
         console.log('Salary report loaded:', report);
         this.salaryReport = report;
@@ -99,8 +111,8 @@ export class EmployeeInfoReport implements OnInit, OnDestroy {
         employeeId: this.employee.employeeId,
         employeeName: this.employee.fullName,
         departmentName: this.employee.departmentName,
-        month: new Date().getMonth() + 1,
-        year: new Date().getFullYear(),
+        month: this.selectedMonth,
+        year: this.selectedYear,
         basicSalary: this.employee.salary,
         overtimeAmount: 0,
         deductionAmount: 0,
@@ -118,13 +130,9 @@ export class EmployeeInfoReport implements OnInit, OnDestroy {
     return months[month - 1] || 'Unknown';
   }
 
-
-
   goBack(): void {
     this.router.navigate(['/salaryreports']);
   }
-
-  
 
   exportPDF() {
     const data = document.getElementById('section-to-export');
@@ -151,6 +159,16 @@ export class EmployeeInfoReport implements OnInit, OnDestroy {
       }
       pdf.save('exported-file.pdf');
       this.cdr.detectChanges();
+    });
+  }
+
+  goToDetailedReport() {
+    this.router.navigate(['/detailedreport'], {
+      queryParams: {
+        employeeId: this.employeeId,
+        month: this.selectedMonth,
+        year: this.selectedYear
+      }
     });
   }
 } 

@@ -32,6 +32,7 @@ export class Sidebar implements OnInit {
   isloggedin = false;
   role: string | null = "";
   @Output() openUpdateProfile = new EventEmitter<void>();
+  @Output() openSystemSettings = new EventEmitter<void>();
 
   constructor(private cdr: ChangeDetectorRef, private authService: AuthService) {}
 

@@ -112,6 +112,13 @@ export class RequestHoliday implements OnInit {
             icon: "error"
           });
         }
+        else if (err.error.message == "You have pending leave request"){
+          Swal.fire({
+            title: "Error!",
+            text: "You have pending leave request",
+            icon: "error"
+          });
+        }
         else {
           Swal.fire({
             title: "Error!",

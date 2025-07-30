@@ -237,6 +237,44 @@
               }
             </div>
           </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="workStartTime" class="form-label">Work Start Time</label>
+              <input
+                type="time"
+                id="workStartTime"
+                formControlName="workStartTime"
+                class="form-input"
+                [class.invalid]="isFieldInvalid('workStartTime')">
+              @if (getFieldError('workStartTime')) {
+              <div class="error-message">
+                <i class="bi bi-exclamation-circle"></i>
+                {{ getFieldError('workStartTime') }}
+              </div>
+              }
+            </div>
+            <div class="form-group">
+              <label for="workEndTime" class="form-label">Work End Time</label>
+              <input
+                type="time"
+                id="workEndTime"
+                formControlName="workEndTime"
+                class="form-input"
+                [class.invalid]="isFieldInvalid('workEndTime')">
+              @if (getFieldError('workEndTime')) {
+              <div class="error-message">
+                <i class="bi bi-exclamation-circle"></i>
+                {{ getFieldError('workEndTime') }}
+              </div>
+              }
+            </div>
+          </div>
+          @if (employeeForm.errors?.['invalidTimeRange']) {
+          <div class="error-message">
+            <i class="bi bi-exclamation-circle"></i>
+            End time must be after start time
+          </div>
+          }
         </div>
         <!-- Form Actions -->
         <div class="form-actions">

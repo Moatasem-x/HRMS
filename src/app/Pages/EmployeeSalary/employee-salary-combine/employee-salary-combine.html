@@ -62,7 +62,7 @@
                       <td>{{ getMonthName(report.month) }}</td>
                       <td>{{ report.year }}</td>
                       <td>
-                        <button class="view-btn" (click)="viewEmployeeInfo(report.employeeId)" title="View Employee Info">
+                        <button class="view-btn" (click)="viewEmployeeInfo(report.employeeId, report.month, report.year)" title="View Employee Info">
                           <i class="bi bi-eye"></i>
                           View Info
                         </button>
@@ -118,10 +118,10 @@
                         <td>{{ getMonthName(report.month) }}</td>
                         <td>{{ report.year }}</td>
                         <td>
-                          <button class="view-btn" (click)="viewEmployeeInfo(report.employeeId)" title="View Employee Info">
-                            <i class="bi bi-eye"></i>
-                            View Info
-                          </button>
+                                                  <button class="view-btn" (click)="viewEmployeeInfo(report.employeeId, report.month, report.year)" title="View Employee Info">
+                          <i class="bi bi-eye"></i>
+                          View Info
+                        </button>
                         </td>
                       </tr>
                     }
