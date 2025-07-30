@@ -32,6 +32,11 @@
             </svg>
           </span>
           <span class="group-title">All Salary Reports</span>
+          <button (click)="exportArrayToExcel(salaryReports, 'AttendanceReport'); $event.stopPropagation()" class="export-btn">
+            <i class="bi bi-file-earmark-excel"></i>
+            Export to Excel
+          </button>
+
         </div>
         @if (!isNavigatingAway && isGroupExpanded("All")) {
           <div @expand class="overflow-hidden">

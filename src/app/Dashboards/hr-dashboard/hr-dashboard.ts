@@ -128,8 +128,19 @@ export class HRDashboard implements AfterViewInit, OnInit, OnDestroy {
     const attendances = this.attendanceData;
     const today = new Date();
     const todayStr = today.toISOString().slice(0, 10); // 'YYYY-MM-DD'
-    this.attendanceToday = attendances.filter(a => a.attendanceDate.slice(0, 10) === todayStr).length;
-    this.absenteesToday = this.totalEmployees - this.attendanceToday;
+    
+    // Calculate new attendance count
+    const newAttendanceToday = attendances.filter(a => a.attendanceDate.slice(0, 10) === todayStr).length;
+    const newAbsenteesToday = this.totalEmployees - newAttendanceToday;
+    
+    // Update the values with a small animation effect
+    if (this.attendanceToday !== newAttendanceToday) {
+      this.attendanceToday = newAttendanceToday;
+    }
+    if (this.absenteesToday !== newAbsenteesToday) {
+      this.absenteesToday = newAbsenteesToday;
+    }
+    
     // --- Dynamic Attendance Chart Data (skip Friday/Saturday) ---
     function isWeekend(date: Date) {
       // 5 = Friday, 6 = Saturday
@@ -172,6 +183,15 @@ export class HRDashboard implements AfterViewInit, OnInit, OnDestroy {
     const prevWeekData = prev5Days.map(dateStr =>
       attendances.filter(a => a.attendanceDate.slice(0, 10) === dateStr).length
     );
+    
+    // Update chart with smooth transition
+    this.updateAttendanceChart(last5Labels, currentWeekData, prevWeekData);
+    
+    this.cdr.detectChanges();
+  }
+
+  // Separate method to update the attendance chart
+  private updateAttendanceChart(labels: string[], currentWeekData: number[], prevWeekData: number[]) {
     // Destroy previous chart if exists
     if (this.attendanceChart) {
       this.attendanceChart.destroy();
@@ -181,7 +201,7 @@ export class HRDashboard implements AfterViewInit, OnInit, OnDestroy {
       this.attendanceChart = new Chart(this.attendanceChartCanvas.nativeElement, {
         type: 'line',
         data: {
-          labels: last5Labels,
+          labels: labels,
           datasets: [
             {
               label: 'Current Week',
@@ -207,6 +227,10 @@ export class HRDashboard implements AfterViewInit, OnInit, OnDestroy {
           plugins: { legend: { display: true } },
           responsive: true,
           maintainAspectRatio: false,
+          animation: {
+            duration: 1000,
+            easing: 'easeInOutQuart'
+          },
           scales: {
             y: { beginAtZero: true, grid: { color: '#f3f3f3' } },
             x: { grid: { color: '#f3f3f3' } }
@@ -214,7 +238,6 @@ export class HRDashboard implements AfterViewInit, OnInit, OnDestroy {
         }
       });
     }
-    this.cdr.detectChanges();
   }
 
   createPerformanceChart() {
@@ -299,7 +322,7 @@ export class HRDashboard implements AfterViewInit, OnInit, OnDestroy {
     } else if (this.todayAttendance && this.todayAttendance.checkOutTime ) {
       this.attendanceStatus = 'checked_out';
     }
-    console.log("todayAttendance", this.todayAttendance);
+    // console.log("todayAttendance", this.todayAttendance);
   }
 
   private getCurrentTimeString(): string {
@@ -319,13 +342,13 @@ export class HRDashboard implements AfterViewInit, OnInit, OnDestroy {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude
         };
-        console.log("attendance", attendance);
         this.attendanceService.checkIn(attendance).subscribe({
           next: (resp) => {
             this.getAttendance();
+            this.refreshAttendanceData(); // Add this line to refresh attendance data
             Swal.fire({
               title: "Success!",
-              text: "You have checked in successfully.",
+              text: "You have checked in successfully. Attendance data has been updated.",
               icon: "success",
               timer: 1500,
               showConfirmButton: false,
@@ -356,6 +379,7 @@ export class HRDashboard implements AfterViewInit, OnInit, OnDestroy {
             }
           },
           complete: () => {
+            this.updateAttendanceStatsAndChart();
             this.cdr.detectChanges();
             this.spinner.hide();
           }
@@ -387,9 +411,10 @@ export class HRDashboard implements AfterViewInit, OnInit, OnDestroy {
         this.attendanceService.checkOut(attendance).subscribe({
           next: (resp) => {
             this.getAttendance();
+            this.refreshAttendanceData(); // Add this line to refresh attendance data
             Swal.fire({
               title: "Success!",
-              text: "You have checked out successfully.",
+              text: "You have checked out successfully. Attendance data has been updated.",
               icon: "success",
               timer: 1500,
               showConfirmButton: false,
@@ -435,6 +460,30 @@ export class HRDashboard implements AfterViewInit, OnInit, OnDestroy {
         });
       }
     );
+  }
+
+  // Add this new method to refresh attendance data
+  refreshAttendanceData() {
+    // Add a small delay to ensure backend has processed the check-in/check-out
+    setTimeout(() => {
+      this.subs.push(this.attendanceService.getAttendances().subscribe({
+        next: (attendances) => {
+          this.attendanceData = attendances;
+          this.attendanceLoaded = true;
+          this.updateAttendanceStatsAndChart();
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('Error refreshing attendance data:', err);
+          this.isRefreshingAttendance = false;
+        }
+      }));
+    }, 500); // 500ms delay to ensure backend processing
+  }
+
+  // Public method to manually refresh attendance data
+  public refreshAttendanceStats() {
+    this.refreshAttendanceData();
   }
 
   
