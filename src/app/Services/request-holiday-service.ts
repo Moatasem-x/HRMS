@@ -9,6 +9,7 @@ import { IHolidayType } from '../Interfaces/iholiday-type';
 })
 export class RequestHolidayService {
   private apiUrl = 'https://localhost:7124/api/leave';
+  private apiUrl2 = 'https://localhost:7124/api/LeaveType';
 
   constructor(private http: HttpClient) {}
 
@@ -26,5 +27,13 @@ export class RequestHolidayService {
 
   takeActionOnRequest(requestId: number, action: string): Observable<IRequestHoliday> {
     return this.http.put<IRequestHoliday>(`${this.apiUrl}/${requestId}?Status=${action}`, {});
+  }
+
+  addHolidayType(holidayType: IHolidayType): Observable<IHolidayType> {
+    return this.http.post<IHolidayType>(`${this.apiUrl2}`, holidayType);
+  }
+
+  deleteHolidayType(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl2}/${id}`);
   }
 }

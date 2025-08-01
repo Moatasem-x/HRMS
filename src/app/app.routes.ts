@@ -12,6 +12,7 @@ import { HRDashboard } from './Dashboards/hr-dashboard/hr-dashboard';
 import { HRForm } from './Pages/hr-form/hr-form';
 import { RequestHoliday } from './Pages/request-holiday/request-holiday';
 import { ManageHolidayRequests } from './Pages/manage-holiday-requests/manage-holiday-requests';
+import { HRHolidayRequest } from './Pages/hr-holiday-request/hr-holiday-request';
 import { Tasks } from './Pages/Tasks/tasks/tasks';
 import { Departments } from './Pages/Department/departments/departments';
 import { EmployeeTasks } from './Pages/Tasks/employee-tasks/employee-tasks';
@@ -32,6 +33,7 @@ export const routes: Routes = [
   {path: 'addhr', component: HRForm, canActivate: [adminGuard]},
   {path: 'requestholiday', component: RequestHoliday, canActivate: [employeeGuard]},
   {path: 'holidayrequests', component: ManageHolidayRequests, canActivate: [adminGuard]},
+  {path: 'hr-holiday-request', component: HRHolidayRequest, canActivate: [adminGuard]},
   {path: 'departments', component: Departments, canActivate: [adminGuard]},
   {path: 'managetasks', component: Tasks, canActivate: [adminGuard]},
   {path: 'mytasks', component: EmployeeTasks, canActivate: [employeeGuard]},

@@ -119,6 +119,21 @@ export class RequestHoliday implements OnInit {
             icon: "error"
           });
         }
+        else if (err.error.message == "You have took all allowed days of this leave this year"){
+          Swal.fire({
+            title: "Error!",
+            text: "You have exceeded your limit",
+            icon: "error"
+          });
+        }
+
+        else if (err.error.message.includes("You can only take")){
+          Swal.fire({
+            title: "Error!",
+            text: err.error.message,
+            icon: "error"
+          });
+        }
         else {
           Swal.fire({
             title: "Error!",

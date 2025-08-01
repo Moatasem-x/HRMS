@@ -1,5 +1,5 @@
 export interface IHolidayType {
-    id: number;
+    id?: number;
     name: string;
     maxDaysPerYear: number;
 }

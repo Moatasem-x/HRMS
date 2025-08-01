@@ -58,6 +58,10 @@
         <span class="sidebar-icon"><i class="bi bi-calendar-check"></i></span>
         <span class="sidebar-label-container" [@labelSlide]="isExpanded ? 'visible' : 'hidden'">Holiday Requests</span>
       </li>
+      <li routerLink="/hr-holiday-request" routerLinkActive="active">
+        <span class="sidebar-icon"><i class="bi bi-calendar-plus"></i></span>
+        <span class="sidebar-label-container" [@labelSlide]="isExpanded ? 'visible' : 'hidden'">Holiday Types</span>
+      </li>
       <li routerLink="/managetasks" routerLinkActive="active">
         <span class="sidebar-icon"><i class="bi bi-list-task"></i></span>
         <span class="sidebar-label-container" [@labelSlide]="isExpanded ? 'visible' : 'hidden'">Manage Tasks</span>
